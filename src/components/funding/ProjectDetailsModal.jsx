@@ -612,56 +612,6 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
           </Tabs>
         </ModalBody>
         
-        <ModalFooter 
-          borderTopWidth="1px" 
-          borderColor="rgba(255, 255, 255, 0.05)"
-          p={6}
-        >
-          <Button 
-            variant="outline" 
-            mr={3} 
-            onClick={onClose}
-            borderColor="rgba(255, 255, 255, 0.2)"
-            color="gray.300"
-            _hover={{
-              borderColor: "white",
-              color: "white"
-            }}
-          >
-            Close
-          </Button>
-          <Button 
-            as={Link}
-            to={`/donate?project=${project.id}`}
-            bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-            _hover={{
-              bgGradient: "linear(to-r, #00E0FF, #8A7CFB)",
-              opacity: 0.9,
-              transform: "translateY(-2px)",
-              boxShadow: "0 10px 20px rgba(0, 224, 255, 0.3)"
-            }}
-            color="white"
-            fontWeight="bold"
-            px={8}
-            py={6}
-            borderRadius="xl"
-            position="relative"
-            overflow="hidden"
-          >
-            {/* Animated glow effect on button */}
-            <Box 
-              position="absolute"
-              top="0"
-              left="-100%"
-              width="50%"
-              height="100%"
-              bg="linear-gradient(to right, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)"
-              animation="shine 1.5s infinite"
-              zIndex={0}
-            />
-            Support This Project
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

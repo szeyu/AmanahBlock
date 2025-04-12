@@ -246,6 +246,7 @@ const ProjectDetailsModal = ({ isOpen, onClose, selectedProject }) => {
           <Button 
             leftIcon={<FaEthereum />}
             variant="gradient"
+            onClick={() => window.location.href = '/donate'}
           >
             Donate Now
           </Button>
