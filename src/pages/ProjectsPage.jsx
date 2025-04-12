@@ -146,7 +146,7 @@ const ProjectsPage = () => {
             </Button>
             <Button 
               as="a"
-              // href="/donate"
+              href="/donate"
               variant="outline"
               borderColor="rgba(255, 255, 255, 0.2)"
               color="white"
