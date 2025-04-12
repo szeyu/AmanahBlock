@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Grid, Heading, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Table, Thead, Tbody, Tr, Th, Td, Badge, Button, Icon, Divider, HStack, Progress, VStack } from '@chakra-ui/react';
 import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import DonationFlow from '../components/DonationFlow';
 
 const Dashboard = () => {
   // Mock data for the dashboard
@@ -61,12 +62,10 @@ const Dashboard = () => {
         </Stat>
       </Grid>
       
-      {/* Donation Chart Placeholder */}
+      {/* Donation Chart */}
       <Box className="card" p={6} borderRadius="md" mb={8}>
-        <Heading size="md" mb={4} color="white">Your Donation History</Heading>
-        <Box h="300px" bg="rgba(11, 197, 234, 0.05)" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
-          <Text color="gray.400">Donation chart will be displayed here</Text>
-        </Box>
+        <Heading size="md" mb={4} color="white">Donation Flow</Heading>
+        <DonationFlow />
       </Box>
       
       {/* Recent Transactions */}
