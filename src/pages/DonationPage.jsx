@@ -39,7 +39,14 @@ import {
   Select,
   Tooltip,
   Icon,
-  useToast
+  useToast,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td, 
+  Input,
 } from '@chakra-ui/react';
 import { 
   FaWallet, 
@@ -52,7 +59,9 @@ import {
   FaRegCheckCircle,
   FaExchangeAlt,
   FaShieldAlt,
-  FaChartPie
+  FaChartPie,
+  FaRegFilePdf,
+  FaRegFileImage,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ShariahComplianceBadge from '../components/ShariahComplianceBadge';
@@ -66,6 +75,106 @@ const DonationPage = () => {
   const [showAllocation, setShowAllocation] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
+  const [donationMode, setDonationMode] = useState('money'); // 'money' or 'food'
+  const [selectedFoodItems, setSelectedFoodItems] = useState([]);
+  const [foodItems] = useState([
+    { id: 1, name: 'Rice (5kg bag)', price: 15, image: 'https://images.unsplash.com/photo-1586201375761-83865001e8ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 2, name: 'Cooking Oil (1L)', price: 8, image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 3, name: 'Flour (2kg)', price: 6, image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 4, name: 'Canned Beans (400g)', price: 3, image: 'https://images.unsplash.com/photo-1594489573800-a394ed9f549e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 5, name: 'Dates (500g)', price: 10, image: 'https://images.unsplash.com/photo-1593904252593-8d0fc780ae29?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 6, name: 'Milk Powder (900g)', price: 12, image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 7, name: 'Lentils (1kg)', price: 5, image: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 8, name: 'Tea (100 bags)', price: 7, image: 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+  ]);
+  
+  // Add new state for Waqf form
+  const [waqfRequests, setWaqfRequests] = useState([]);
+  const [waqfForm, setWaqfForm] = useState({
+    name: '',
+    assetType: '',
+    location: '',
+    purpose: ''
+  });
+
+  // Handle form input changes
+  const handleWaqfFormChange = (e) => {
+    const { name, value } = e.target;
+    setWaqfForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle Waqf request submission
+  const handleWaqfSubmit = (e) => {
+    e.preventDefault();
+    
+    // Add new request to the list with a unique ID
+    const newRequest = {
+      id: Date.now(),
+      ...waqfForm,
+      documents: uploadedFiles.length,
+      status: 'Pending Review',
+      submittedDate: new Date().toLocaleDateString()
+    };
+    
+    setWaqfRequests(prev => [...prev, newRequest]);
+    
+    // Reset form
+    setWaqfForm({
+      name: '',
+      assetType: '',
+      location: '',
+      purpose: ''
+    });
+    setUploadedFiles([]);
+    
+    // Show success toast
+    toast({
+      title: "Waqf request submitted",
+      description: "Our team will review your request and contact you soon.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "top-right",
+    });
+  };
+
+  // First, add a new state for file uploads
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
+  // Add a function to handle file uploads
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Validate file types
+    const validFiles = files.filter(file => {
+      const fileType = file.type;
+      return fileType === 'image/png' || 
+            fileType === 'image/jpeg' || 
+            fileType === 'application/pdf';
+    });
+    
+    if (validFiles.length !== files.length) {
+      toast({
+        title: "Invalid file type",
+        description: "Only PNG, JPEG, and PDF files are allowed",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    
+    // Add valid files to state
+    setUploadedFiles(prev => [...prev, ...validFiles]);
+  };
+
+  // Add a function to remove uploaded files
+  const handleRemoveFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   // Mock data for pool stats
   const poolStats = {
@@ -134,6 +243,45 @@ const DonationPage = () => {
     }, 2000);
   };
 
+  // Add a function to handle adding food items
+  const handleAddFoodItem = (item) => {
+    const existingItem = selectedFoodItems.find(i => i.id === item.id);
+    
+    if (existingItem) {
+      setSelectedFoodItems(
+        selectedFoodItems.map(i => 
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        )
+      );
+    } else {
+      setSelectedFoodItems([...selectedFoodItems, { ...item, quantity: 1 }]);
+    }
+  };
+
+  // Add a function to handle removing food items
+  const handleRemoveFoodItem = (itemId) => {
+    setSelectedFoodItems(selectedFoodItems.filter(item => item.id !== itemId));
+  };
+
+  // Add a function to update food item quantity
+  const handleUpdateFoodQuantity = (itemId, quantity) => {
+    if (quantity <= 0) {
+      handleRemoveFoodItem(itemId);
+      return;
+    }
+    
+    setSelectedFoodItems(
+      selectedFoodItems.map(item => 
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  // Calculate total food donation amount
+  const calculateFoodTotal = () => {
+    return selectedFoodItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
   // Show allocation details when general pool is selected
   useEffect(() => {
     if (selectedPool === 'general') {
@@ -179,6 +327,226 @@ const DonationPage = () => {
             <Text color="gray.300" mb={4}>
               Waqf is an endowment made by a Muslim to a religious, educational, or charitable cause. The donated assets are held and preserved for specific purposes indefinitely.
             </Text>
+            
+            {/* Waqf Donation Form */}
+            <Box 
+              bg="rgba(26, 32, 44, 0.7)"
+              backdropFilter="blur(10px)"
+              borderRadius="lg"
+              p={6}
+              borderWidth="1px"
+              borderColor="gray.700"
+              mb={8}
+            >
+              <Heading size="md" color="white" mb={4}>Waqf Asset Donation Request</Heading>
+              <Text color="gray.300" mb={6}>
+                Please provide details about the asset you wish to donate as Waqf. Our team will review your request and contact you to complete the process.
+              </Text>
+              
+              <form onSubmit={handleWaqfSubmit}>
+                <VStack spacing={4} align="stretch">
+                  <FormControl isRequired>
+                    <FormLabel color="gray.300">Full Name</FormLabel>
+                    <Input
+                      name="name"
+                      value={waqfForm.name}
+                      onChange={handleWaqfFormChange}
+                      bg="gray.800" 
+                      borderColor="gray.600"
+                      type="text"
+                    />
+                  </FormControl>
+                  
+                  <FormControl isRequired>
+                    <FormLabel color="gray.300">Asset Type</FormLabel>
+                    <Select 
+                      name="assetType"
+                      value={waqfForm.assetType}
+                      onChange={handleWaqfFormChange}
+                      bg="gray.800" 
+                      borderColor="gray.600"
+                      placeholder="Select asset type"
+                    >
+                      <option value="Land">Land</option>
+                      <option value="Building">Building</option>
+                      <option value="School">School</option>
+                      <option value="Hospital">Hospital</option>
+                      <option value="Farm">Farm</option>
+                      <option value="Business">Business</option>
+                      <option value="Other">Other</option>
+                    </Select>
+                  </FormControl>
+                  
+                  <FormControl isRequired>
+                    <FormLabel color="gray.300">Location</FormLabel>
+                    <Input
+                      name="location"
+                      value={waqfForm.location}
+                      onChange={handleWaqfFormChange}
+                      bg="gray.800" 
+                      borderColor="gray.600"
+                      type="text"
+                    />
+                  </FormControl>
+                  
+                  <FormControl isRequired>
+                    <FormLabel color="gray.300">Purpose</FormLabel>
+                    <Select 
+                      name="purpose"
+                      value={waqfForm.purpose}
+                      onChange={handleWaqfFormChange}
+                      bg="gray.800" 
+                      borderColor="gray.600"
+                      placeholder="Select intended purpose"
+                    >
+                      <option value="Education">Education</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Poverty Relief">Poverty Relief</option>
+                      <option value="Religious Services">Religious Services</option>
+                      <option value="Community Development">Community Development</option>
+                      <option value="Other">Other</option>
+                    </Select>
+                  </FormControl>
+
+                  {/* Add the new Ownership Documents upload box */}
+                  <FormControl mt={4}>
+                    <FormLabel color="gray.300">Ownership Documents</FormLabel>
+                    <Box
+                      border="2px dashed"
+                      borderColor="gray.600"
+                      borderRadius="md"
+                      p={4}
+                      bg="gray.800"
+                      mb={3}
+                    >
+                      <VStack spacing={2}>
+                        <Text color="gray.300" fontSize="sm" textAlign="center">
+                          Upload proof of ownership documents (PNG, JPEG, or PDF)
+                        </Text>
+                        <Button
+                          size="sm"
+                          colorScheme="brand"
+                          onClick={() => document.getElementById('file-upload').click()}
+                        >
+                          Select Files
+                        </Button>
+                        <Input
+                          id="file-upload"
+                          type="file"
+                          multiple
+                          accept=".png,.jpg,.jpeg,.pdf"
+                          onChange={handleFileUpload}
+                          display="none"
+                        />
+                      </VStack>
+                    </Box>
+                    
+                    {/* Display uploaded files */}
+                    {uploadedFiles.length > 0 && (
+                      <Box mt={3}>
+                        <Text color="gray.300" fontSize="sm" mb={2}>
+                          Uploaded Documents ({uploadedFiles.length})
+                        </Text>
+                        <VStack spacing={2} align="stretch">
+                          {uploadedFiles.map((file, index) => (
+                            <Flex
+                              key={index}
+                              bg="gray.700"
+                              p={2}
+                              borderRadius="md"
+                              justify="space-between"
+                              align="center"
+                            >
+                              <HStack>
+                                <Icon 
+                                  as={file.type.includes('pdf') ? FaRegFilePdf : FaRegFileImage} 
+                                  color={file.type.includes('pdf') ? "red.400" : "blue.400"} 
+                                />
+                                <Text color="white" fontSize="sm" noOfLines={1}>
+                                  {file.name}
+                                </Text>
+                                <Badge colorScheme="gray" fontSize="xs">
+                                  {(file.size / 1024).toFixed(0)} KB
+                                </Badge>
+                              </HStack>
+                              <Button
+                                size="xs"
+                                colorScheme="red"
+                                variant="ghost"
+                                onClick={() => handleRemoveFile(index)}
+                              >
+                                ✕
+                              </Button>
+                            </Flex>
+                          ))}
+                        </VStack>
+                      </Box>
+                    )}
+                    <Text color="gray.500" fontSize="xs" mt={2}>
+                      Please ensure all documents are clear and legible. Maximum file size: 5MB per file.
+                    </Text>
+                  </FormControl>
+                  
+                  <Button 
+                    type="submit"
+                    variant="gradient" 
+                    size="lg" 
+                    mt={4}
+                    colorScheme="green"
+                  >
+                    Submit Waqf Request
+                  </Button>
+                </VStack>
+              </form>
+            </Box>
+            
+            {/* Waqf Requests Table */}
+            {waqfRequests.length > 0 && (
+              <Box 
+                bg="rgba(26, 32, 44, 0.7)"
+                backdropFilter="blur(10px)"
+                borderRadius="lg"
+                p={6}
+                borderWidth="1px"
+                borderColor="gray.700"
+              >
+                <Heading size="md" color="white" mb={4}>Your Waqf Requests</Heading>
+                <Box overflowX="auto">
+                  <Table variant="simple" colorScheme="whiteAlpha">
+                    <Thead>
+                      <Tr>
+                        <Th color="gray.400">Asset Type</Th>
+                        <Th color="gray.400">Location</Th>
+                        <Th color="gray.400">Purpose</Th>
+                        <Th color="gray.400">Documents</Th>
+                        <Th color="gray.400">Status</Th>
+                        <Th color="gray.400">Submitted Date</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {waqfRequests.map(request => (
+                        <Tr key={request.id}>
+                          <Td color="white">{request.assetType}</Td>
+                          <Td color="white">{request.location}</Td>
+                          <Td color="white">{request.purpose}</Td>
+                          <Td color="white">
+                            {request.documents > 0 ? (
+                              <Badge colorScheme="blue">{request.documents} files</Badge>
+                            ) : (
+                              <Badge colorScheme="gray">None</Badge>
+                            )}
+                          </Td>
+                          <Td>
+                            <Badge colorScheme="yellow">{request.status}</Badge>
+                          </Td>
+                          <Td color="white">{request.submittedDate}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Box>
+              </Box>
+            )}
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -309,98 +677,254 @@ const DonationPage = () => {
       >
         <Heading size="md" color="white" mb={4}>Donation Amount</Heading>
         
-        <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap={8}>
-          <Box>
-            <FormControl mb={6}>
-              <FormLabel color="gray.300">Enter Amount</FormLabel>
-              <NumberInput 
-                value={donationAmount} 
-                onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
-                min={10}
-                max={1000000}
-              >
-                <NumberInputField bg="gray.800" borderColor="gray.600" />
-                <NumberInputStepper>
-                  <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
-                  <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
-                </NumberInputStepper>
-              </NumberInput>
-            </FormControl>
+        {/* Donation Mode Selector */}
+        <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')}>
+          <TabList>
+            <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Donate Money</Tab>
+            <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Donate Food</Tab>
+          </TabList>
+      
+          <TabPanels>
+            <TabPanel px={0}>
+              {/* Money Donation UI */}
+              <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap={8}>
+                <Box>
+                  <FormControl mb={6}>
+                    <FormLabel color="gray.300">Enter Amount</FormLabel>
+                    <NumberInput 
+                      value={donationAmount} 
+                      onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
+                      min={10}
+                      max={1000000}
+                    >
+                      <NumberInputField bg="gray.800" borderColor="gray.600" />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
+                        <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </FormControl>
+                  
+                  <FormControl mb={6}>
+                    <FormLabel color="gray.300">Currency</FormLabel>
+                    <RadioGroup value={currency} onChange={setCurrency}>
+                      <Stack direction="row" spacing={5}>
+                        <Radio value="USDT" colorScheme="green">USDT</Radio>
+                        <Radio value="ETH" colorScheme="purple">ETH</Radio>
+                        <Radio value="MYR" colorScheme="blue">MYR</Radio>
+                      </Stack>
+                    </RadioGroup>
+                  </FormControl>
+                  
+                  {currency === 'MYR' && (
+                    <Box p={4} bg="gray.800" borderRadius="md" mb={6}>
+                      <Flex align="center" mb={2}>
+                        <Box as={FaExchangeAlt} color="brand.500" mr={2} />
+                        <Text color="white" fontWeight="medium">P2P Exchange</Text>
+                      </Flex>
+                      <Text color="gray.300" fontSize="sm" mb={2}>
+                        Your MYR donation will be converted to USDT through our Shariah-compliant P2P exchange to avoid Riba (interest).
+                      </Text>
+                      <HStack justify="space-between">
+                        <Text color="gray.400" fontSize="sm">Exchange Rate:</Text>
+                        <Text color="white" fontSize="sm">1 USDT = 4.65 MYR</Text>
+                      </HStack>
+                      <HStack justify="space-between">
+                        <Text color="gray.400" fontSize="sm">You're donating:</Text>
+                        <Text color="white" fontSize="sm">{donationAmount} MYR ≈ {(donationAmount / 4.65).toFixed(2)} USDT</Text>
+                      </HStack>
+                    </Box>
+                  )}
+                  
+                  <Button 
+                    variant="gradient" 
+                    size="lg" 
+                    w="full"
+                    leftIcon={<FaWallet />}
+                    onClick={onOpen}
+                  >
+                    Donate Now
+                  </Button>
+                </Box>
+                
+                <VStack spacing={4} align="stretch">
+                  <Box p={4} bg="gray.800" borderRadius="md">
+                    <Flex align="center" mb={2}>
+                      <Box as={FaShieldAlt} color="green.500" mr={2} />
+                      <Text color="white" fontWeight="medium">Shariah Compliant</Text>
+                    </Flex>
+                    <Text color="gray.300" fontSize="sm">
+                      All donations are handled according to Islamic principles, avoiding Riba (interest) and ensuring ethical fund management.
+                    </Text>
+                  </Box>
+                  
+                  <Box p={4} bg="gray.800" borderRadius="md">
+                    <Flex align="center" mb={2}>
+                      <Box as={FaRegCheckCircle} color="brand.500" mr={2} />
+                      <Text color="white" fontWeight="medium">100% Transparency</Text>
+                    </Flex>
+                    <Text color="gray.300" fontSize="sm">
+                      Every donation is recorded on the blockchain, allowing you to track exactly how your funds are used.
+                    </Text>
+                  </Box>
+                  
+                  <Box p={4} bg="gray.800" borderRadius="md">
+                    <Flex align="center" mb={2}>
+                      <Box as={FaRegLightbulb} color="yellow.500" mr={2} />
+                      <Text color="white" fontWeight="medium">AI-Powered Allocation</Text>
+                    </Flex>
+                    <Text color="gray.300" fontSize="sm">
+                      Our AI system analyzes needs across all pools to ensure optimal distribution of general pool funds.
+                    </Text>
+                  </Box>
+                </VStack>
+              </Grid>
+            </TabPanel>
             
-            <FormControl mb={6}>
-              <FormLabel color="gray.300">Currency</FormLabel>
-              <RadioGroup value={currency} onChange={setCurrency}>
-                <Stack direction="row" spacing={5}>
-                  <Radio value="USDT" colorScheme="green">USDT</Radio>
-                  <Radio value="ETH" colorScheme="purple">ETH</Radio>
-                  <Radio value="MYR" colorScheme="blue">MYR</Radio>
-                </Stack>
-              </RadioGroup>
-            </FormControl>
-            
-            {currency === 'MYR' && (
-              <Box p={4} bg="gray.800" borderRadius="md" mb={6}>
-                <Flex align="center" mb={2}>
-                  <Box as={FaExchangeAlt} color="brand.500" mr={2} />
-                  <Text color="white" fontWeight="medium">P2P Exchange</Text>
-                </Flex>
-                <Text color="gray.300" fontSize="sm" mb={2}>
-                  Your MYR donation will be converted to USDT through our Shariah-compliant P2P exchange to avoid Riba (interest).
-                </Text>
-                <HStack justify="space-between">
-                  <Text color="gray.400" fontSize="sm">Exchange Rate:</Text>
-                  <Text color="white" fontSize="sm">1 USDT = 4.65 MYR</Text>
-                </HStack>
-                <HStack justify="space-between">
-                  <Text color="gray.400" fontSize="sm">You're donating:</Text>
-                  <Text color="white" fontSize="sm">{donationAmount} MYR ≈ {(donationAmount / 4.65).toFixed(2)} USDT</Text>
-                </HStack>
-              </Box>
-            )}
-            
-            <Button 
-              variant="gradient" 
-              size="lg" 
-              w="full"
-              leftIcon={<FaWallet />}
-              onClick={onOpen}
-            >
-              Donate Now
-            </Button>
-          </Box>
-          
-          <VStack spacing={4} align="stretch">
-            <Box p={4} bg="gray.800" borderRadius="md">
-              <Flex align="center" mb={2}>
-                <Box as={FaShieldAlt} color="green.500" mr={2} />
-                <Text color="white" fontWeight="medium">Shariah Compliant</Text>
-              </Flex>
-              <Text color="gray.300" fontSize="sm">
-                All donations are handled according to Islamic principles, avoiding Riba (interest) and ensuring ethical fund management.
+            <TabPanel px={0}>
+              {/* Food Donation UI */}
+              <Text color="gray.300" mb={4}>
+                Select food items to donate. These will be purchased and distributed to those in need through our partner organizations.
               </Text>
-            </Box>
-            
-            <Box p={4} bg="gray.800" borderRadius="md">
-              <Flex align="center" mb={2}>
-                <Box as={FaRegCheckCircle} color="brand.500" mr={2} />
-                <Text color="white" fontWeight="medium">100% Transparency</Text>
-              </Flex>
-              <Text color="gray.300" fontSize="sm">
-                Every donation is recorded on the blockchain, allowing you to track exactly how your funds are used.
-              </Text>
-            </Box>
-            
-            <Box p={4} bg="gray.800" borderRadius="md">
-              <Flex align="center" mb={2}>
-                <Box as={FaRegLightbulb} color="yellow.500" mr={2} />
-                <Text color="white" fontWeight="medium">AI-Powered Allocation</Text>
-              </Flex>
-              <Text color="gray.300" fontSize="sm">
-                Our AI system analyzes needs across all pools to ensure optimal distribution of general pool funds.
-              </Text>
-            </Box>
-          </VStack>
-        </Grid>
+              
+              {/* Food Items Grid */}
+              <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={4} mb={6}>
+                {foodItems.map(item => (
+                  <Box 
+                    key={item.id}
+                    bg="gray.800"
+                    borderRadius="lg"
+                    overflow="hidden"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <Image 
+                      src={item.image} 
+                      alt={item.name}
+                      h="120px"
+                      w="100%"
+                      objectFit="cover"
+                    />
+                    <Box p={3}>
+                      <Heading size="sm" color="white" mb={1}>{item.name}</Heading>
+                      <Text color="brand.500" fontWeight="bold" mb={3}>${item.price.toFixed(2)}</Text>
+                      
+                      {selectedFoodItems.find(i => i.id === item.id) ? (
+                        <Flex align="center" justify="space-between">
+                          <NumberInput 
+                            size="sm" 
+                            maxW="100px" 
+                            min={0} 
+                            value={selectedFoodItems.find(i => i.id === item.id).quantity}
+                            onChange={(valueString) => handleUpdateFoodQuantity(item.id, parseInt(valueString))}
+                          >
+                            <NumberInputField bg="gray.700" borderColor="gray.600" />
+                            <NumberInputStepper>
+                              <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
+                              <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
+                            </NumberInputStepper>
+                          </NumberInput>
+                          <Text color="white" fontWeight="bold">
+                            ${(item.price * selectedFoodItems.find(i => i.id === item.id).quantity).toFixed(2)}
+                          </Text>
+                        </Flex>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          colorScheme="brand" 
+                          variant="outline" 
+                          w="full"
+                          onClick={() => handleAddFoodItem(item)}
+                        >
+                          Add to Donation
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
+                ))}
+              </Grid>
+              
+              {/* Selected Food Items Summary */}
+              {selectedFoodItems.length > 0 && (
+                <Box 
+                  bg="gray.800" 
+                  borderRadius="lg" 
+                  p={4} 
+                  mb={6}
+                  borderWidth="1px"
+                  borderColor="gray.700"
+                >
+                  <Heading size="sm" color="white" mb={4}>Your Food Donation</Heading>
+                  
+                  <VStack spacing={3} align="stretch" mb={4}>
+                    {selectedFoodItems.map(item => (
+                      <Flex key={item.id} justify="space-between" align="center">
+                        <HStack>
+                          <Text color="white">{item.name}</Text>
+                          <Badge colorScheme="brand">x{item.quantity}</Badge>
+                        </HStack>
+                        <HStack>
+                          <Text color="white">${(item.price * item.quantity).toFixed(2)}</Text>
+                          <Button 
+                            size="xs" 
+                            colorScheme="red" 
+                            variant="ghost"
+                            onClick={() => handleRemoveFoodItem(item.id)}
+                          >
+                            ✕
+                          </Button>
+                        </HStack>
+                      </Flex>
+                    ))}
+                  </VStack>
+                  
+                  <Divider borderColor="gray.700" mb={4} />
+                  
+                  <Flex justify="space-between" align="center" mb={6}>
+                    <Text color="white" fontWeight="bold">Total Food Donation</Text>
+                    <Text color="brand.500" fontWeight="bold" fontSize="xl">${calculateFoodTotal().toFixed(2)}</Text>
+                  </Flex>
+                  
+                  <Button 
+                    variant="gradient" 
+                    size="lg" 
+                    w="full"
+                    leftIcon={<FaWallet />}
+                    onClick={() => {
+                      setDonationAmount(calculateFoodTotal());
+                      onOpen();
+                    }}
+                  >
+                    Donate Food Items
+                  </Button>
+                </Box>
+              )}
+              
+              {selectedFoodItems.length === 0 && (
+                <Box 
+                  bg="gray.800" 
+                  borderRadius="lg" 
+                  p={4} 
+                  mb={6}
+                  borderWidth="1px"
+                  borderColor="gray.700"
+                  textAlign="center"
+                >
+                  <Text color="gray.400" mb={2}>No food items selected yet</Text>
+                  <Text color="gray.300" fontSize="sm">
+                    Select food items above to create your donation package
+                  </Text>
+                </Box>
+              )}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Box>
       
       {/* Donation Confirmation Modal */}
@@ -466,4 +990,4 @@ const DonationPage = () => {
   );
 };
 
-export default DonationPage; 
+export default DonationPage;

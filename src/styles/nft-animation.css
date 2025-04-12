@@ -1,0 +1,45 @@
+/* NFT Card animations */
+.nft-card {
+    transform: translateZ(0); /* Hardware acceleration */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.3s ease;
+    will-change: transform, box-shadow; /* Optimize for animations */
+}
+  
+.nft-card:hover {
+    transform: translateY(-5px) rotateY(5deg);
+    box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+}
+  
+.nft-animation {
+    transform: translateZ(0); /* Hardware acceleration */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform; /* Optimize for animations */
+}
+  
+.nft-animation:hover {
+    transform: scale(1.02) rotateY(5deg);
+    box-shadow: 0 15px 30px rgba(138, 43, 226, 0.4);
+}
+  
+/* Modal animations */
+.modal-content {
+    transform: translateZ(0); /* Hardware acceleration */
+    will-change: transform, opacity;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+  
+/* Chakra UI modal animations override */
+.chakra-modal__content-container {
+    will-change: opacity, transform;
+}
+  
+.chakra-modal__overlay {
+    backdrop-filter: blur(10px);
+    transition: backdrop-filter 0.3s ease, background-color 0.3s ease !important;
+}
+  
+/* Optimize animation performance */
+* {
+    backface-visibility: hidden;
+}
