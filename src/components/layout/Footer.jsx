@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Flex, Text, Link, VStack, HStack, Icon, Divider } from '@chakra-ui/react';
+import { Box, Container, Flex, Text, Link, VStack, HStack, Icon, Divider, Image } from '@chakra-ui/react';
 import { FaTwitter, FaDiscord, FaGithub, FaTelegram } from 'react-icons/fa';
 
 const Footer = () => {
@@ -10,7 +10,9 @@ const Footer = () => {
           {/* Logo and Description */}
           <VStack align={{ base: 'center', md: 'flex-start' }} mb={{ base: 6, md: 0 }}>
             <Flex align="center" mb={2}>
-              <Box w="30px" h="30px" bg="accent.500" borderRadius="full" mr={2} />
+              <Box w="50px" h="50px" borderRadius="full" mr={2}>
+                <Image src={"/Amanah Block Logo.png"} alt="Logo" boxSize="50px" />
+              </Box>
               <Box fontWeight="bold" fontSize="lg" bgGradient="linear(to-r, brand.500, accent.500)" bgClip="text">
                 AmanahBlock
               </Box>
