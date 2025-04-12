@@ -40,7 +40,8 @@ import {
   AccordionPanel,
   AccordionIcon,
   Tooltip,
-  SimpleGrid
+  SimpleGrid,
+  Select
 } from '@chakra-ui/react';
 import { 
   FaMapMarkerAlt, 
@@ -61,6 +62,7 @@ import {
 import { Link } from 'react-router-dom';
 import ShariahComplianceBadge from '../components/ShariahComplianceBadge';
 import BlockchainVerification from '../components/BlockchainVerification';
+import MilestoneTimeline from '../components/VerticalTimeline';
 
 const ProjectFundingPage = () => {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -232,14 +234,115 @@ const ProjectFundingPage = () => {
     }
   };
   
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('progress');
+  
+  const categories = ['all', 'Education', 'Disaster Relief'];
+  
+  // Filter and sort projects based on selected criteria
+  const filteredProjects = projects
+    .filter(project => {
+      // Category filter
+      if (categoryFilter !== 'all' && project.category !== categoryFilter) {
+        return false;
+      }
+      
+      // Status filter
+      if (statusFilter !== 'all' && project.status !== statusFilter) {
+        return false;
+      }
+      
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by selected criteria
+      switch(sortBy) {
+        case 'progress':
+          return b.progress - a.progress;
+        case 'deadline':
+          // Extract days from deadline string (e.g., "30 days left" -> 30)
+          const aDays = parseInt(a.endDate.split('-')[2]);
+          const bDays = parseInt(b.endDate.split('-')[2]);
+          return aDays - bDays;
+        case 'donors':
+          return b.partners.length - a.partners.length;
+        case 'amount':
+          return b.raisedAmount - a.raisedAmount;
+        default:
+          return 0;
+      }
+    });
+  
   return (
     <Box p={5} maxW="container.xl" mx="auto">
       <Heading mb={2} color="white" size="xl">Project Funding</Heading>
       <Text color="gray.400" mb={6}>Track the progress of funded projects with milestone-based verification</Text>
       
+      {/* Filters */}
+      <Box 
+        bg="rgba(26, 32, 44, 0.7)"
+        backdropFilter="blur(10px)"
+        borderRadius="lg"
+        p={4}
+        mb={6}
+        borderWidth="1px"
+        borderColor="gray.700"
+      >
+        <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={4}>
+          <Select 
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            bg="gray.800"
+            borderColor="gray.600"
+            color="white"
+            _hover={{ borderColor: "brand.500" }}
+            _focus={{ borderColor: "brand.500" }}
+          >
+            {categories.map(category => (
+              <option key={category} value={category} style={{ backgroundColor: "#1A202C", color: "white" }}>
+                {category === 'all' ? 'All Categories' : category}
+              </option>
+            ))}
+          </Select>
+          
+          <Select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            bg="gray.800"
+            borderColor="gray.600"
+            color="white"
+            _hover={{ borderColor: "brand.500" }}
+            _focus={{ borderColor: "brand.500" }}
+          >
+            <option value="all" style={{ backgroundColor: "#1A202C", color: "white" }}>All Statuses</option>
+            <option value="In Progress" style={{ backgroundColor: "#1A202C", color: "white" }}>In Progress</option>
+            <option value="Completed" style={{ backgroundColor: "#1A202C", color: "white" }}>Completed</option>
+            <option value="Pending" style={{ backgroundColor: "#1A202C", color: "white" }}>Pending</option>
+            <option value="Delayed" style={{ backgroundColor: "#1A202C", color: "white" }}>Delayed</option>
+            <option value="Failed" style={{ backgroundColor: "#1A202C", color: "white" }}>Failed</option>
+          </Select>
+          
+          <Select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            bg="gray.800"
+            borderColor="gray.600"
+            color="white"
+            _hover={{ borderColor: "brand.500" }}
+            _focus={{ borderColor: "brand.500" }}
+          >
+            <option value="progress" style={{ backgroundColor: "#1A202C", color: "white" }}>Sort by Progress</option>
+            <option value="deadline" style={{ backgroundColor: "#1A202C", color: "white" }}>Sort by Deadline</option>
+            <option value="donors" style={{ backgroundColor: "#1A202C", color: "white" }}>Sort by Donors</option>
+            <option value="amount" style={{ backgroundColor: "#1A202C", color: "white" }}>Sort by Amount</option>
+          </Select>
+        </Grid>
+      </Box>
+      
       {/* Project Cards */}
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6} mb={10}>
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <Box 
             key={project.id}
             bg="rgba(26, 32, 44, 0.7)"
@@ -373,9 +476,34 @@ const ProjectFundingPage = () => {
       
       {/* Milestone Tracking Modal */}
       {selectedProject && (
-        <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
+        <Modal isOpen={isOpen} onClose={onClose} size="4xl" scrollBehavior="inside">
           <ModalOverlay backdropFilter="blur(10px)" />
-          <ModalContent bg="gray.800" color="white">
+          <ModalContent 
+            bg="gray.800" 
+            color="white"
+            sx={{
+              '& .chakra-modal__body': {
+                maxHeight: '70vh',
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(66, 153, 225, 0.5) rgba(45, 55, 72, 0.3)',
+                '&::-webkit-scrollbar': {
+                  width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: 'rgba(45, 55, 72, 0.3)',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: 'rgba(66, 153, 225, 0.5)',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    background: 'rgba(66, 153, 225, 0.7)',
+                  },
+                },
+              },
+            }}
+          >
             <ModalHeader borderBottomWidth="1px" borderColor="gray.700">
               <Heading size="md">{selectedProject.title} - Milestones</Heading>
             </ModalHeader>
@@ -429,123 +557,7 @@ const ProjectFundingPage = () => {
                 
                 <Heading size="sm" mb={2}>Milestone Tracking</Heading>
                 
-                <Accordion allowMultiple defaultIndex={[0]}>
-                  {selectedProject.milestones.map((milestone, index) => (
-                    <AccordionItem 
-                      key={milestone.id} 
-                      borderColor="gray.700"
-                      bg={milestone.status === "Completed" ? "rgba(72, 187, 120, 0.1)" : 
-                         milestone.status === "In Progress" ? "rgba(66, 153, 225, 0.1)" : "transparent"}
-                    >
-                      <h2>
-                        <AccordionButton py={4}>
-                          <Box flex="1" textAlign="left">
-                            <Flex justify="space-between" align="center">
-                              <HStack>
-                                <Badge 
-                                  colorScheme={getStatusColor(milestone.status)} 
-                                  borderRadius="full"
-                                >
-                                  {index + 1}
-                                </Badge>
-                                <Text fontWeight="medium" color="white">{milestone.title}</Text>
-                              </HStack>
-                              <Badge colorScheme={getStatusColor(milestone.status)}>
-                                {milestone.status}
-                              </Badge>
-                            </Flex>
-                          </Box>
-                          <AccordionIcon />
-                        </AccordionButton>
-                      </h2>
-                      <AccordionPanel pb={4}>
-                        <VStack align="stretch" spacing={4}>
-                          <Text color="gray.300">{milestone.description}</Text>
-                          
-                          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                            <Box>
-                              <Text color="gray.400" fontSize="sm">Funding Amount</Text>
-                              <Text color="white" fontWeight="bold">${milestone.amount.toLocaleString()}</Text>
-                            </Box>
-                            {milestone.completionDate && (
-                              <Box>
-                                <Text color="gray.400" fontSize="sm">Completion Date</Text>
-                                <Text color="white">{new Date(milestone.completionDate).toLocaleDateString()}</Text>
-                              </Box>
-                            )}
-                          </SimpleGrid>
-                          
-                          {milestone.status === "Completed" && (
-                            <>
-                              <Divider borderColor="gray.700" />
-                              
-                              <Heading size="xs" color="gray.300" mb={2}>Verification Evidence</Heading>
-                              
-                              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                                {milestone.evidence.map((item, i) => (
-                                  <Box 
-                                    key={i} 
-                                    p={3} 
-                                    bg="gray.700" 
-                                    borderRadius="md"
-                                    borderLeftWidth="3px"
-                                    borderLeftColor={item.type === "image" ? "brand.500" : "accent.500"}
-                                  >
-                                    <Flex align="center">
-                                      <Icon 
-                                        as={item.type === "image" ? FaCamera : FaFileAlt} 
-                                        color={item.type === "image" ? "brand.500" : "accent.500"}
-                                        mr={2}
-                                      />
-                                      <Text color="white" fontSize="sm">{item.title}</Text>
-                                    </Flex>
-                                  </Box>
-                                ))}
-                              </SimpleGrid>
-                              
-                              <Box p={4} bg="gray.700" borderRadius="md">
-                                <Flex align="center" mb={2}>
-                                  <Icon as={FaEthereum} color="brand.500" mr={2} />
-                                  <Text color="white" fontWeight="medium">Blockchain Verification</Text>
-                                </Flex>
-                                <Text color="gray.300" fontSize="sm" mb={2}>
-                                  This milestone has been verified on the blockchain, ensuring transparency and immutability.
-                                </Text>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  colorScheme="brand"
-                                  as={Link}
-                                  to={`/audit-trail/tx/${milestone.verificationHash}`}
-                                >
-                                  View Transaction
-                                </Button>
-                              </Box>
-                            </>
-                          )}
-                          
-                          {milestone.status === "In Progress" && (
-                            <Box p={4} bg="blue.900" borderRadius="md" opacity={0.8}>
-                              <Flex align="center">
-                                <Icon as={FaRegClock} color="blue.300" mr={2} />
-                                <Text color="blue.100">This milestone is currently in progress. Verification will be available upon completion.</Text>
-                              </Flex>
-                            </Box>
-                          )}
-                          
-                          {milestone.status === "Pending" && (
-                            <Box p={4} bg="gray.700" borderRadius="md" opacity={0.8}>
-                              <Flex align="center">
-                                <Icon as={FaRegTimesCircle} color="gray.400" mr={2} />
-                                <Text color="gray.300">This milestone is pending and will begin once previous milestones are completed.</Text>
-                              </Flex>
-                            </Box>
-                          )}
-                        </VStack>
-                      </AccordionPanel>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <MilestoneTimeline milestones={selectedProject.milestones} />
                 
                 <Divider borderColor="gray.700" />
                 
