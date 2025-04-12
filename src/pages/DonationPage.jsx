@@ -47,6 +47,7 @@ import {
   Th,
   Td, 
   Input,
+  Center,
 } from '@chakra-ui/react';
 import { 
   FaWallet, 
@@ -68,8 +69,10 @@ import {
   FaMoneyBillWave,
   FaBitcoin,
   FaClock,
+  FaQrcode,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import ShariahComplianceBadge from '../components/ShariahComplianceBadge';
 import AIDonationAdvisor from '../components/AIDonationAdvisor';
 
@@ -81,6 +84,7 @@ const DonationPage = () => {
   const [showAllocation, setShowAllocation] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isQRCodeOpen, onOpen: onQRCodeOpen, onClose: onQRCodeClose } = useDisclosure();
   const toast = useToast();
 
   const [donationMode, setDonationMode] = useState('money'); // 'money' or 'food'
@@ -297,6 +301,13 @@ const DonationPage = () => {
       setShowAllocation(false);
     }
   }, [selectedPool]);
+
+  const handlePaymentMethodSelect = (method) => {
+    setPaymentMethod(method);
+    if (method === 'ewallet') {
+      onQRCodeOpen();
+    }
+  };
 
   return (
     <Box p={5} maxW="container.xl" mx="auto">
@@ -722,7 +733,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'card' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('card')}
+                    onClick={() => handlePaymentMethodSelect('card')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -744,7 +755,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'banking' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('banking')}
+                    onClick={() => handlePaymentMethodSelect('banking')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -766,7 +777,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'ewallet' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('ewallet')}
+                    onClick={() => handlePaymentMethodSelect('ewallet')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -788,7 +799,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'cash' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('cash')}
+                    onClick={() => handlePaymentMethodSelect('cash')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -810,7 +821,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'crypto' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('crypto')}
+                    onClick={() => handlePaymentMethodSelect('crypto')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -832,7 +843,7 @@ const DonationPage = () => {
                     borderColor={paymentMethod === 'bnpl' ? "brand.500" : "gray.700"}
                     borderRadius="lg"
                     cursor="pointer"
-                    onClick={() => setPaymentMethod('bnpl')}
+                    onClick={() => handlePaymentMethodSelect('bnpl')}
                     transition="all 0.3s"
                     _hover={{
                       borderColor: "brand.500",
@@ -982,7 +993,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'card' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('card')}
+                        onClick={() => handlePaymentMethodSelect('card')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1004,7 +1015,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'banking' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('banking')}
+                        onClick={() => handlePaymentMethodSelect('banking')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1026,7 +1037,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'ewallet' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('ewallet')}
+                        onClick={() => handlePaymentMethodSelect('ewallet')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1048,7 +1059,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'cash' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('cash')}
+                        onClick={() => handlePaymentMethodSelect('cash')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1070,7 +1081,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'crypto' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('crypto')}
+                        onClick={() => handlePaymentMethodSelect('crypto')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1092,7 +1103,7 @@ const DonationPage = () => {
                         borderColor={paymentMethod === 'bnpl' ? "brand.500" : "gray.700"}
                         borderRadius="lg"
                         cursor="pointer"
-                        onClick={() => setPaymentMethod('bnpl')}
+                        onClick={() => handlePaymentMethodSelect('bnpl')}
                         transition="all 0.3s"
                         _hover={{
                           borderColor: "brand.500",
@@ -1200,6 +1211,61 @@ const DonationPage = () => {
               onClick={handleDonate}
             >
               Confirm Donation
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* E-Wallet QR Code Modal */}
+      <Modal isOpen={isQRCodeOpen} onClose={onQRCodeClose} size="md">
+        <ModalOverlay backdropFilter="blur(10px)" />
+        <ModalContent bg="gray.800" color="white">
+          <ModalHeader borderBottomWidth="1px" borderColor="gray.700">
+            <HStack spacing={3}>
+              <Icon as={FaQrcode} color="brand.500" />
+              <Text>Scan QR Code to Pay</Text>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody py={6}>
+            <VStack spacing={6}>
+              <Box 
+                p={4} 
+                bg="white" 
+                borderRadius="lg"
+                boxShadow="0 0 20px rgba(11, 197, 234, 0.2)"
+              >
+                <QRCodeSVG 
+                  value={`donation:${donationAmount}${currency}:${selectedPool}:${donationType}`}
+                  size={200}
+                  level="H"
+                  includeMargin={true}
+                />
+              </Box>
+              <VStack spacing={2}>
+                <Text color="gray.300">Amount to Pay</Text>
+                <Text fontSize="2xl" fontWeight="bold" color="brand.500">
+                  {donationAmount} {currency}
+                </Text>
+              </VStack>
+              <Text color="gray.400" fontSize="sm" textAlign="center">
+                Scan this QR code with your e-wallet app to complete the payment
+              </Text>
+            </VStack>
+          </ModalBody>
+          <ModalFooter borderTopWidth="1px" borderColor="gray.700">
+            <Button variant="outline" mr={3} onClick={onQRCodeClose}>
+              Close
+            </Button>
+            <Button 
+              variant="gradient" 
+              leftIcon={<FaWallet />}
+              onClick={() => {
+                onQRCodeClose();
+                onOpen();
+              }}
+            >
+              Proceed to Confirmation
             </Button>
           </ModalFooter>
         </ModalContent>
