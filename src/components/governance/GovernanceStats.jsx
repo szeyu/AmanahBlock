@@ -81,35 +81,41 @@ const StatCard = ({ label, value, helpText, icon, index }) => {
         position="relative"
         overflow="hidden"
         transition="all 0.3s ease"
+        height="180px"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
         _hover={{
           borderColor: "#00E0FF",
         }}
       >
-        <Flex align="center" mb={3}>
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            bg="rgba(0, 224, 255, 0.1)"
-            color="#00E0FF"
-            borderRadius="full"
-            p={2}
-            mr={3}
-            w="36px"
-            h="36px"
+        <Box>
+          <Flex align="center" mb={3}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              bg="rgba(0, 224, 255, 0.1)"
+              color="#00E0FF"
+              borderRadius="full"
+              p={2}
+              mr={3}
+              w="36px"
+              h="36px"
+            >
+              <Icon as={icon} w={5} h={5} />
+            </Box>
+            <StatLabel color="gray.300" fontSize="md" fontWeight="medium">{label}</StatLabel>
+          </Flex>
+          
+          <StatNumber 
+            color="white" 
+            fontSize="2xl" 
+            fontWeight="bold"
           >
-            <Icon as={icon} w={5} h={5} />
-          </Box>
-          <StatLabel color="gray.300" fontSize="md" fontWeight="medium">{label}</StatLabel>
-        </Flex>
-        
-        <StatNumber 
-          color="white" 
-          fontSize="2xl" 
-          fontWeight="bold"
-        >
-          {value}
-        </StatNumber>
+            {value}
+          </StatNumber>
+        </Box>
         
         <StatHelpText 
           color="#00E0FF" 

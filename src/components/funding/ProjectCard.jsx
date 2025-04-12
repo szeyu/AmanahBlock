@@ -110,6 +110,16 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
           right={0} 
           bottom={0} 
           bg="linear-gradient(to top, rgba(13, 16, 31, 1) 0%, rgba(13, 16, 31, 0.7) 50%, rgba(13, 16, 31, 0.3) 100%)"
+          // change the size of the gradient overlay to match the enlarged image
+          width="100%"
+          height="100%"
+          transition="all 0.5s"
+          transform={isHovered ? "scale(1.05)" : "scale(1)"}
+          // change the opacity of the gradient overlay to match the enlarged image
+          opacity={isHovered ? 0.9 : 0.6}
+          // change the position of the gradient overlay to match the enlarged image
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         />
         
         {/* Shariah Compliance Badge */}
