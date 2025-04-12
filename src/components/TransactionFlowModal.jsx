@@ -147,8 +147,9 @@ const TransactionFlow = ({ transaction }) => {
     
     // Calculate investment and profit amounts
     const amount = transaction?.amount ? parseFloat(transaction.amount.split(' ')[0]) : 0;
-    const investmentAmount = amount.toFixed(2);
-    const profitAmount = (amount * 0.05).toFixed(2); // Assuming 5% profit for demonstration
+    const investmentAmount = (amount * 0.9).toFixed(2); // 90% to investment
+    const emergencyAmount = (amount * 0.1).toFixed(2); // 10% to emergency fund
+    const profitAmount = (amount * 0.9 * 0.05).toFixed(2); // 5% profit from investment
     
     // Common nodes
     nodes.push({
@@ -232,6 +233,22 @@ const TransactionFlow = ({ transaction }) => {
     });
     
     nodes.push({
+      id: 'emergencyFund',
+      type: 'transaction',
+      data: { 
+        label: 'Emergency Fund',
+        icon: <FaUserShield />,
+        isHighlighted: true,
+      },
+      position: { x: 1250, y: 100 },
+      style: { 
+        background: '#1A202C', 
+        color: '#E2E8F0', 
+        border: '2px solid #3182CE',
+      },
+    });
+    
+    nodes.push({
       id: 'waqfFund',
       type: 'transaction',
       data: { 
@@ -249,23 +266,6 @@ const TransactionFlow = ({ transaction }) => {
     });
     
     nodes.push({
-      id: 'emergencyFund',
-      type: 'transaction',
-      data: { 
-        label: 'Emergency Fund',
-        icon: <FaUserShield />,
-        isHighlighted: transaction?.type === 'Zakat',
-      },
-      position: { x: 1550, y: 200 },
-      style: { 
-        background: '#1A202C', 
-        color: '#E2E8F0', 
-        border: transaction?.type === 'Zakat' ? '2px solid #3182CE' : '1px solid #4A5568',
-        opacity: transaction?.type === 'Zakat' ? 1 : 0.6,
-      },
-    });
-    
-    nodes.push({
       id: 'schoolBuildingPool',
       type: 'transaction',
       data: { 
@@ -273,7 +273,7 @@ const TransactionFlow = ({ transaction }) => {
         icon: <FaSchool />,
         isHighlighted: transaction?.type === 'Sadaqah',
       },
-      position: { x: 1550, y: 300 },
+      position: { x: 1550, y: 200 },
       style: { 
         background: '#1A202C', 
         color: '#E2E8F0', 
@@ -290,7 +290,7 @@ const TransactionFlow = ({ transaction }) => {
         icon: <FaUtensils />,
         isHighlighted: false,
       },
-      position: { x: 1550, y: 400 },
+      position: { x: 1550, y: 300 },
       style: { 
         background: '#1A202C', 
         color: '#E2E8F0', 
@@ -307,7 +307,7 @@ const TransactionFlow = ({ transaction }) => {
         icon: <FaWater />,
         isHighlighted: false,
       },
-      position: { x: 1550, y: 500 },
+      position: { x: 1550, y: 400 },
       style: { 
         background: '#1A202C', 
         color: '#E2E8F0', 
@@ -347,7 +347,7 @@ const TransactionFlow = ({ transaction }) => {
       style: { stroke: '#3182CE', strokeWidth: 2 },
     });
     
-    // Charity Pool invests in Investment Pool
+    // Charity Pool splits to Investment Pool (90%) and Emergency Fund (10%)
     edges.push({
       id: 'e4-5',
       source: 'charityPool',
@@ -358,9 +358,20 @@ const TransactionFlow = ({ transaction }) => {
       style: { stroke: '#3182CE', strokeWidth: 2 },
     });
     
-    // Investment Pool generates profit that flows to destination pools
     edges.push({
-      id: 'e5-6',
+      id: 'e4-6',
+      source: 'charityPool',
+      target: 'emergencyFund',
+      animated: true,
+      type: 'transaction',
+      data: { label: `${emergencyAmount} USDT` },
+      style: { stroke: '#3182CE', strokeWidth: 2 },
+    });
+    
+    // Investment Pool generates profit that flows to destination pools
+    // For Waqf transactions
+    edges.push({
+      id: 'e5-7',
       source: 'investmentPool',
       target: 'waqfFund',
       animated: transaction?.type === 'Waqf',
@@ -373,20 +384,7 @@ const TransactionFlow = ({ transaction }) => {
       },
     });
     
-    edges.push({
-      id: 'e5-7',
-      source: 'investmentPool',
-      target: 'emergencyFund',
-      animated: transaction?.type === 'Zakat',
-      type: 'transaction',
-      data: { label: transaction?.type === 'Zakat' ? `${profitAmount} USDT` : '' },
-      style: { 
-        stroke: transaction?.type === 'Zakat' ? '#3182CE' : '#4A5568', 
-        strokeWidth: transaction?.type === 'Zakat' ? 2 : 1,
-        opacity: transaction?.type === 'Zakat' ? 1 : 0.6,
-      },
-    });
-    
+    // For Sadaqah transactions
     edges.push({
       id: 'e5-8',
       source: 'investmentPool',
@@ -401,25 +399,66 @@ const TransactionFlow = ({ transaction }) => {
       },
     });
     
+    // For Zakat transactions - flow to Emergency Fund
     edges.push({
-      id: 'e5-9',
+      id: 'e5-6',
       source: 'investmentPool',
-      target: 'foodBank',
-      animated: false,
+      target: 'emergencyFund',
+      animated: transaction?.type === 'Zakat',
       type: 'transaction',
-      data: { label: '' },
-      style: { stroke: '#4A5568', strokeWidth: 1, opacity: 0.6 },
+      data: { label: transaction?.type === 'Zakat' ? `${profitAmount} USDT` : '' },
+      style: { 
+        stroke: transaction?.type === 'Zakat' ? '#3182CE' : '#4A5568', 
+        strokeWidth: transaction?.type === 'Zakat' ? 2 : 1,
+        opacity: transaction?.type === 'Zakat' ? 1 : 0.6,
+      },
     });
     
-    edges.push({
-      id: 'e5-10',
-      source: 'investmentPool',
-      target: 'waterProject',
-      animated: false,
-      type: 'transaction',
-      data: { label: '' },
-      style: { stroke: '#4A5568', strokeWidth: 1, opacity: 0.6 },
-    });
+    // For other transaction types, default to Food Bank
+    if (transaction?.type && !['Waqf', 'Sadaqah', 'Zakat'].includes(transaction.type)) {
+      edges.push({
+        id: 'e5-9',
+        source: 'investmentPool',
+        target: 'foodBank',
+        animated: true,
+        type: 'transaction',
+        data: { label: `${profitAmount} USDT` },
+        style: { stroke: '#3182CE', strokeWidth: 2 },
+      });
+    } else {
+      edges.push({
+        id: 'e5-9',
+        source: 'investmentPool',
+        target: 'foodBank',
+        animated: false,
+        type: 'transaction',
+        data: { label: '' },
+        style: { stroke: '#4A5568', strokeWidth: 1, opacity: 0.6 },
+      });
+    }
+    
+    // For other transaction types, default to Water Project
+    if (transaction?.type && !['Waqf', 'Sadaqah', 'Zakat'].includes(transaction.type)) {
+      edges.push({
+        id: 'e5-10',
+        source: 'investmentPool',
+        target: 'waterProject',
+        animated: true,
+        type: 'transaction',
+        data: { label: `${profitAmount} USDT` },
+        style: { stroke: '#3182CE', strokeWidth: 2 },
+      });
+    } else {
+      edges.push({
+        id: 'e5-10',
+        source: 'investmentPool',
+        target: 'waterProject',
+        animated: false,
+        type: 'transaction',
+        data: { label: '' },
+        style: { stroke: '#4A5568', strokeWidth: 1, opacity: 0.6 },
+      });
+    }
     
     return { nodes, edges };
   };
@@ -432,11 +471,7 @@ const TransactionFlow = ({ transaction }) => {
   useEffect(() => {
     // Initial fit view with animation
     setTimeout(() => {
-      fitView({ 
-        duration: 800, 
-        padding: 0.2,
-        maxZoom: 1.2
-      });
+      fitView({ duration: 800, padding: 0.5 });
     }, 100);
   }, []);
 
@@ -455,15 +490,9 @@ const TransactionFlow = ({ transaction }) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         fitView
-        fitViewOptions={{ 
-          duration: 800, 
-          padding: 0.2,
-          maxZoom: 1.2
-        }}
-        minZoom={0.3}
+        fitViewOptions={{ duration: 800, padding: 0.5 }}
+        minZoom={0.2}
         maxZoom={1.5}
-        defaultZoom={1.0}
-        defaultViewport={{ x: 0, y: 0, zoom: 1.0 }}
         defaultEdgeOptions={{
           type: 'transaction',
           animated: true,
