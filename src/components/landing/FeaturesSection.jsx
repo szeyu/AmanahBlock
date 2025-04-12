@@ -21,6 +21,9 @@ const FeatureCard = ({ icon, title, description, buttonText, buttonLink, accentC
     transition="all 0.3s"
     position="relative"
     overflow="hidden"
+    height="100%"
+    display="flex"
+    flexDirection="column"
     _hover={{
       transform: "translateY(-5px)",
       boxShadow: `0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px ${accentColor}30`,
@@ -41,24 +44,27 @@ const FeatureCard = ({ icon, title, description, buttonText, buttonLink, accentC
       zIndex={0}
     />
     
-    <VStack spacing={6} position="relative" zIndex={1}>
-      <Circle 
-        size="80px" 
-        bg={`rgba(${accentColor === "#00E0FF" ? "0, 224, 255" : 
-                accentColor === "#8A7CFB" ? "138, 124, 251" : 
-                accentColor === "#FF5A5A" ? "255, 90, 90" : 
-                "72, 187, 120"}, 0.1)`} 
-        color={accentColor}
-        mb={2}
-      >
-        <Icon as={icon} w={8} h={8} />
-      </Circle>
-      
-      <Heading as="h3" size="lg" mb={2} color="white" fontWeight="bold">{title}</Heading>
-      
-      <Text color="gray.300" mb={6} fontSize="md">
-        {description}
-      </Text>
+    <VStack spacing={6} position="relative" zIndex={1} height="100%" justify="space-between">
+      <Box width="100%">
+        <Flex justify="center" mb={4}>
+          <Circle 
+            size="80px" 
+            bg={`rgba(${accentColor === "#00E0FF" ? "0, 224, 255" : 
+                    accentColor === "#8A7CFB" ? "138, 124, 251" : 
+                    accentColor === "#FF5A5A" ? "255, 90, 90" : 
+                    "72, 187, 120"}, 0.1)`} 
+            color={accentColor}
+          >
+            <Icon as={icon} w={8} h={8} />
+          </Circle>
+        </Flex>
+        
+        <Heading as="h3" size="lg" mb={2} color="white" fontWeight="bold">{title}</Heading>
+        
+        <Text color="gray.300" fontSize="md">
+          {description}
+        </Text>
+      </Box>
       
       <Button 
         as={Link} 

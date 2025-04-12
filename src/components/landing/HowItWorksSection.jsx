@@ -29,7 +29,8 @@ const StepCard = ({ number, icon, title, description, accentColor }) => (
     <Circle 
       position="absolute"
       top="-30px"
-      left="20px"
+      left="50%"
+      transform="translateX(-50%)"
       size="60px"
       bg={accentColor}
       color="white"
@@ -56,7 +57,7 @@ const StepCard = ({ number, icon, title, description, accentColor }) => (
       zIndex={0}
     />
     
-    <VStack align="flex-start" spacing={4} position="relative" zIndex={1}>
+    <VStack align="center" spacing={4} position="relative" zIndex={1}>
       <Flex 
         w="60px" 
         h="60px" 
@@ -71,8 +72,8 @@ const StepCard = ({ number, icon, title, description, accentColor }) => (
       >
         <Icon as={icon} color={accentColor} boxSize={7} />
       </Flex>
-      <Heading size="md" color="white" fontWeight="bold">{title}</Heading>
-      <Text color="gray.300" fontSize="md">
+      <Heading size="md" color="white" fontWeight="bold" textAlign="center">{title}</Heading>
+      <Text color="gray.300" fontSize="md" textAlign="center">
         {description}
       </Text>
     </VStack>
