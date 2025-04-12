@@ -43,7 +43,7 @@ const AIDonationAdvisor = ({
   onRecommendationSelect = () => {},
   isActive = true
 }) => {
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: false });
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
   const [isLoading, setIsLoading] = useState(false);
   const [recommendation, setRecommendation] = useState(null);
   const [customAllocation, setCustomAllocation] = useState({
@@ -61,6 +61,13 @@ const AIDonationAdvisor = ({
   
   // Mock data for current needs
   const currentNeeds = {
+    general: {
+      name: "General Charity Pool",
+      urgency: "Medium",
+      description: "Funds are distributed based on need across all projects",
+      icon: FaHandHoldingUsd,
+      color: "purple"
+    },
     school: {
       name: "School Building",
       urgency: "Medium",
@@ -77,18 +84,11 @@ const AIDonationAdvisor = ({
     },
     food: {
       name: "Food Bank",
-      urgency: "Medium",
+      urgency: "Medium-High",
       description: "Ongoing food security programs in 5 countries",
       icon: FaUtensils,
       color: "orange"
     },
-    emergency: {
-      name: "Emergency Fund",
-      urgency: "Medium-High",
-      description: "Reserve for rapid response to emerging crises",
-      icon: FaHandHoldingUsd,
-      color: "purple"
-    }
   };
   
   // Generate AI recommendation based on current needs and donation amount
@@ -247,8 +247,8 @@ const AIDonationAdvisor = ({
     >
       <Flex justify="space-between" align="center" mb={4}>
         <HStack>
-          <Icon as={FaRobot} color="accent.500" boxSize={6} />
-          <Heading size="md" color="white">AI Donation Advisor</Heading>
+          {/* <Icon as={FaRobot} color="accent.500" boxSize={6} /> */}
+          <Heading size="md" color="white">Donation Allocation</Heading>
         </HStack>
         <Button 
           variant="outline" 
@@ -260,9 +260,9 @@ const AIDonationAdvisor = ({
         </Button>
       </Flex>
       
-      <Text color="gray.300" mb={4} position="relative" zIndex={1}>
+      {/* <Text color="gray.300" mb={4} position="relative" zIndex={1}>
         Our AI analyzes current needs, impact potential, and donation patterns to recommend the optimal allocation of your donation.
-      </Text>
+      </Text> */}
       
       <Collapse in={isOpen} animateOpacity>
         <VStack spacing={6} align="stretch">
@@ -286,35 +286,54 @@ const AIDonationAdvisor = ({
                   </Button>
                 </Flex>
                 
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4} mb={4}>
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={5} mb={8}>
                   {Object.entries(currentNeeds).map(([key, data]) => (
                     <Box 
                       key={key} 
-                      p={3} 
+                      p={5} 
                       bg="gray.800" 
                       borderRadius="md" 
                       borderLeftWidth="4px"
                       borderLeftColor={`${data.color}.500`}
+                      minH="180px"
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="space-between"
+                      boxShadow="md"
+                      transition="transform 0.2s"
+                      _hover={{ transform: "translateY(-2px)" }}
+                      position="relative"
                     >
-                      <Flex justify="space-between" mb={2}>
-                        <HStack>
-                          <Icon as={data.icon} color={`${data.color}.500`} />
-                          <Text color="white" fontWeight="medium">{data.name}</Text>
-                        </HStack>
-                        <Badge 
-                          colorScheme={
-                            data.urgency === "High" ? "red" : 
-                            data.urgency === "Medium-High" ? "orange" : 
-                            data.urgency === "Medium" ? "yellow" : 
-                            "green"
-                          }
-                        >
-                          {data.urgency}
-                        </Badge>
-                      </Flex>
-                      <Text color="gray.400" fontSize="xs" noOfLines={2}>
+                      <HStack mb={3}>
+                        <Icon as={data.icon} color={`${data.color}.500`} boxSize={5} />
+                        <Text color="white" fontWeight="medium">{data.name}</Text>
+                      </HStack>
+                      
+                      <Text color="gray.400" fontSize="sm" noOfLines={2} mb={10}>
                         {data.description}
                       </Text>
+                      
+                      <Badge 
+                        colorScheme={
+                          data.urgency === "High" ? "red" : 
+                          data.urgency === "Medium-High" ? "orange" : 
+                          data.urgency === "Medium" ? "yellow" : 
+                          "green"
+                        }
+                        fontSize="xs"
+                        px={2}
+                        py={1}
+                        borderRadius="md"
+                        textTransform="uppercase"
+                        fontWeight="bold"
+                        position="absolute"
+                        bottom="3"
+                        right="3"
+                        minW="80px"
+                        textAlign="center"
+                      >
+                        {data.urgency}
+                      </Badge>
                     </Box>
                   ))}
                 </SimpleGrid>
