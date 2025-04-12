@@ -25,6 +25,12 @@ const ProjectFilters = ({ filters, setFilters }) => {
           color="white"
           borderColor="gray.600"
           _hover={{ borderColor: "brand.500" }}
+          sx={{
+            option: {
+              bg: "gray.700",
+              color: "white"
+            },
+          }}
         >
           <option value="Education">Education</option>
           <option value="Healthcare">Healthcare</option>
@@ -41,6 +47,12 @@ const ProjectFilters = ({ filters, setFilters }) => {
           color="white"
           borderColor="gray.600"
           _hover={{ borderColor: "brand.500" }}
+          sx={{
+            option: {
+              bg: "gray.700",
+              color: "white"
+            }
+          }}
         >
           <option value="In Progress">In Progress</option>
           <option value="Completed">Completed</option>
@@ -56,6 +68,12 @@ const ProjectFilters = ({ filters, setFilters }) => {
           color="white"
           borderColor="gray.600"
           _hover={{ borderColor: "brand.500" }}
+          sx={{
+            option: {
+              bg: "gray.700",
+              color: "white"
+            }
+          }}
         >
           <option value="progress">Progress</option>
           <option value="deadline">Deadline</option>

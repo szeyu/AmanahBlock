@@ -25,7 +25,21 @@ const ProjectFilters = ({ filters, setFilters, addFilter, removeFilter }) => {
           <Input placeholder="Search projects" />
         </InputGroup>
         
-        <Select placeholder="Category" maxW={{ base: 'full', md: '200px' }} onChange={(e) => addFilter(e.target.value)}>
+        <Select 
+          placeholder="Category" 
+          maxW={{ base: 'full', md: '200px' }} 
+          onChange={(e) => addFilter(e.target.value)}
+          bg="gray.700"
+          color="white"
+          borderColor="gray.600"
+          _hover={{ borderColor: "brand.500" }}
+          sx={{
+            option: {
+              bg: "gray.700",
+              color: "white"
+            },
+          }}
+        >
           <option value="Education">Education</option>
           <option value="Disaster">Disaster Relief</option>
           <option value="Food">Food & Nutrition</option>
@@ -34,7 +48,21 @@ const ProjectFilters = ({ filters, setFilters, addFilter, removeFilter }) => {
           <option value="Children">Children & Orphans</option>
         </Select>
         
-        <Select placeholder="Location" maxW={{ base: 'full', md: '200px' }} onChange={(e) => addFilter(e.target.value)}>
+        <Select 
+          placeholder="Location" 
+          maxW={{ base: 'full', md: '200px' }} 
+          onChange={(e) => addFilter(e.target.value)}
+          bg="gray.700"
+          color="white"
+          borderColor="gray.600"
+          _hover={{ borderColor: "brand.500" }}
+          sx={{
+            option: {
+              bg: "gray.700",
+              color: "white"
+            },
+          }}
+        >
           <option value="Yemen">Yemen</option>
           <option value="Bangladesh">Bangladesh</option>
           <option value="Egypt">Egypt</option>
