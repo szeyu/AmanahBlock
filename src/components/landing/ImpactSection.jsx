@@ -24,6 +24,7 @@ import {
   FaVrCardboard,
   FaGlobeAfrica,
 } from 'react-icons/fa';
+import ImpactMap from '../../components/ImpactMap';
 
 // Mock data for featured impact stories
 const impactStories = [
@@ -202,42 +203,23 @@ const ImpactSection = () => {
               <Heading size="md" color="white" mb={1}>Global Impact Map</Heading>
               <Text color="gray.400">Explore our projects and their impact around the world</Text>
             </Box>
-            <Tooltip label="Coming Soon" placement="top">
-              <Button 
-                leftIcon={<FaGlobeAfrica />} 
-                variant="outline"
-                isDisabled
-                opacity={0.7}
-                _hover={{ opacity: 0.7 }}
-              >
-                Open Full Map
-              </Button>
-            </Tooltip>
+            <Button 
+              leftIcon={<FaGlobeAfrica />} 
+              variant="outline"
+              as={Link}
+              to="/impact/explorer"
+            >
+              Open Full Map
+            </Button>
           </Flex>
           
           <Box 
             h="400px" 
-            bg="gray.800" 
             borderRadius="md" 
             position="relative"
             overflow="hidden"
           >
-            <Flex 
-              position="absolute" 
-              top="0" 
-              left="0" 
-              right="0" 
-              bottom="0" 
-              justify="center" 
-              align="center"
-              direction="column"
-              bg="url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80')"
-              bgSize="cover"
-              bgPosition="center"
-            >
-              <Text color="white" fontSize="lg" fontWeight="bold" mb={4}>Interactive Map Coming Soon</Text>
-              <Text color="gray.300">Our projects span 28 countries across 4 continents</Text>
-            </Flex>
+            <ImpactMap />
           </Box>
         </Box>
       </Box>
