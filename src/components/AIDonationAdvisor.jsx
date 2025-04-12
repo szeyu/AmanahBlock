@@ -301,7 +301,12 @@ const AIDonationAdvisor = ({
                       justifyContent="space-between"
                       boxShadow="md"
                       transition="transform 0.2s"
-                      _hover={{ transform: "translateY(-2px)" }}
+                      _hover={{ 
+                        transform: "translateY(-2px)",
+                        boxShadow: `0 0 20px ${data.color}.500`,
+                        borderColor: `${data.color}.500`,
+                        borderWidth: "2px"
+                      }}
                       position="relative"
                     >
                       <HStack mb={3}>
