@@ -99,7 +99,7 @@ const GlobalImpactMap = () => {
                 key={geo.rsmKey}
                 geography={geo}
                 fill="#1A202C"
-                stroke="#FFFFFF"
+                stroke="#b6c3d9"
                 style={{
                   default: { outline: 'none' },
                   hover: { fill: '#3182CE', outline: 'none' },
