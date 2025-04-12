@@ -1,102 +1,88 @@
 import React from 'react';
-import { 
-  Box, 
-  HStack, 
-  Text, 
-  Icon, 
-  Tooltip, 
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverBody,
-  PopoverArrow,
-  PopoverCloseButton,
-  List,
-  ListItem,
-  ListIcon,
-  Divider,
-  Badge
+import {
+  Badge,
+  Tooltip,
+  HStack,
+  Text,
+  Icon,
+  Box,
+  Flex,
+  Avatar,
+  AvatarGroup
 } from '@chakra-ui/react';
-import { FaShieldAlt, FaCheckCircle, FaExternalLinkAlt, FaUserTie } from 'react-icons/fa';
+import { FaCheckCircle, FaExclamationTriangle, FaQuestionCircle } from 'react-icons/fa';
 
-const ShariahComplianceBadge = ({ level = "Fully Compliant", scholars = [], certificationDate = "2023-05-01", showDetails = true }) => {
-  // Define color scheme based on compliance level
-  const getColorScheme = () => {
-    switch(level) {
-      case "Fully Compliant":
-        return "green";
-      case "Partially Compliant":
-        return "yellow";
-      case "Under Review":
-        return "orange";
-      default:
-        return "purple";
-    }
-  };
+const ShariahComplianceBadge = ({ level, scholars = [], showDetails = false }) => {
+  let color, icon, text;
   
-  const colorScheme = getColorScheme();
+  switch (level) {
+    case 'Fully Compliant':
+      color = 'green';
+      icon = FaCheckCircle;
+      text = 'Fully Compliant';
+      break;
+    case 'Under Review':
+      color = 'orange';
+      icon = FaExclamationTriangle;
+      text = 'Under Review';
+      break;
+    case 'Non-Compliant':
+      color = 'red';
+      icon = FaExclamationTriangle;
+      text = 'Non-Compliant';
+      break;
+    default:
+      color = 'gray';
+      icon = FaQuestionCircle;
+      text = 'Pending Review';
+  }
   
-  // Simple badge if details not needed
   if (!showDetails) {
     return (
-      <Badge colorScheme={colorScheme} borderRadius="full" px={2} py={1}>
-        <HStack spacing={1}>
-          <Icon as={FaShieldAlt} boxSize={3} />
-          <Text fontSize="xs">{level}</Text>
-        </HStack>
+      <Badge 
+        colorScheme={color} 
+        borderRadius="full" 
+        px={3}
+        py={1}
+        display="flex"
+        alignItems="center"
+      >
+        <Icon as={icon} mr={1} />
+        <Text>{text}</Text>
       </Badge>
     );
   }
   
-  // Detailed badge with popover
   return (
-    <Popover placement="bottom" trigger="hover">
-      <PopoverTrigger>
-        <Box as="span" cursor="pointer">
-          <Badge colorScheme={colorScheme} borderRadius="full" px={2} py={1}>
-            <HStack spacing={1}>
-              <Icon as={FaShieldAlt} boxSize={3} />
-              <Text fontSize="xs">{level}</Text>
-              <Icon as={FaExternalLinkAlt} boxSize={2} />
-            </HStack>
-          </Badge>
+    <Tooltip
+      hasArrow
+      label={
+        <Box p={2}>
+          <Text fontWeight="bold" mb={2}>Shariah Review Status</Text>
+          <Text mb={2}>This proposal has been reviewed by {scholars.length} scholars.</Text>
+          {scholars.map((scholar, index) => (
+            <Text key={index} fontSize="sm">{scholar}</Text>
+          ))}
         </Box>
-      </PopoverTrigger>
-      <PopoverContent bg="gray.800" borderColor="gray.700" color="white" _focus={{ boxShadow: 'none' }}>
-        <PopoverArrow bg="gray.800" />
-        <PopoverCloseButton />
-        <PopoverHeader borderBottomWidth="1px" borderColor="gray.700" fontWeight="bold">
-          Shariah Compliance Certification
-        </PopoverHeader>
-        <PopoverBody>
-          <Text fontSize="sm" mb={3}>
-            This project has been verified and certified as {level.toLowerCase()} with Islamic principles by our Shariah board.
-          </Text>
-          
-          {scholars.length > 0 && (
-            <>
-              <Text fontSize="sm" fontWeight="bold" mb={1}>Certifying Scholars:</Text>
-              <List spacing={1} mb={3}>
-                {scholars.map((scholar, index) => (
-                  <ListItem key={index} fontSize="xs">
-                    <ListIcon as={FaUserTie} color={`${colorScheme}.400`} />
-                    {scholar}
-                  </ListItem>
-                ))}
-              </List>
-            </>
-          )}
-          
-          <Divider borderColor="gray.700" my={2} />
-          
-          <HStack fontSize="xs" color="gray.400" justify="space-between">
-            <Text>Certification Date: {certificationDate}</Text>
-            <Icon as={FaCheckCircle} color={`${colorScheme}.400`} />
-          </HStack>
-        </PopoverBody>
-      </PopoverContent>
-    </Popover>
+      }
+      bg="gray.800"
+      color="white"
+      borderRadius="md"
+      placement="top"
+    >
+      <Badge 
+        colorScheme={color} 
+        borderRadius="full" 
+        px={3}
+        py={1}
+        display="flex"
+        alignItems="center"
+        cursor="pointer"
+      >
+        <Icon as={icon} mr={1} />
+        <Text>{text}</Text>
+      </Badge>
+    </Tooltip>
   );
 };
 

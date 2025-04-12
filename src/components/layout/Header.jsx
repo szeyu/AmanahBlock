@@ -41,7 +41,8 @@ import {
   FaCalculator,
   FaProjectDiagram,
   FaRegClipboard,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaHandHoldingHeart
 } from 'react-icons/fa';
 
 const Header = () => {
@@ -81,6 +82,24 @@ const Header = () => {
     return location.pathname === path;
   };
 
+  // Main navigation items including Funding Tracker and Emergency Fund
+  const mainNavItems = [
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/donate', label: 'Donate' },
+    { path: '/projects', label: 'Projects' },
+    { path: '/project-funding', label: 'Funding Tracker', icon: FaProjectDiagram },
+    { path: '/emergency-fund', label: 'Emergency Fund', icon: FaExclamationTriangle },
+    { path: '/governance', label: 'Governance', icon: FaGavel }
+  ];
+
+  // Secondary navigation items for dropdown
+  const secondaryNavItems = [
+    { path: '/islamic-defi', label: 'Islamic DeFi', icon: FaChartLine },
+    { path: '/zakat-calculator', label: 'Zakat Calculator', icon: FaCalculator },
+    { path: '/impact', label: 'Impact Explorer' },
+    { path: '/beneficiary-feedback', label: 'Beneficiary Feedback' }
+  ];
+
   return (
     <Box as="header" bg="rgba(10, 15, 30, 0.8)" py={4} px={8} position="sticky" top={0} zIndex={10} backdropFilter="blur(10px)" boxShadow="0 2px 10px rgba(0,0,0,0.3)">
       <Flex justify="space-between" align="center" maxW="container.xl" mx="auto">
@@ -112,64 +131,81 @@ const Header = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <HStack spacing={8} display={{ base: 'none', md: 'flex' }}>
-          <Link to="/dashboard">
-            <Text color={isActive('/dashboard') ? 'brand.500' : 'white'} fontWeight={isActive('/dashboard') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Dashboard
-            </Text>
+        <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
+          {mainNavItems.slice(0, 4).map((item) => (
+            <Link to={item.path} key={item.path}>
+              <Text 
+                color={isActive(item.path) ? 'brand.500' : 'white'} 
+                fontWeight={isActive(item.path) ? 'bold' : 'normal'} 
+                _hover={{ color: 'brand.500' }}
+              >
+                {item.label}
+              </Text>
+            </Link>
+          ))}
+          
+          <Link to={mainNavItems[4].path}>
+            <Tooltip label="Emergency Fund" placement="bottom">
+              <Flex 
+                align="center" 
+                color={isActive(mainNavItems[4].path) ? 'red.500' : 'white'} 
+                fontWeight={isActive(mainNavItems[4].path) ? 'bold' : 'normal'} 
+                _hover={{ color: 'red.500' }}
+              >
+                <Box as={mainNavItems[4].icon} mr={1} />
+                <Text>{mainNavItems[4].label}</Text>
+              </Flex>
+            </Tooltip>
           </Link>
-          <Link to="/donate">
-            <Text color={isActive('/donate') ? 'brand.500' : 'white'} fontWeight={isActive('/donate') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Donate
-            </Text>
+          
+          <Link to={mainNavItems[5].path}>
+            <Tooltip label="Community Governance" placement="bottom">
+              <Flex 
+                align="center" 
+                color={isActive(mainNavItems[5].path) ? 'brand.500' : 'white'} 
+                fontWeight={isActive(mainNavItems[5].path) ? 'bold' : 'normal'} 
+                _hover={{ color: 'brand.500' }}
+              >
+                <Box as={mainNavItems[5].icon} mr={1} />
+                <Text>{mainNavItems[5].label}</Text>
+              </Flex>
+            </Tooltip>
           </Link>
-          <Link to="/projects">
-            <Text color={isActive('/projects') ? 'brand.500' : 'white'} fontWeight={isActive('/projects') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Projects
-            </Text>
-          </Link>
-          <Link to="/project-funding">
-            <Text color={isActive('/project-funding') ? 'brand.500' : 'white'} fontWeight={isActive('/project-funding') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Funding Tracker
-            </Text>
-          </Link>
-          <Link to="/emergency-fund">
-            <Text color={isActive('/emergency-fund') ? 'brand.500' : 'white'} fontWeight={isActive('/emergency-fund') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Emergency Fund
-            </Text>
-          </Link>
-          <Link to="/beneficiary-feedback">
-            <Text color={isActive('/beneficiary-feedback') ? 'brand.500' : 'white'} fontWeight={isActive('/beneficiary-feedback') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Beneficiary Feedback
-            </Text>
-          </Link>
-          <Link to="/governance">
-            <Text color={isActive('/governance') ? 'brand.500' : 'white'} fontWeight={isActive('/governance') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Governance
-            </Text>
-          </Link>
-          <Link to="/impact">
-            <Text color={isActive('/impact') ? 'brand.500' : 'white'} fontWeight={isActive('/impact') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Impact
-            </Text>
-          </Link>
-          <Link to="/islamic-defi">
-            <Text color={isActive('/islamic-defi') ? 'brand.500' : 'white'} fontWeight={isActive('/islamic-defi') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Islamic DeFi
-            </Text>
-          </Link>
-          <Link to="/zakat-calculator">
-            <Text color={isActive('/zakat-calculator') ? 'brand.500' : 'white'} fontWeight={isActive('/zakat-calculator') ? 'bold' : 'normal'} _hover={{ color: 'brand.500' }}>
-              Zakat
-            </Text>
-          </Link>
+          
+          {/* More dropdown for secondary items */}
+          <Menu>
+            <MenuButton 
+              as={Button} 
+              rightIcon={<ChevronDownIcon />} 
+              variant="ghost" 
+              color="white" 
+              _hover={{ bg: 'whiteAlpha.200' }}
+              _active={{ bg: 'whiteAlpha.300' }}
+            >
+              More
+            </MenuButton>
+            <MenuList bg="gray.800" borderColor="gray.700">
+              {secondaryNavItems.map((item) => (
+                <MenuItem 
+                  key={item.path} 
+                  as={Link} 
+                  to={item.path} 
+                  bg="gray.800" 
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  icon={item.icon ? <Box as={item.icon} /> : null}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
         </HStack>
 
-        {/* Connect Wallet Button (Desktop) */}
-        <HStack spacing={4} display={{ base: 'none', md: 'flex' }}>
+        {/* Auth/Wallet Section */}
+        <HStack spacing={4}>
           {!isWalletConnected ? (
             <>
-              <Link to="/login">
+              <Link to="/login" display={{ base: 'none', md: 'block' }}>
                 <Button variant="outline" borderColor="brand.500" color="brand.500">
                   Login
                 </Button>
@@ -178,39 +214,50 @@ const Header = () => {
                 leftIcon={<FaWallet />}
                 variant="gradient"
                 onClick={handleConnectWallet}
-                loadingText="Connecting..."
               >
                 Connect Wallet
               </Button>
             </>
           ) : (
             <Menu>
-              <MenuButton
-                as={Button}
-                variant="outline"
-                borderColor="rgba(255, 255, 255, 0.2)"
-                rightIcon={<ChevronDownIcon />}
-                leftIcon={<FaEthereum />}
+              <MenuButton 
+                as={Button} 
+                variant="outline" 
+                borderColor="gray.600"
+                _hover={{ borderColor: 'brand.500' }}
               >
                 <HStack>
+                  <Box as={FaEthereum} color="brand.500" />
                   <Text>0x71C...93E4</Text>
-                  <Badge colorScheme="green" variant="solid" borderRadius="full" px={2}>
-                    2.14 ETH
-                  </Badge>
+                  <Badge colorScheme="green" ml={2}>2.14 ETH</Badge>
                 </HStack>
               </MenuButton>
               <MenuList bg="gray.800" borderColor="gray.700">
-                <Link to="/profile">
-                  <MenuItem icon={<FaUserCircle />} _hover={{ bg: 'gray.700' }}>My Profile</MenuItem>
-                </Link>
-                <Link to="/donations">
-                  <MenuItem icon={<FaHistory />} _hover={{ bg: 'gray.700' }}>My Donations</MenuItem>
-                </Link>
-                <Link to="/settings">
-                  <MenuItem icon={<FaCog />} _hover={{ bg: 'gray.700' }}>Settings</MenuItem>
-                </Link>
-                <MenuDivider borderColor="gray.700" />
-                <MenuItem icon={<FaSignOutAlt />} onClick={handleDisconnectWallet} _hover={{ bg: 'gray.700' }}>
+                <MenuItem 
+                  as={Link} 
+                  to="/profile" 
+                  bg="gray.800" 
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  icon={<Box as={FaUserCircle} />}
+                >
+                  My Profile
+                </MenuItem>
+                <MenuItem 
+                  as={Link} 
+                  to="/donations" 
+                  bg="gray.800" 
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  icon={<Box as={FaHistory} />}
+                >
+                  My Donations
+                </MenuItem>
+                <MenuItem 
+                  bg="gray.800" 
+                  _hover={{ bg: 'whiteAlpha.200' }}
+                  icon={<Box as={FaSignOutAlt} color="red.500" />}
+                  onClick={handleDisconnectWallet}
+                  color="red.400"
+                >
                   Disconnect Wallet
                 </MenuItem>
               </MenuList>
@@ -222,113 +269,71 @@ const Header = () => {
         <IconButton
           aria-label="Open menu"
           icon={<HamburgerIcon />}
-          display={{ base: 'flex', md: 'none' }}
-          onClick={onOpen}
           variant="ghost"
           color="white"
+          display={{ base: 'flex', md: 'none' }}
+          onClick={onOpen}
         />
 
         {/* Mobile Drawer */}
-        <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
-          <DrawerOverlay />
+        <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="full">
+          <DrawerOverlay backdropFilter="blur(10px)" />
           <DrawerContent bg="gray.800" color="white">
-            <DrawerCloseButton />
-            <DrawerHeader borderBottomWidth="1px" borderColor="gray.700">Menu</DrawerHeader>
+            <DrawerHeader borderBottomWidth="1px" borderColor="gray.700">
+              <Flex justify="space-between" align="center">
+                <Flex align="center">
+                  <Box 
+                    w="30px" 
+                    h="30px" 
+                    bg="accent.500" 
+                    borderRadius="full" 
+                    mr={2} 
+                  />
+                  <Text fontWeight="bold">SadaqahChain</Text>
+                </Flex>
+                <DrawerCloseButton position="static" />
+              </Flex>
+            </DrawerHeader>
             <DrawerBody>
               <VStack spacing={4} align="stretch" mt={4}>
-                <Link to="/dashboard" onClick={onClose}>
-                  <Text color={isActive('/dashboard') ? 'brand.500' : 'white'} fontWeight={isActive('/dashboard') ? 'bold' : 'normal'}>
-                    Dashboard
-                  </Text>
-                </Link>
-                <Link to="/donate" onClick={onClose}>
-                  <Text color={isActive('/donate') ? 'brand.500' : 'white'} fontWeight={isActive('/donate') ? 'bold' : 'normal'}>
-                    Donate
-                  </Text>
-                </Link>
-                <Link to="/projects" onClick={onClose}>
-                  <Text color={isActive('/projects') ? 'brand.500' : 'white'} fontWeight={isActive('/projects') ? 'bold' : 'normal'}>
-                    Projects
-                  </Text>
-                </Link>
-                
-                <Link to="/project-funding" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaRegClipboard} mr={2} color={isActive('/project-funding') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/project-funding') ? 'brand.500' : 'white'} fontWeight={isActive('/project-funding') ? 'bold' : 'normal'}>
-                      Funding Tracker
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/emergency-fund" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaExclamationTriangle} mr={2} color={isActive('/emergency-fund') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/emergency-fund') ? 'brand.500' : 'white'} fontWeight={isActive('/emergency-fund') ? 'bold' : 'normal'}>
-                      Emergency Fund
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/beneficiary-feedback" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaUserCircle} mr={2} color={isActive('/beneficiary-feedback') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/beneficiary-feedback') ? 'brand.500' : 'white'} fontWeight={isActive('/beneficiary-feedback') ? 'bold' : 'normal'}>
-                      Beneficiary Feedback
-                    </Text>
-                  </Flex>
-                </Link>
+                {/* Main Navigation Items */}
+                {mainNavItems.map((item) => (
+                  <Link to={item.path} key={item.path} onClick={onClose}>
+                    <Flex align="center">
+                      {item.icon && <Box as={item.icon} mr={2} color={isActive(item.path) ? 'brand.500' : 'gray.400'} />}
+                      <Text 
+                        color={isActive(item.path) ? 'brand.500' : 'white'} 
+                        fontWeight={isActive(item.path) ? 'bold' : 'normal'}
+                        fontSize="lg"
+                        py={2}
+                      >
+                        {item.label}
+                      </Text>
+                    </Flex>
+                  </Link>
+                ))}
                 
                 <Divider borderColor="gray.700" />
-                <Text color="gray.400" fontWeight="bold" fontSize="sm">Web3 Features</Text>
+                <Text color="gray.400" fontWeight="bold" fontSize="sm">Features</Text>
                 
-                <Link to="/governance" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaGavel} mr={2} color={isActive('/governance') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/governance') ? 'brand.500' : 'white'} fontWeight={isActive('/governance') ? 'bold' : 'normal'}>
-                      Governance
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/impact" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaGlobeAfrica} mr={2} color={isActive('/impact') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/impact') ? 'brand.500' : 'white'} fontWeight={isActive('/impact') ? 'bold' : 'normal'}>
-                      Impact Explorer
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/islamic-defi" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaChartLine} mr={2} color={isActive('/islamic-defi') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/islamic-defi') ? 'brand.500' : 'white'} fontWeight={isActive('/islamic-defi') ? 'bold' : 'normal'}>
-                      Islamic DeFi
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/zakat-calculator" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaCalculator} mr={2} color={isActive('/zakat-calculator') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/zakat-calculator') ? 'brand.500' : 'white'} fontWeight={isActive('/zakat-calculator') ? 'bold' : 'normal'}>
-                      Zakat Calculator
-                    </Text>
-                  </Flex>
-                </Link>
-                
-                <Link to="/audit-trail" onClick={onClose}>
-                  <Flex align="center">
-                    <Box as={FaHistory} mr={2} color={isActive('/audit-trail') ? 'brand.500' : 'gray.400'} />
-                    <Text color={isActive('/audit-trail') ? 'brand.500' : 'white'} fontWeight={isActive('/audit-trail') ? 'bold' : 'normal'}>
-                      Audit Trail
-                    </Text>
-                  </Flex>
-                </Link>
+                {/* Secondary Navigation Items */}
+                {secondaryNavItems.map((item) => (
+                  <Link to={item.path} key={item.path} onClick={onClose}>
+                    <Flex align="center">
+                      {item.icon && <Box as={item.icon} mr={2} color={isActive(item.path) ? 'brand.500' : 'gray.400'} />}
+                      <Text 
+                        color={isActive(item.path) ? 'brand.500' : 'white'} 
+                        fontWeight={isActive(item.path) ? 'bold' : 'normal'}
+                      >
+                        {item.label}
+                      </Text>
+                    </Flex>
+                  </Link>
+                ))}
                 
                 <Divider borderColor="gray.700" />
                 
+                {/* Auth/Wallet Section */}
                 {!isWalletConnected ? (
                   <>
                     <Link to="/login" onClick={onClose}>
