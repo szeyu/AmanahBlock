@@ -137,6 +137,18 @@ const Header = () => {
               isActive={isActive("/donate")} 
               isPrimary={true}
             />
+
+            <NavLink 
+              to="/governance" 
+              label="Governance" 
+              isActive={isActive("/governance")} 
+            />
+
+            <NavLink 
+              to="/islamic-defi" 
+              label="Islamic Defi" 
+              isActive={isActive("/islamic-defi")} 
+            />
             
             {/* Projects dropdown menu */}
             <Menu>
@@ -178,12 +190,6 @@ const Header = () => {
                 </MenuItem>
               </MenuList>
             </Menu>
-            
-            <NavLink 
-              to="/governance" 
-              label="Governance" 
-              isActive={isActive("/governance")} 
-            />
             
             {/* More dropdown menu */}
             <Menu>
