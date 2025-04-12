@@ -260,11 +260,12 @@ const DonationPage = () => {
     const types = ['sadaqah', 'zakat', 'waqf'];
     setDonationType(types[index]);
     
-    // Reset to money donation mode if not sadaqah
-    if (types[index] !== 'sadaqah' && donationMode === 'food') {
+    // Reset donation mode to 'money' and clear selected food items when switching tabs
+    if (types[index] !== 'sadaqah') {
       setDonationMode('money');
+      setSelectedFoodItems([]);
     }
-};
+  };
 
   // Add a function to handle adding food items
   const handleAddFoodItem = (item) => {
@@ -714,7 +715,7 @@ const DonationPage = () => {
         <Heading size="md" color="white" mb={4}>Donation Amount</Heading>
         
         {/* Donation Mode Selector */}
-        <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')}>
+        <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')} index={donationMode === 'money' ? 0 : 1}>
           <TabList>
             <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Donate Money</Tab>
             {donationType === 'sadaqah' && (
