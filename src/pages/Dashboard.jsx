@@ -4,14 +4,64 @@ import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt, FaCertifica
 import { Link } from 'react-router-dom';
 import DonationFlow from '../components/DonationFlow';
 import TransactionFlowModal from '../components/TransactionFlowModal';
+import { Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 const Dashboard = () => {
+  ChartJS.register(ArcElement, Tooltip, Legend);
+
   // Mock data for the dashboard
   const donationStats = {
     total: 3700,
     activeProjects: 7,
     investmentReturns: 215,
     impactScore: 87
+  };
+
+  const getFundAllocationData = () => {
+    return {
+      labels: ['Education', 'Disaster Relief', 'Food & Water'],
+      datasets: [
+        {
+          data: [45, 30, 25], // Percentages
+          backgroundColor: ['#04CEEB', '#FF5A5A', '#47BB78'], // blue.500, red.500, green.500
+          borderColor: ['#2C5282', '#C53030', '#2F855A'], // Darker versions for borders
+          borderWidth: 1,
+          hoverOffset: 10,
+        },
+      ],
+    };
+  };
+  
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#CBD5E0', // gray.300
+          font: {
+            size: 12,
+          },
+          padding: 20,
+        },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(26, 32, 44, 0.8)', // gray.800 with opacity
+        titleColor: 'white',
+        bodyColor: 'white',
+        borderColor: '#4A5568', // gray.600
+        borderWidth: 1,
+        padding: 12,
+        displayColors: true,
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${context.raw}%`;
+          }
+        }
+      }
+    },
   };
 
   // Add NFT data
@@ -329,9 +379,9 @@ const Dashboard = () => {
       </Modal>
       
       {/* Project Progress */}
-      <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap={6}>
+      {/* <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap={6}> */}
         {/* Project Progress */}
-        <Box className="card" p={6} borderRadius="md">
+        {/* <Box className="card" p={6} borderRadius="md">
           <Heading size="md" mb={4} color="white">Project Progress</Heading>
           <VStack spacing={6} align="stretch">
             {projectProgress.map((project, idx) => (
@@ -363,31 +413,31 @@ const Dashboard = () => {
               </Box>
             ))}
           </VStack>
-        </Box>
+        </Box> */}
         
-        {/* Fund Allocation */}
-        <Box className="card" p={6} borderRadius="md">
-          <Heading size="md" mb={4} color="white">Fund Allocation</Heading>
-          <Box h="250px" bg="rgba(128, 90, 213, 0.05)" borderRadius="md" display="flex" alignItems="center" justifyContent="center">
-            <Text color="gray.400">Fund allocation chart will be displayed here</Text>
-          </Box>
-          <Divider my={4} borderColor="gray.700" />
-          <Flex justify="space-between" wrap="wrap" gap={2}>
-            <HStack>
-              <Box w="12px" h="12px" borderRadius="full" bg="blue.500" />
-              <Text fontSize="sm" color="gray.300">Education (45%)</Text>
-            </HStack>
-            <HStack>
-              <Box w="12px" h="12px" borderRadius="full" bg="red.500" />
-              <Text fontSize="sm" color="gray.300">Disaster Relief (30%)</Text>
-            </HStack>
-            <HStack>
-              <Box w="12px" h="12px" borderRadius="full" bg="green.500" />
-              <Text fontSize="sm" color="gray.300">Food & Water (25%)</Text>
-            </HStack>
-          </Flex>
+      {/* Fund Allocation */}
+      <Box className="card" p={6} borderRadius="md">
+        <Heading size="md" mb={4} color="white">Fund Allocation</Heading>
+        <Box h="250px" borderRadius="md" position="relative">
+          <Pie data={getFundAllocationData()} options={chartOptions} />
         </Box>
-      </Grid>
+        <Divider my={4} borderColor="gray.700" />
+        <Flex justify="space-between" wrap="wrap" gap={2}>
+          <HStack>
+            <Box w="12px" h="12px" borderRadius="full" bg="blue.500" />
+            <Text fontSize="sm" color="gray.300">Education (45%)</Text>
+          </HStack>
+          <HStack>
+            <Box w="12px" h="12px" borderRadius="full" bg="red.500" />
+            <Text fontSize="sm" color="gray.300">Disaster Relief (30%)</Text>
+          </HStack>
+          <HStack>
+            <Box w="12px" h="12px" borderRadius="full" bg="green.500" />
+            <Text fontSize="sm" color="gray.300">Food & Water (25%)</Text>
+          </HStack>
+        </Flex>
+      </Box>
+      {/* </Grid> */}
 
       <TransactionFlowModal
         isOpen={isTransactionModalOpen}
