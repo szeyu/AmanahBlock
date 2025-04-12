@@ -62,6 +62,12 @@ import {
   FaChartPie,
   FaRegFilePdf,
   FaRegFileImage,
+  FaCreditCard,
+  FaUniversity,
+  FaMobileAlt,
+  FaMoneyBillWave,
+  FaBitcoin,
+  FaClock,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ShariahComplianceBadge from '../components/ShariahComplianceBadge';
@@ -73,20 +79,21 @@ const DonationPage = () => {
   const [selectedPool, setSelectedPool] = useState('general');
   const [currency, setCurrency] = useState('USDT');
   const [showAllocation, setShowAllocation] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
 
   const [donationMode, setDonationMode] = useState('money'); // 'money' or 'food'
   const [selectedFoodItems, setSelectedFoodItems] = useState([]);
   const [foodItems] = useState([
-    { id: 1, name: 'Rice (5kg bag)', price: 15, image: 'https://images.unsplash.com/photo-1586201375761-83865001e8ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 2, name: 'Cooking Oil (1L)', price: 8, image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 3, name: 'Flour (2kg)', price: 6, image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 4, name: 'Canned Beans (400g)', price: 3, image: 'https://images.unsplash.com/photo-1594489573800-a394ed9f549e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 5, name: 'Dates (500g)', price: 10, image: 'https://images.unsplash.com/photo-1593904252593-8d0fc780ae29?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 6, name: 'Milk Powder (900g)', price: 12, image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 7, name: 'Lentils (1kg)', price: 5, image: 'https://images.unsplash.com/photo-1515543904379-3d757afe72e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 8, name: 'Tea (100 bags)', price: 7, image: 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
+    { id: 1, name: 'Rice (5kg bag)', price: 15, image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=jpg' },
+    { id: 2, name: 'Cooking Oil (1L)', price: 8, image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=jpg' },
+    { id: 3, name: 'Flour (2kg)', price: 6, image: 'https://images.unsplash.com/photo-1627485937980-221c88ac04f9?q=80&w=2683&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 4, name: 'Canned Beans (400g)', price: 3, image: 'https://images.unsplash.com/photo-1669655139685-1daf4fd4afd8?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 5, name: 'Dates (500g)', price: 10, image: 'https://images.unsplash.com/photo-1629738601425-494c3d6ba3e2?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 6, name: 'Milk Powder (900g)', price: 12, image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=jpg' },
+    { id: 7, name: 'Lentils (1kg)', price: 5, image: 'https://images.unsplash.com/photo-1612869538502-b5baa439abd7?q=80&w=2535&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+    { id: 8, name: 'Tea (100 bags)', price: 7, image: 'https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=jpg' },
   ]);
   
   // Add new state for Waqf form
@@ -687,98 +694,170 @@ const DonationPage = () => {
           <TabPanels>
             <TabPanel px={0}>
               {/* Money Donation UI */}
-              <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap={8}>
-                <Box>
-                  <FormControl mb={6}>
-                    <FormLabel color="gray.300">Enter Amount</FormLabel>
-                    <NumberInput 
-                      value={donationAmount} 
-                      onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
-                      min={10}
-                      max={1000000}
-                    >
-                      <NumberInputField bg="gray.800" borderColor="gray.600" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
-                        <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </FormControl>
-                  
-                  <FormControl mb={6}>
-                    <FormLabel color="gray.300">Currency</FormLabel>
-                    <RadioGroup value={currency} onChange={setCurrency}>
-                      <Stack direction="row" spacing={5}>
-                        <Radio value="USDT" colorScheme="green">USDT</Radio>
-                        <Radio value="ETH" colorScheme="purple">ETH</Radio>
-                        <Radio value="MYR" colorScheme="blue">MYR</Radio>
-                      </Stack>
-                    </RadioGroup>
-                  </FormControl>
-                  
-                  {currency === 'MYR' && (
-                    <Box p={4} bg="gray.800" borderRadius="md" mb={6}>
-                      <Flex align="center" mb={2}>
-                        <Box as={FaExchangeAlt} color="brand.500" mr={2} />
-                        <Text color="white" fontWeight="medium">P2P Exchange</Text>
-                      </Flex>
-                      <Text color="gray.300" fontSize="sm" mb={2}>
-                        Your MYR donation will be converted to USDT through our Shariah-compliant P2P exchange to avoid Riba (interest).
-                      </Text>
-                      <HStack justify="space-between">
-                        <Text color="gray.400" fontSize="sm">Exchange Rate:</Text>
-                        <Text color="white" fontSize="sm">1 USDT = 4.65 MYR</Text>
-                      </HStack>
-                      <HStack justify="space-between">
-                        <Text color="gray.400" fontSize="sm">You're donating:</Text>
-                        <Text color="white" fontSize="sm">{donationAmount} MYR ≈ {(donationAmount / 4.65).toFixed(2)} USDT</Text>
-                      </HStack>
-                    </Box>
-                  )}
-                  
-                  <Button 
-                    variant="gradient" 
-                    size="lg" 
-                    w="full"
-                    leftIcon={<FaWallet />}
-                    onClick={onOpen}
+              <FormControl mb={6}>
+                <FormLabel color="gray.300">Enter Amount</FormLabel>
+                <NumberInput 
+                  value={donationAmount} 
+                  onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
+                  min={10}
+                  max={1000000}
+                >
+                  <NumberInputField bg="gray.800" borderColor="gray.600" />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
+                    <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+
+              {/* Payment Method Selection */}
+              <Box mb={6}>
+                <Text color="gray.300" mb={4}>Select payment method</Text>
+                <Grid templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }} gap={4}>
+                  {/* Card Payment */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'card' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'card' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('card')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
                   >
-                    Donate Now
-                  </Button>
-                </Box>
-                
-                <VStack spacing={4} align="stretch">
-                  <Box p={4} bg="gray.800" borderRadius="md">
-                    <Flex align="center" mb={2}>
-                      <Box as={FaShieldAlt} color="green.500" mr={2} />
-                      <Text color="white" fontWeight="medium">Shariah Compliant</Text>
-                    </Flex>
-                    <Text color="gray.300" fontSize="sm">
-                      All donations are handled according to Islamic principles, avoiding Riba (interest) and ensuring ethical fund management.
-                    </Text>
+                    <HStack spacing={3}>
+                      <Icon as={FaCreditCard} boxSize="24px" color={paymentMethod === 'card' ? "brand.500" : "gray.400"} />
+                      <Text color="white">Card Payment</Text>
+                    </HStack>
                   </Box>
-                  
-                  <Box p={4} bg="gray.800" borderRadius="md">
-                    <Flex align="center" mb={2}>
-                      <Box as={FaRegCheckCircle} color="brand.500" mr={2} />
-                      <Text color="white" fontWeight="medium">100% Transparency</Text>
-                    </Flex>
-                    <Text color="gray.300" fontSize="sm">
-                      Every donation is recorded on the blockchain, allowing you to track exactly how your funds are used.
-                    </Text>
+
+                  {/* Online Banking */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'banking' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'banking' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('banking')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <HStack spacing={3}>
+                      <Icon as={FaUniversity} boxSize="24px" color={paymentMethod === 'banking' ? "brand.500" : "gray.400"} />
+                      <Text color="white">Online Banking</Text>
+                    </HStack>
                   </Box>
-                  
-                  <Box p={4} bg="gray.800" borderRadius="md">
-                    <Flex align="center" mb={2}>
-                      <Box as={FaRegLightbulb} color="yellow.500" mr={2} />
-                      <Text color="white" fontWeight="medium">AI-Powered Allocation</Text>
-                    </Flex>
-                    <Text color="gray.300" fontSize="sm">
-                      Our AI system analyzes needs across all pools to ensure optimal distribution of general pool funds.
-                    </Text>
+
+                  {/* e-Wallet */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'ewallet' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'ewallet' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('ewallet')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <HStack spacing={3}>
+                      <Icon as={FaMobileAlt} boxSize="24px" color={paymentMethod === 'ewallet' ? "brand.500" : "gray.400"} />
+                      <Text color="white">e-Wallet</Text>
+                    </HStack>
                   </Box>
-                </VStack>
-              </Grid>
+
+                  {/* Cash */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'cash' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'cash' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('cash')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <HStack spacing={3}>
+                      <Icon as={FaMoneyBillWave} boxSize="24px" color={paymentMethod === 'cash' ? "brand.500" : "gray.400"} />
+                      <Text color="white">Cash</Text>
+                    </HStack>
+                  </Box>
+
+                  {/* Crypto */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'crypto' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'crypto' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('crypto')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <HStack spacing={3}>
+                      <Icon as={FaBitcoin} boxSize="24px" color={paymentMethod === 'crypto' ? "brand.500" : "gray.400"} />
+                      <Text color="white">Crypto</Text>
+                    </HStack>
+                  </Box>
+
+                  {/* Buy Now Pay Later */}
+                  <Box
+                    p={4}
+                    bg={paymentMethod === 'bnpl' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                    borderWidth="1px"
+                    borderColor={paymentMethod === 'bnpl' ? "brand.500" : "gray.700"}
+                    borderRadius="lg"
+                    cursor="pointer"
+                    onClick={() => setPaymentMethod('bnpl')}
+                    transition="all 0.3s"
+                    _hover={{
+                      borderColor: "brand.500",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                    }}
+                  >
+                    <HStack spacing={3}>
+                      <Icon as={FaClock} boxSize="24px" color={paymentMethod === 'bnpl' ? "brand.500" : "gray.400"} />
+                      <Text color="white">Buy Now Pay Later</Text>
+                    </HStack>
+                  </Box>
+                </Grid>
+              </Box>
+
+              <Button 
+                variant="gradient" 
+                size="lg" 
+                w="full"
+                leftIcon={<FaWallet />}
+                onClick={onOpen}
+                isDisabled={!paymentMethod}
+              >
+                Donate Now
+              </Button>
             </TabPanel>
             
             <TabPanel px={0}>
@@ -890,6 +969,144 @@ const DonationPage = () => {
                     <Text color="white" fontWeight="bold">Total Food Donation</Text>
                     <Text color="brand.500" fontWeight="bold" fontSize="xl">${calculateFoodTotal().toFixed(2)}</Text>
                   </Flex>
+
+                  {/* Add payment method selection for food donation */}
+                  <Box mb={6}>
+                    <Text color="gray.300" mb={4}>Select payment method</Text>
+                    <Grid templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }} gap={4}>
+                      {/* Card Payment */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'card' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'card' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('card')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaCreditCard} boxSize="24px" color={paymentMethod === 'card' ? "brand.500" : "gray.400"} />
+                          <Text color="white">Card Payment</Text>
+                        </HStack>
+                      </Box>
+
+                      {/* Online Banking */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'banking' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'banking' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('banking')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaUniversity} boxSize="24px" color={paymentMethod === 'banking' ? "brand.500" : "gray.400"} />
+                          <Text color="white">Online Banking</Text>
+                        </HStack>
+                      </Box>
+
+                      {/* e-Wallet */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'ewallet' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'ewallet' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('ewallet')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaMobileAlt} boxSize="24px" color={paymentMethod === 'ewallet' ? "brand.500" : "gray.400"} />
+                          <Text color="white">e-Wallet</Text>
+                        </HStack>
+                      </Box>
+
+                      {/* Cash */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'cash' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'cash' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('cash')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaMoneyBillWave} boxSize="24px" color={paymentMethod === 'cash' ? "brand.500" : "gray.400"} />
+                          <Text color="white">Cash</Text>
+                        </HStack>
+                      </Box>
+
+                      {/* Crypto */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'crypto' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'crypto' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('crypto')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaBitcoin} boxSize="24px" color={paymentMethod === 'crypto' ? "brand.500" : "gray.400"} />
+                          <Text color="white">Crypto</Text>
+                        </HStack>
+                      </Box>
+
+                      {/* Buy Now Pay Later */}
+                      <Box
+                        p={4}
+                        bg={paymentMethod === 'bnpl' ? "rgba(11, 197, 234, 0.2)" : "gray.800"}
+                        borderWidth="1px"
+                        borderColor={paymentMethod === 'bnpl' ? "brand.500" : "gray.700"}
+                        borderRadius="lg"
+                        cursor="pointer"
+                        onClick={() => setPaymentMethod('bnpl')}
+                        transition="all 0.3s"
+                        _hover={{
+                          borderColor: "brand.500",
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                        }}
+                      >
+                        <HStack spacing={3}>
+                          <Icon as={FaClock} boxSize="24px" color={paymentMethod === 'bnpl' ? "brand.500" : "gray.400"} />
+                          <Text color="white">Buy Now Pay Later</Text>
+                        </HStack>
+                      </Box>
+                    </Grid>
+                  </Box>
                   
                   <Button 
                     variant="gradient" 
@@ -900,6 +1117,7 @@ const DonationPage = () => {
                       setDonationAmount(calculateFoodTotal());
                       onOpen();
                     }}
+                    isDisabled={!paymentMethod}
                   >
                     Donate Food Items
                   </Button>
