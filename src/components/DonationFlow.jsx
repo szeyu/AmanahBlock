@@ -569,25 +569,19 @@ const Flow = () => {
   const { fitView } = useReactFlow();
 
   useEffect(() => {
-    // Initial fit view with animation
-    setTimeout(() => {
-      fitView({ duration: 800, padding: 0.2 });
-    }, 100);
-
-    // After fit view animation, zoom to desired level
+    // Initial fit view with animation to accommodate all nodes
     setTimeout(() => {
       fitView({ 
         duration: 800, 
         padding: 0.2,
-        maxZoom: 0.8,
-        minZoom: 0.8
+        includeHiddenNodes: false
       });
-    }, 1000);
+    }, 100);
   }, []);
 
   return (
     <Box 
-      h="700px" 
+      h="400px" 
       w="100%" 
       bg="rgba(11, 197, 234, 0.05)" 
       borderRadius="md"
@@ -599,7 +593,8 @@ const Flow = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+        fitView
+        fitViewOptions={{ duration: 800, padding: 0.2 }}
         minZoom={0.2}
         maxZoom={1.5}
         defaultEdgeOptions={{
