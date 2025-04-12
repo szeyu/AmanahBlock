@@ -254,18 +254,6 @@ const DonationPage = () => {
     }, 2000);
   };
 
-  // Update this function to handle donation type changes
-  const handleDonationTypeChange = (index) => {
-    // Set donation type based on tab index
-    const types = ['sadaqah', 'zakat', 'waqf'];
-    setDonationType(types[index]);
-    
-    // Reset to money donation mode if not sadaqah
-    if (types[index] !== 'sadaqah' && donationMode === 'food') {
-      setDonationMode('money');
-    }
-};
-
   // Add a function to handle adding food items
   const handleAddFoodItem = (item) => {
     const existingItem = selectedFoodItems.find(i => i.id === item.id);
@@ -326,19 +314,13 @@ const DonationPage = () => {
       <Heading mb={2} color="white" size="xl">Make a Donation</Heading>
       <Text color="gray.400" mb={6}>Support Shariah-compliant charitable projects with transparent blockchain tracking</Text>
       
-      {/* Donation Type Selection - Modified to use the new handler */}
-      <Tabs 
-        variant="soft-rounded" 
-        colorScheme="brand" 
-        mb={8}
-        onChange={handleDonationTypeChange}
-      >
+      {/* Donation Type Selection */}
+      <Tabs variant="soft-rounded" colorScheme="brand" mb={8}>
         <TabList>
           <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Sadaqah (Voluntary)</Tab>
           <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Zakat (Obligatory)</Tab>
           <Tab _selected={{ color: 'white', bg: 'green.500' }}>Waqf (Endowment)</Tab>
         </TabList>
-        
         <TabPanels mt={4}>
           <TabPanel px={0}>
             <Text color="gray.300" mb={4}>
@@ -588,7 +570,7 @@ const DonationPage = () => {
       </Tabs>
       
       {/* Pool Selection */}
-      {/* <Box 
+      <Box 
         bg="rgba(26, 32, 44, 0.7)"
         backdropFilter="blur(10px)"
         borderRadius="lg"
@@ -642,10 +624,10 @@ const DonationPage = () => {
               </Box>
             </GridItem>
           ))}
-        </Grid> */}
+        </Grid>
         
         {/* Fund Allocation Visualization (for General Pool) */}
-        {/* {showAllocation && (
+        {showAllocation && (
           <Box mt={8} p={4} bg="gray.800" borderRadius="md">
             <Flex justify="space-between" align="center" mb={4}>
               <Heading size="sm" color="white">General Pool Fund Allocation</Heading>
@@ -681,7 +663,7 @@ const DonationPage = () => {
             </Text>
           </Box>
         )}
-      </Box> */}
+      </Box>
       
       {/* AI Donation Advisor */}
       <AIDonationAdvisor 
@@ -717,9 +699,7 @@ const DonationPage = () => {
         <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')}>
           <TabList>
             <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Donate Money</Tab>
-            {donationType === 'sadaqah' && (
-              <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Donate Food</Tab>
-            )}
+            <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Donate Food</Tab>
           </TabList>
       
           <TabPanels>
@@ -877,153 +857,6 @@ const DonationPage = () => {
                     </HStack>
                   </Box>
                 </Grid>
-                {/* Card Payment Details */}
-                {paymentMethod === 'card' && (
-                  <Box mt={4} p={4} bg="gray.800" borderRadius="md">
-                    <Text color="white" fontWeight="medium" mb={3}>Card Payment Details</Text>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Card Type</FormLabel>
-                      <RadioGroup defaultValue="credit">
-                        <Stack direction="row" spacing={5}>
-                          <Radio value="credit" colorScheme="brand">Credit Card</Radio>
-                          <Radio value="debit" colorScheme="brand">Debit Card</Radio>
-                        </Stack>
-                      </RadioGroup>
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Card Network</FormLabel>
-                      <RadioGroup defaultValue="visa">
-                        <Stack direction="row" spacing={5}>
-                          <Radio value="visa" colorScheme="brand">Visa</Radio>
-                          <Radio value="mastercard" colorScheme="brand">Mastercard</Radio>
-                          <Radio value="amex" colorScheme="brand">American Express</Radio>
-                        </Stack>
-                      </RadioGroup>
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Card Number</FormLabel>
-                      <Input 
-                        placeholder="XXXX XXXX XXXX XXXX" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                      />
-                    </FormControl>
-                    
-                    <Grid templateColumns="1fr 1fr" gap={3}>
-                      <FormControl>
-                        <FormLabel color="gray.300" fontSize="sm">Expiry Date</FormLabel>
-                        <Input 
-                          placeholder="MM/YY" 
-                          bg="gray.700" 
-                          borderColor="gray.600"
-                        />
-                      </FormControl>
-                      
-                      <FormControl>
-                        <FormLabel color="gray.300" fontSize="sm">CVV</FormLabel>
-                        <Input 
-                          placeholder="XXX" 
-                          bg="gray.700" 
-                          borderColor="gray.600"
-                          type="password"
-                          maxLength={4}
-                        />
-                      </FormControl>
-                    </Grid>
-                    
-                    <FormControl mt={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Cardholder Name (Optional)</FormLabel>
-                      <Input 
-                        placeholder="Name as it appears on card" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                      />
-                    </FormControl>
-                    
-                    <Text color="gray.400" fontSize="xs" mt={3}>
-                      Your payment information is securely processed and we do not store your card details.
-                    </Text>
-                  </Box>
-                )}
-                
-                {/* Online Banking Details */}
-                {paymentMethod === 'banking' && (
-                  <Box mt={4} p={4} bg="gray.800" borderRadius="md">
-                    <Text color="white" fontWeight="medium" mb={3}>Online Banking Details</Text>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Select Bank</FormLabel>
-                      <Select 
-                        placeholder="Choose your bank" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                      >
-                        <option value="maybank">Maybank</option>
-                        <option value="cimb">CIMB Bank</option>
-                        <option value="publicbank">Public Bank</option>
-                        <option value="rhb">RHB Bank</option>
-                        <option value="hongleong">Hong Leong Bank</option>
-                        <option value="ambank">AmBank</option>
-                        <option value="bsn">Bank Simpanan Nasional</option>
-                        <option value="bankislam">Bank Islam</option>
-                        <option value="ocbc">OCBC Bank</option>
-                        <option value="hsbc">HSBC Bank</option>
-                        <option value="standardchartered">Standard Chartered</option>
-                      </Select>
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Account Number</FormLabel>
-                      <Input 
-                        placeholder="Enter your account number" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                      />
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Account Holder Name</FormLabel>
-                      <Input 
-                        placeholder="Enter account holder name" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                      />
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Transfer Amount</FormLabel>
-                      <NumberInput 
-                        value={donationAmount} 
-                        onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
-                        min={10}
-                        max={1000000}
-                      >
-                        <NumberInputField bg="gray.700" borderColor="gray.600" />
-                        <NumberInputStepper>
-                          <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
-                          <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
-                        </NumberInputStepper>
-                      </NumberInput>
-                    </FormControl>
-                    
-                    <FormControl mb={3}>
-                      <FormLabel color="gray.300" fontSize="sm">Reference/Description</FormLabel>
-                      <Input 
-                        placeholder="e.g., Donation for AmanahBlock" 
-                        bg="gray.700" 
-                        borderColor="gray.600"
-                        defaultValue={`${donationType.toUpperCase()} Donation`}
-                      />
-                    </FormControl>
-                    
-                    <Text color="gray.400" fontSize="xs" mt={2}>
-                      You will be redirected to your bank's secure login page to complete the payment after clicking "Donate Now".
-                    </Text>
-                  </Box>
-                )}
               </Box>
 
               <Button 

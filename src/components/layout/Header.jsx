@@ -105,16 +105,16 @@ const Header = () => {
           <Link to="/">
             <Flex align="center" mr={8}>
               <Box 
-                w="36px" 
-                h="36px" 
-                bg="accent.500" 
+                w="45px" 
+                h="45px" 
+                // bg="accent.500" 
                 borderRadius="full" 
-                mr={2} 
+                mr={1} 
                 display="flex" 
                 alignItems="center" 
                 justifyContent="center"
               >
-                <Box as={FaHandHoldingHeart} color="white" size="20px" />
+                <Image src={"/Amanah Block Logo.png"} alt="Logo" boxSize="50px" />
               </Box>
               <Text 
                 fontWeight="bold" 

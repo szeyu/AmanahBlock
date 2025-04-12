@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Heading,
@@ -24,7 +24,9 @@ import {
   FaVrCardboard,
   FaGlobeAfrica,
 } from 'react-icons/fa';
-import ImpactMap from '../../components/ImpactMap';
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
+import { motion } from 'framer-motion';
+
 
 // Mock data for featured impact stories
 const impactStories = [
@@ -65,6 +67,86 @@ const impactStories = [
     hasVR: false
   }
 ];
+
+const GlobalImpactMap = () => {
+  const [tooltipContent, setTooltipContent] = useState("");
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleMarkerMouseEnter = (content, event) => {
+    setTooltipContent(content);
+    setTooltipPosition({ x: event.clientX, y: event.clientY });
+    setShowTooltip(true);
+  };
+
+  const handleMarkerMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
+  return (
+    <div className="w-full h-[350px] bg-gray.900 rounded-lg shadow-lg p-4 relative">
+      <ComposableMap
+        projection="geoMercator"
+        projectionConfig={{
+          scale: 100,
+          center: [0, 20]
+        }}
+      >
+        <Geographies geography="/features.json">
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#1A202C"
+                stroke="#FFFFFF"
+                style={{
+                  default: { outline: 'none' },
+                  hover: { fill: '#3182CE', outline: 'none' },
+                  pressed: { outline: 'none' }
+                }}
+              />
+            ))
+          }
+        </Geographies>
+        <Marker 
+          coordinates={[45.3182, 2.0469]}
+          onMouseEnter={(e) => handleMarkerMouseEnter("Somalia: Clean Water Project", e)}
+          onMouseLeave={handleMarkerMouseLeave}
+        >
+          <circle r={8} fill="#3182CE" />
+        </Marker>
+        <Marker 
+          coordinates={[35.2956, 31.9522]}
+          onMouseEnter={(e) => handleMarkerMouseEnter("Palestine: School Rebuilding", e)}
+          onMouseLeave={handleMarkerMouseLeave}
+        >
+          <circle r={8} fill="#3182CE" />
+        </Marker>
+        <Marker 
+          coordinates={[44.1917, 15.3694]}
+          onMouseEnter={(e) => handleMarkerMouseEnter("Yemen: Emergency Food Relief", e)}
+          onMouseLeave={handleMarkerMouseLeave}
+        >
+          <circle r={8} fill="#3182CE" />
+        </Marker>
+      </ComposableMap>
+      
+      {showTooltip && (
+        <div 
+          className="absolute bg-gray.800 text-white px-3 py-2 rounded-md shadow-lg z-10"
+          style={{ 
+            left: `${tooltipPosition.x}px`, 
+            top: `${tooltipPosition.y - 40}px`,
+            transform: 'translateX(-50%)'
+          }}
+        >
+          {tooltipContent}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ImpactSection = () => {
   return (
@@ -197,30 +279,27 @@ const ImpactSection = () => {
           p={6}
           borderWidth="1px"
           borderColor="gray.700"
+          height={"900px"}
         >
           <Flex justify="space-between" align="center" mb={6}>
             <Box>
               <Heading size="md" color="white" mb={1}>Global Impact Map</Heading>
               <Text color="gray.400">Explore our projects and their impact around the world</Text>
             </Box>
-            <Button 
-              leftIcon={<FaGlobeAfrica />} 
-              variant="outline"
-              as={Link}
-              to="/impact/explorer"
-            >
-              Open Full Map
-            </Button>
+            <Tooltip label="Coming Soon" placement="top">
+              <Button 
+                leftIcon={<FaGlobeAfrica />} 
+                variant="outline"
+                isDisabled
+                opacity={0.7}
+                _hover={{ opacity: 0.7 }}
+              >
+                Open Full Map
+              </Button>
+            </Tooltip>
           </Flex>
           
-          <Box 
-            h="400px" 
-            borderRadius="md" 
-            position="relative"
-            overflow="hidden"
-          >
-            <ImpactMap />
-          </Box>
+          <GlobalImpactMap />
         </Box>
       </Box>
     </Box>
