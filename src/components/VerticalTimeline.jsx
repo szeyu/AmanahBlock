@@ -33,6 +33,7 @@ const customStyles = `
     max-width: 100%;
     padding: 0;
     margin: 0;
+    overflow: visible !important; /* Prevent double scrollbar */
   }
   
   .vertical-timeline-element {
@@ -45,12 +46,17 @@ const customStyles = `
   
   .vertical-timeline-element-content {
     box-shadow: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 1em;
+    overflow: visible !important; /* Prevent content scrollbar */
   }
   
   .vertical-timeline-element-date {
     color: rgba(255, 255, 255, 0.6) !important;
     opacity: 1 !important;
     font-size: 0.85em !important;
+    padding: 0 !important;
   }
   
   @media only screen and (min-width: 1170px) {

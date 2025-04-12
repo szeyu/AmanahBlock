@@ -254,6 +254,19 @@ const DonationPage = () => {
     }, 2000);
   };
 
+  // Update this function to handle donation type changes
+  const handleDonationTypeChange = (index) => {
+    // Set donation type based on tab index
+    const types = ['sadaqah', 'zakat', 'waqf'];
+    setDonationType(types[index]);
+    
+    // Reset donation mode to 'money' and clear selected food items when switching tabs
+    if (types[index] !== 'sadaqah') {
+      setDonationMode('money');
+      setSelectedFoodItems([]);
+    }
+  };
+
   // Add a function to handle adding food items
   const handleAddFoodItem = (item) => {
     const existingItem = selectedFoodItems.find(i => i.id === item.id);
@@ -696,7 +709,7 @@ const DonationPage = () => {
         <Heading size="md" color="white" mb={4}>Donation Amount</Heading>
         
         {/* Donation Mode Selector */}
-        <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')}>
+        <Tabs variant="soft-rounded" colorScheme="brand" mb={6} onChange={(index) => setDonationMode(index === 0 ? 'money' : 'food')} index={donationMode === 'money' ? 0 : 1}>
           <TabList>
             <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Donate Money</Tab>
             <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Donate Food</Tab>
