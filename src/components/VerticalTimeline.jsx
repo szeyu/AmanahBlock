@@ -26,6 +26,51 @@ import {
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
+// Add custom styles to override the react-vertical-timeline-component styles
+const customStyles = `
+  .vertical-timeline {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .vertical-timeline-element {
+    margin: 2em 0;
+  }
+  
+  .vertical-timeline::before {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .vertical-timeline-element-content {
+    box-shadow: none;
+  }
+  
+  .vertical-timeline-element-date {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+    font-size: 0.85em !important;
+  }
+  
+  @media only screen and (min-width: 1170px) {
+    .vertical-timeline-element-content .vertical-timeline-element-date {
+      position: absolute;
+      width: 100%;
+      left: 124%;
+      top: 6px;
+      font-size: 0.85em !important;
+    }
+    
+    .vertical-timeline-element:nth-child(even):not(.vertical-timeline-element--left) .vertical-timeline-element-content .vertical-timeline-element-date, 
+    .vertical-timeline-element.vertical-timeline-element--right .vertical-timeline-element-content .vertical-timeline-element-date {
+      left: auto;
+      right: 124%;
+      text-align: right;
+    }
+  }
+`;
+
 const MilestoneCard = ({ milestone, index }) => {
   const { isOpen, onToggle } = useDisclosure();
   const [isHovered, setIsHovered] = useState(false);
@@ -70,10 +115,7 @@ const MilestoneCard = ({ milestone, index }) => {
           borderColor: milestone.status === "Completed" ? "rgba(72, 187, 120, 0.3)" : 
                       milestone.status === "In Progress" ? "rgba(66, 153, 225, 0.3)" : 
                       "rgba(113, 128, 150, 0.3)",
-          boxShadow: isHovered ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
-          width: "45%",
-          marginLeft: isEven ? "0" : "auto",
-          marginRight: isEven ? "auto" : "0"
+          boxShadow: isHovered ? "0 4px 12px rgba(0,0,0,0.2)" : "none"
         }}
         contentArrowStyle={{ 
           borderRight: isEven ? '7px solid rgba(45, 55, 72, 0.3)' : 'none',
@@ -228,11 +270,20 @@ const MilestoneCard = ({ milestone, index }) => {
 
 const MilestoneTimeline = ({ milestones }) => {
   return (
-    <VerticalTimeline animate={false} lineColor="#2D3748">
-      {milestones.map((milestone, index) => (
-        <MilestoneCard key={milestone.id} milestone={milestone} index={index} />
-      ))}
-    </VerticalTimeline>
+    <Box position="relative" width="100%" pb={10}>
+      {/* Inject custom styles */}
+      <style>{customStyles}</style>
+      
+      <VerticalTimeline 
+        animate={false} 
+        lineColor="#2D3748"
+        className="custom-timeline"
+      >
+        {milestones.map((milestone, index) => (
+          <MilestoneCard key={milestone.id} milestone={milestone} index={index} />
+        ))}
+      </VerticalTimeline>
+    </Box>
   );
 };
 
