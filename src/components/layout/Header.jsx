@@ -120,7 +120,7 @@ const Header = () => {
                 bgGradient="linear(to-r, brand.500, accent.500)" 
                 bgClip="text"
               >
-                SadaqahChain
+                AmanahBlock
               </Text>
             </Flex>
           </Link>

@@ -12,7 +12,7 @@ const Footer = () => {
             <Flex align="center" mb={2}>
               <Box w="30px" h="30px" bg="accent.500" borderRadius="full" mr={2} />
               <Box fontWeight="bold" fontSize="lg" bgGradient="linear(to-r, brand.500, accent.500)" bgClip="text">
-                SadaqahChain
+                AmanahBlock
               </Box>
             </Flex>
             <Text color="gray.400" maxW="300px" textAlign={{ base: 'center', md: 'left' }}>
@@ -66,7 +66,7 @@ const Footer = () => {
 
         <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" pt={6}>
           <Text color="gray.500" fontSize="sm" textAlign={{ base: 'center', md: 'left' }}>
-            © 2023 SadaqahChain. All rights reserved.
+            © 2023 AmanahBlock. All rights reserved.
           </Text>
           <Text color="gray.500" fontSize="sm" mt={{ base: 2, md: 0 }}>
             Certified by Islamic Scholars Council

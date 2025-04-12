@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Grid, Heading, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Table, Thead, Tbody, Tr, Th, Td, Badge, Button, Icon, Divider, HStack, Progress, VStack } from '@chakra-ui/react';
-import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt } from 'react-icons/fa';
+import { Box, Grid, Heading, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Table, Thead, Tbody, Tr, Th, Td, Badge, Button, Icon, Divider, HStack, Progress, VStack, SimpleGrid, Image, Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton, useDisclosure} from '@chakra-ui/react';
+import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt, FaCertificate } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import DonationFlow from '../components/DonationFlow';
 import TransactionFlowModal from '../components/TransactionFlowModal';
@@ -12,6 +12,44 @@ const Dashboard = () => {
     activeProjects: 7,
     investmentReturns: 215,
     impactScore: 87
+  };
+
+  // Add NFT data
+  const nftCollection = [
+    { 
+      id: 1, 
+      name: "School Building #001", 
+      image: "/NFTCard/NFTCard.svg",
+      type: "Education", 
+      rarity: "Rare", // Added rarity
+      issueDate: "2023-04-15"
+    },
+    { 
+      id: 2, 
+      name: "Water Well #042", 
+      image: "/NFTCard/NFTCard2.svg", 
+      type: "Food", 
+      rarity: "Common", 
+      issueDate: "2023-05-02"
+    },
+    { 
+      id: 3, 
+      name: "Food Bank #013", 
+      image: "/NFTCard/NFTCard3.svg",
+      type: "Food", 
+      rarity: "Uncommon",
+      issueDate: "2023-03-28"
+    },
+  ];
+
+  // State for selected NFT and modal
+  const [selectedNft, setSelectedNft] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Function to handle NFT click
+  const handleNftClick = (nft) => {
+    setSelectedNft(nft);
+    onOpen();
   };
 
   const recentTransactions = [
@@ -76,6 +114,73 @@ const Dashboard = () => {
         <Heading size="md" mb={4} color="white">Donation Flow</Heading>
         <DonationFlow />
       </Box>
+
+      {/* NFT Collection - Added this section */}
+      <Box className="card" p={6} borderRadius="md" mb={8}>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Heading size="md" color="white">Impact NFTs</Heading>
+          <Button as={Link} to="/nft-gallery" size="sm" rightIcon={<FaExternalLinkAlt />} variant="outline" colorScheme="purple">
+            View All
+          </Button>
+        </Flex>
+        
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={4}>
+          {nftCollection.map((nft) => (
+            <Box 
+              key={nft.id}
+              bg="gray.800"
+              borderRadius="lg"
+              overflow="hidden"
+              cursor="pointer"
+              transition="all 0.3s"
+              _hover={{ 
+                transform: "translateY(-5px)",
+                boxShadow: "0 10px 20px rgba(138, 43, 226, 0.3)"
+              }}
+              onClick={() => handleNftClick(nft)}
+              className="nft-card"
+            >
+              <Box position="relative">
+                <Image 
+                  src={nft.image} 
+                  alt={nft.name}
+                  h="150px"
+                  w="100%"
+                  objectFit="cover"
+                />
+                <Badge 
+                  position="absolute" 
+                  top="2" 
+                  right="2" 
+                  colorScheme={
+                    nft.rarity === 'Common' ? 'gray' : 
+                    nft.rarity === 'Uncommon' ? 'green' : 
+                    nft.rarity === 'Rare' ? 'blue' : 'purple'
+                  }
+                >
+                  {nft.rarity}
+                </Badge>
+              </Box>
+              <Box p={3}>
+                <Text fontWeight="bold" color="white" noOfLines={1}>{nft.name}</Text>
+                <Flex justify="space-between" align="center" mt={1}>
+                  <Badge colorScheme={
+                    nft.type === 'Education' ? 'blue' : 
+                    nft.type === 'Water' ? 'cyan' : 
+                    nft.type === 'Food' ? 'green' : 'pink'
+                  }>
+                    {nft.type}
+                  </Badge>
+                  <HStack spacing={1}>
+                    <Icon as={FaCertificate} color="purple.300" />
+                    <Text fontSize="xs" color="gray.400">Verified</Text>
+                  </HStack>
+                </Flex>
+              </Box>
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Box>
       
       {/* Recent Transactions */}
       <Box className="card" p={6} borderRadius="md" mb={8}>
@@ -131,6 +236,97 @@ const Dashboard = () => {
           </Table>
         </Box>
       </Box>
+
+      {/* NFT Modal */}
+      <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered motionPreset="scale">
+        <ModalOverlay backdropFilter="blur(10px)" bg="rgba(0,0,0,0.7)"/>
+        <ModalContent 
+          bg="gray.800" 
+          borderWidth="1px" 
+          borderColor="purple.500"
+          borderRadius="xl"
+          overflow="hidden"
+          className="modal-content"
+        >
+          <ModalCloseButton color="white" />
+          <ModalBody p={0}>
+            {selectedNft && (
+              <Box>
+                <Box 
+                  position="relative" 
+                  h="300px" 
+                  className="nft-animation"
+                >
+                  <Image 
+                    src={selectedNft.image} 
+                    alt={selectedNft.name}
+                    w="100%"
+                    h="100%"
+                    objectFit="cover"
+                  />
+                  <Box 
+                    position="absolute" 
+                    bottom="0" 
+                    left="0" 
+                    right="0" 
+                    bg="rgba(0,0,0,0.7)" 
+                    p={4}
+                    backdropFilter="blur(5px)"
+                  >
+                    <Heading size="md" color="white">{selectedNft.name}</Heading>
+                    <Text color="gray.300" fontSize="sm">Impact Certificate</Text>
+                  </Box>
+                </Box>
+                <Box p={6}>
+                  <Grid templateColumns="1fr 1fr" gap={4}>
+                    <Box>
+                      <Text color="gray.400" fontSize="sm">Type</Text>
+                      <Text color="white" fontWeight="bold">{selectedNft.type}</Text>
+                    </Box>
+                    <Box>
+                      <Text color="gray.400" fontSize="sm">Rarity</Text>
+                      <Text color="white" fontWeight="bold">{selectedNft.rarity}</Text>
+                    </Box>
+                    <Box>
+                      <Text color="gray.400" fontSize="sm">Issue Date</Text>
+                      <Text color="white">{selectedNft.issueDate}</Text>
+                    </Box>
+                    <Box>
+                      <Text color="gray.400" fontSize="sm">Token ID</Text>
+                      <Text color="white">#{selectedNft.id.toString().padStart(4, '0')}</Text>
+                    </Box>
+                  </Grid>
+                  
+                  <Divider my={4} borderColor="gray.700" />
+                  
+                  <Text color="gray.300" fontSize="sm" mb={4}>
+                    This NFT represents your contribution to a real-world impact project. 
+                    It's a permanent record on the blockchain of your support.
+                  </Text>
+                  
+                  <Flex justify="space-between">
+                    <Button 
+                      leftIcon={<FaExternalLinkAlt />} 
+                      colorScheme="purple" 
+                      variant="outline" 
+                      size="sm"
+                    >
+                      View on Explorer
+                    </Button>
+                    <Button 
+                      colorScheme="brand" 
+                      size="sm"
+                      onClick={onClose} // Add close function
+                    >
+                      Close
+                    </Button>
+                  </Flex>
+                </Box>
+              </Box>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       
       {/* Project Progress */}
       <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap={6}>
