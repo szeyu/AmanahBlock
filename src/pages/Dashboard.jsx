@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Grid, Heading, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Table, Thead, Tbody, Tr, Th, Td, Badge, Button, Icon, Divider, HStack, Progress, VStack } from '@chakra-ui/react';
 import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import DonationFlow from '../components/DonationFlow';
+import TransactionFlowModal from '../components/TransactionFlowModal';
 
 const Dashboard = () => {
   // Mock data for the dashboard
@@ -24,6 +25,14 @@ const Dashboard = () => {
     { name: 'Emergency Flood Relief', category: 'Disaster', progress: 85, raised: '25,500', goal: '30,000' },
     { name: 'Food Bank Initiative', category: 'Food', progress: 40, raised: '10,000', goal: '25,000' },
   ];
+
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+
+  const handleTransactionDetails = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsTransactionModalOpen(true);
+  };
 
   return (
     <Box p={5} maxW="container.xl" mx="auto">
@@ -107,7 +116,12 @@ const Dashboard = () => {
                     </Badge>
                   </Td>
                   <Td>
-                    <Button size="xs" leftIcon={<FaRegFileAlt />} variant="ghost" colorScheme="blue">
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      variant="outline"
+                      onClick={() => handleTransactionDetails(tx)}
+                    >
                       Details
                     </Button>
                   </Td>
@@ -178,6 +192,12 @@ const Dashboard = () => {
           </Flex>
         </Box>
       </Grid>
+
+      <TransactionFlowModal
+        isOpen={isTransactionModalOpen}
+        onClose={() => setIsTransactionModalOpen(false)}
+        transaction={selectedTransaction}
+      />
     </Box>
   );
 };
