@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactFlow, { 
   Background,
   useNodesState,
@@ -6,6 +6,8 @@ import ReactFlow, {
   Handle,
   Position,
   getBezierPath,
+  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { 
@@ -194,7 +196,7 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-const DonationFlow = () => {
+const Flow = () => {
   const initialNodes = [
     {
       id: 'donor',
@@ -564,6 +566,24 @@ const DonationFlow = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { fitView } = useReactFlow();
+
+  useEffect(() => {
+    // Initial fit view with animation
+    setTimeout(() => {
+      fitView({ duration: 800, padding: 0.2 });
+    }, 100);
+
+    // After fit view animation, zoom to desired level
+    setTimeout(() => {
+      fitView({ 
+        duration: 800, 
+        padding: 0.2,
+        maxZoom: 0.8,
+        minZoom: 0.8
+      });
+    }, 1000);
+  }, []);
 
   return (
     <Box 
@@ -579,7 +599,7 @@ const DonationFlow = () => {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        fitView
+        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
         minZoom={0.2}
         maxZoom={1.5}
         defaultEdgeOptions={{
@@ -594,6 +614,14 @@ const DonationFlow = () => {
         <Background color="#319795" gap={16} size={1} />
       </ReactFlow>
     </Box>
+  );
+};
+
+const DonationFlow = () => {
+  return (
+    <ReactFlowProvider>
+      <Flow />
+    </ReactFlowProvider>
   );
 };
 
