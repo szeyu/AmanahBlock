@@ -27,7 +27,7 @@ import {
   Divider
 } from '@chakra-ui/react';
 import { Link, useLocation } from 'react-router-dom';
-import { HamburgerIcon, ChevronDownIcon, ExternalLinkIcon } from '@chakra-ui/icons';
+import { HamburgerIcon, ChevronDownIcon, ExternalLinkAlt } from '@chakra-ui/icons';
 import { 
   FaWallet, 
   FaEthereum, 
@@ -44,7 +44,9 @@ import {
   FaBookOpen,
   FaRegLightbulb,
   FaComments,
-  FaChartPie
+  FaChartPie,
+  FaSearch,
+  FaRocket
 } from 'react-icons/fa';
 
 const Header = () => {
@@ -136,13 +138,46 @@ const Header = () => {
               isPrimary={true}
             />
             
-            <NavLink to="/projects" label="Projects" isActive={isActive("/projects")} />
-            
-            <NavLink 
-              to="/project-funding" 
-              label="Funding Tracker" 
-              isActive={isActive("/project-funding")} 
-            />
+            {/* Projects dropdown menu */}
+            <Menu>
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                size="sm"
+                rightIcon={<ChevronDownIcon />}
+                color={isActive("/projects") || isActive("/project-funding") ? "white" : "gray.300"}
+                fontWeight={isActive("/projects") || isActive("/project-funding") ? "bold" : "normal"}
+                _hover={{
+                  bg: "rgba(255, 255, 255, 0.1)",
+                  color: "white"
+                }}
+                _active={{
+                  bg: "rgba(255, 255, 255, 0.1)"
+                }}
+              >
+                Projects
+              </MenuButton>
+              <MenuList bg="gray.800" borderColor="gray.700">
+                <MenuItem 
+                  as={Link} 
+                  to="/projects"
+                  icon={<FaSearch />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Explore Projects
+                </MenuItem>
+                <MenuItem 
+                  as={Link} 
+                  to="/project-funding"
+                  icon={<FaRocket />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Ongoing Projects
+                </MenuItem>
+              </MenuList>
+            </Menu>
             
             <NavLink 
               to="/governance" 
@@ -357,8 +392,15 @@ const Header = () => {
               <VStack align="stretch" spacing={4} mt={4}>
                 <MobileNavLink to="/dashboard" label="Dashboard" icon={FaChartLine} onClick={onClose} />
                 <MobileNavLink to="/donate" label="Donate" icon={FaHandHoldingHeart} onClick={onClose} isPrimary={true} />
-                <MobileNavLink to="/projects" label="Projects" icon={FaProjectDiagram} onClick={onClose} />
-                <MobileNavLink to="/project-funding" label="Funding Tracker" icon={FaChartLine} onClick={onClose} />
+                
+                <Divider borderColor="gray.700" />
+                
+                <Text color="gray.400" fontSize="sm" fontWeight="bold" px={3}>Projects</Text>
+                <MobileNavLink to="/projects" label="Explore Projects" icon={FaSearch} onClick={onClose} />
+                <MobileNavLink to="/project-funding" label="Ongoing Projects" icon={FaRocket} onClick={onClose} />
+                
+                <Divider borderColor="gray.700" />
+                
                 <MobileNavLink to="/governance" label="Governance" icon={FaGavel} onClick={onClose} />
                 
                 <Divider borderColor="gray.700" />

@@ -4,7 +4,7 @@ export const projectsData = [
     title: "School Building in Yemen",
     category: "Education",
     location: "Sana'a, Yemen",
-    image: "https://images.unsplash.com/photo-1594608661623-aa0bd3a69799",
+    image: "https://images.pexels.com/photos/8471835/pexels-photo-8471835.jpeg",
     description: "Construction of a school for 500 children in war-torn Yemen, providing safe access to education.",
     totalFunding: 50000,
     raisedAmount: 32500,
