@@ -40,9 +40,11 @@ import {
   FaChartLine, 
   FaCalculator,
   FaProjectDiagram,
-  FaRegClipboard,
-  FaExclamationTriangle,
-  FaHandHoldingHeart
+  FaHandHoldingHeart,
+  FaBookOpen,
+  FaRegLightbulb,
+  FaComments,
+  FaChartPie
 } from 'react-icons/fa';
 
 const Header = () => {
@@ -50,310 +52,326 @@ const Header = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const location = useLocation();
   const toast = useToast();
-
+  
   const handleConnectWallet = () => {
-    // Simulate wallet connection
-    setTimeout(() => {
-      setIsWalletConnected(true);
-      toast({
-        title: "Wallet connected",
-        description: "Your wallet has been successfully connected",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      });
-    }, 1000);
+    setIsWalletConnected(true);
+    toast({
+      title: "Wallet connected",
+      description: "Your wallet has been successfully connected.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
-
+  
   const handleDisconnectWallet = () => {
     setIsWalletConnected(false);
     toast({
       title: "Wallet disconnected",
-      description: "Your wallet has been disconnected",
+      description: "Your wallet has been disconnected.",
       status: "info",
-      duration: 5000,
+      duration: 3000,
       isClosable: true,
-      position: "top-right",
     });
   };
-
+  
   const isActive = (path) => {
     return location.pathname === path;
   };
-
-  // Main navigation items including Funding Tracker and Emergency Fund
-  const mainNavItems = [
-    { path: '/dashboard', label: 'Dashboard' },
-    { path: '/donate', label: 'Donate' },
-    { path: '/projects', label: 'Projects' },
-    { path: '/project-funding', label: 'Funding Tracker', icon: FaProjectDiagram },
-    { path: '/emergency-fund', label: 'Emergency Fund', icon: FaExclamationTriangle },
-    { path: '/governance', label: 'Governance', icon: FaGavel }
-  ];
-
-  // Secondary navigation items for dropdown
-  const secondaryNavItems = [
-    { path: '/islamic-defi', label: 'Islamic DeFi', icon: FaChartLine },
-    { path: '/zakat-calculator', label: 'Zakat Calculator', icon: FaCalculator },
-    { path: '/impact', label: 'Impact Explorer' },
-    { path: '/beneficiary-feedback', label: 'Beneficiary Feedback' }
-  ];
-
+  
   return (
-    <Box as="header" bg="rgba(10, 15, 30, 0.8)" py={4} px={8} position="sticky" top={0} zIndex={10} backdropFilter="blur(10px)" boxShadow="0 2px 10px rgba(0,0,0,0.3)">
-      <Flex justify="space-between" align="center" maxW="container.xl" mx="auto">
-        {/* Logo */}
-        <Link to="/">
-          <Flex align="center">
-            <Box 
-              w="40px" 
-              h="40px" 
-              bg="accent.500" 
-              borderRadius="full" 
-              mr={2} 
-              position="relative"
-              overflow="hidden"
-              _after={{
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bg: 'radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.8) 0%, transparent 20%)',
-              }}
-            />
-            <Box fontWeight="bold" fontSize="xl" bgGradient="linear(to-r, brand.500, accent.500)" bgClip="text">
-              SadaqahChain
-            </Box>
-          </Flex>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <HStack spacing={6} display={{ base: 'none', md: 'flex' }}>
-          {mainNavItems.slice(0, 4).map((item) => (
-            <Link to={item.path} key={item.path}>
+    <Box 
+      as="header" 
+      bg="rgba(10, 15, 30, 0.8)" 
+      backdropFilter="blur(10px)" 
+      position="sticky" 
+      top={0} 
+      zIndex={1000}
+      borderBottom="1px solid"
+      borderColor="rgba(255, 255, 255, 0.1)"
+    >
+      <Flex 
+        align="center" 
+        justify="space-between" 
+        maxW="container.xl" 
+        mx="auto" 
+        px={4} 
+        py={3}
+      >
+        {/* Logo and Navigation */}
+        <Flex align="center">
+          <Link to="/">
+            <Flex align="center" mr={8}>
+              <Box 
+                w="36px" 
+                h="36px" 
+                bg="accent.500" 
+                borderRadius="full" 
+                mr={2} 
+                display="flex" 
+                alignItems="center" 
+                justifyContent="center"
+              >
+                <Box as={FaHandHoldingHeart} color="white" size="20px" />
+              </Box>
               <Text 
-                color={isActive(item.path) ? 'brand.500' : 'white'} 
-                fontWeight={isActive(item.path) ? 'bold' : 'normal'} 
-                _hover={{ color: 'brand.500' }}
+                fontWeight="bold" 
+                fontSize="xl" 
+                bgGradient="linear(to-r, brand.500, accent.500)" 
+                bgClip="text"
               >
-                {item.label}
+                SadaqahChain
               </Text>
-            </Link>
-          ))}
-          
-          <Link to={mainNavItems[4].path}>
-            <Tooltip label="Emergency Fund" placement="bottom">
-              <Flex 
-                align="center" 
-                color={isActive(mainNavItems[4].path) ? 'red.500' : 'white'} 
-                fontWeight={isActive(mainNavItems[4].path) ? 'bold' : 'normal'} 
-                _hover={{ color: 'red.500' }}
-              >
-                <Box as={mainNavItems[4].icon} mr={1} />
-                <Text>{mainNavItems[4].label}</Text>
-              </Flex>
-            </Tooltip>
+            </Flex>
           </Link>
           
-          <Link to={mainNavItems[5].path}>
-            <Tooltip label="Community Governance" placement="bottom">
-              <Flex 
-                align="center" 
-                color={isActive(mainNavItems[5].path) ? 'brand.500' : 'white'} 
-                fontWeight={isActive(mainNavItems[5].path) ? 'bold' : 'normal'} 
-                _hover={{ color: 'brand.500' }}
-              >
-                <Box as={mainNavItems[5].icon} mr={1} />
-                <Text>{mainNavItems[5].label}</Text>
-              </Flex>
-            </Tooltip>
-          </Link>
-          
-          {/* More dropdown for secondary items */}
-          <Menu>
-            <MenuButton 
-              as={Button} 
-              rightIcon={<ChevronDownIcon />} 
-              variant="ghost" 
-              color="white" 
-              _hover={{ bg: 'whiteAlpha.200' }}
-              _active={{ bg: 'whiteAlpha.300' }}
-            >
-              More
-            </MenuButton>
-            <MenuList bg="gray.800" borderColor="gray.700">
-              {secondaryNavItems.map((item) => (
-                <MenuItem 
-                  key={item.path} 
-                  as={Link} 
-                  to={item.path} 
-                  bg="gray.800" 
-                  _hover={{ bg: 'whiteAlpha.200' }}
-                  icon={item.icon ? <Box as={item.icon} /> : null}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        </HStack>
-
-        {/* Auth/Wallet Section */}
-        <HStack spacing={4}>
-          {!isWalletConnected ? (
-            <>
-              <Link to="/login" display={{ base: 'none', md: 'block' }}>
-                <Button variant="outline" borderColor="brand.500" color="brand.500">
-                  Login
-                </Button>
-              </Link>
-              <Button 
-                leftIcon={<FaWallet />}
-                variant="gradient"
-                onClick={handleConnectWallet}
-              >
-                Connect Wallet
-              </Button>
-            </>
-          ) : (
+          {/* Desktop Navigation */}
+          <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+            <NavLink to="/dashboard" label="Dashboard" isActive={isActive("/dashboard")} />
+            
+            <NavLink 
+              to="/donate" 
+              label="Donate" 
+              isActive={isActive("/donate")} 
+              isPrimary={true}
+            />
+            
+            <NavLink to="/projects" label="Projects" isActive={isActive("/projects")} />
+            
+            <NavLink 
+              to="/project-funding" 
+              label="Funding Tracker" 
+              isActive={isActive("/project-funding")} 
+            />
+            
+            <NavLink 
+              to="/governance" 
+              label="Governance" 
+              isActive={isActive("/governance")} 
+            />
+            
+            {/* More dropdown menu */}
             <Menu>
-              <MenuButton 
-                as={Button} 
-                variant="outline" 
-                borderColor="gray.600"
-                _hover={{ borderColor: 'brand.500' }}
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                size="sm"
+                rightIcon={<ChevronDownIcon />}
+                color={isActive("/zakat-calculator") || isActive("/impact") || isActive("/beneficiary-feedback") ? "white" : "gray.300"}
+                fontWeight={isActive("/zakat-calculator") || isActive("/impact") || isActive("/beneficiary-feedback") ? "bold" : "normal"}
+                _hover={{
+                  bg: "rgba(255, 255, 255, 0.1)",
+                  color: "white"
+                }}
+                _active={{
+                  bg: "rgba(255, 255, 255, 0.1)"
+                }}
               >
-                <HStack>
-                  <Box as={FaEthereum} color="brand.500" />
-                  <Text>0x71C...93E4</Text>
-                  <Badge colorScheme="green" ml={2}>2.14 ETH</Badge>
-                </HStack>
+                More
               </MenuButton>
               <MenuList bg="gray.800" borderColor="gray.700">
                 <MenuItem 
                   as={Link} 
-                  to="/profile" 
-                  bg="gray.800" 
-                  _hover={{ bg: 'whiteAlpha.200' }}
-                  icon={<Box as={FaUserCircle} />}
+                  to="/zakat-calculator"
+                  icon={<FaCalculator />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Zakat Calculator
+                </MenuItem>
+                <MenuItem 
+                  as={Link} 
+                  to="/impact"
+                  icon={<FaChartPie />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Impact Explorer
+                </MenuItem>
+                <MenuItem 
+                  as={Link} 
+                  to="/beneficiary-feedback"
+                  icon={<FaComments />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Beneficiary Feedback
+                </MenuItem>
+                <MenuDivider borderColor="gray.700" />
+                <MenuItem 
+                  as={Link} 
+                  to="/learn"
+                  icon={<FaBookOpen />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  Learn
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </HStack>
+        </Flex>
+        
+        {/* Right side - Auth & Wallet */}
+        <HStack spacing={3}>
+          {/* Login Button - Only show when not connected */}
+          {!isWalletConnected && (
+            <Link to="/login">
+              <Button 
+                variant="outline" 
+                size="sm"
+                borderColor="rgba(255, 255, 255, 0.2)"
+                color="white"
+                _hover={{
+                  bg: "rgba(255, 255, 255, 0.1)",
+                  borderColor: "white"
+                }}
+              >
+                Login
+              </Button>
+            </Link>
+          )}
+          
+          {/* Wallet Connection Button */}
+          {isWalletConnected ? (
+            <Menu>
+              <MenuButton
+                as={Button}
+                size="sm"
+                bg="#00E0FF"
+                color="gray.800"
+                _hover={{
+                  bg: "#00B5D8"
+                }}
+                _active={{
+                  bg: "#00B5D8"
+                }}
+                leftIcon={<FaWallet />}
+                rightIcon={<ChevronDownIcon />}
+              >
+                0x71C...93E4
+              </MenuButton>
+              <MenuList bg="gray.800" borderColor="gray.700">
+                <Box px={4} py={2}>
+                  <Flex justify="space-between" align="center" mb={2}>
+                    <Text color="gray.400" fontSize="sm">Balance</Text>
+                    <Badge colorScheme="green" variant="solid">2.14 ETH</Badge>
+                  </Flex>
+                  <Flex align="center" mb={2}>
+                    <Box as={FaEthereum} color="brand.500" mr={2} />
+                    <Text color="white" fontSize="sm" fontFamily="mono">0x71C7f4E9A4D0F9A93E4</Text>
+                  </Flex>
+                </Box>
+                <MenuDivider borderColor="gray.700" />
+                <MenuItem 
+                  icon={<FaUserCircle />} 
+                  as={Link} 
+                  to="/profile"
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
                 >
                   My Profile
                 </MenuItem>
                 <MenuItem 
+                  icon={<FaHistory />} 
                   as={Link} 
-                  to="/donations" 
-                  bg="gray.800" 
-                  _hover={{ bg: 'whiteAlpha.200' }}
-                  icon={<Box as={FaHistory} />}
+                  to="/donations"
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
                 >
                   My Donations
                 </MenuItem>
                 <MenuItem 
-                  bg="gray.800" 
-                  _hover={{ bg: 'whiteAlpha.200' }}
-                  icon={<Box as={FaSignOutAlt} color="red.500" />}
+                  icon={<FaGavel />} 
+                  as={Link} 
+                  to="/governance"
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  My Votes
+                </MenuItem>
+                <MenuDivider borderColor="gray.700" />
+                <MenuItem 
+                  icon={<FaSignOutAlt />} 
                   onClick={handleDisconnectWallet}
-                  color="red.400"
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                  color="red.300"
                 >
                   Disconnect Wallet
                 </MenuItem>
               </MenuList>
             </Menu>
+          ) : (
+            <Button
+              size="sm"
+              bg="#00E0FF"
+              color="gray.800"
+              _hover={{
+                bg: "#00B5D8"
+              }}
+              leftIcon={<FaWallet />}
+              onClick={handleConnectWallet}
+            >
+              Connect Wallet
+            </Button>
           )}
+          
+          {/* Mobile menu button */}
+          <IconButton
+            display={{ base: "flex", md: "none" }}
+            aria-label="Open menu"
+            icon={<HamburgerIcon />}
+            onClick={onOpen}
+            variant="ghost"
+            color="white"
+            _hover={{
+              bg: "rgba(255, 255, 255, 0.1)"
+            }}
+          />
         </HStack>
-
-        {/* Mobile Menu Button */}
-        <IconButton
-          aria-label="Open menu"
-          icon={<HamburgerIcon />}
-          variant="ghost"
-          color="white"
-          display={{ base: 'flex', md: 'none' }}
-          onClick={onOpen}
-        />
-
-        {/* Mobile Drawer */}
-        <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="full">
+        
+        {/* Mobile drawer */}
+        <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="xs">
           <DrawerOverlay backdropFilter="blur(10px)" />
           <DrawerContent bg="gray.800" color="white">
+            <DrawerCloseButton />
             <DrawerHeader borderBottomWidth="1px" borderColor="gray.700">
-              <Flex justify="space-between" align="center">
-                <Flex align="center">
-                  <Box 
-                    w="30px" 
-                    h="30px" 
-                    bg="accent.500" 
-                    borderRadius="full" 
-                    mr={2} 
-                  />
-                  <Text fontWeight="bold">SadaqahChain</Text>
-                </Flex>
-                <DrawerCloseButton position="static" />
+              <Flex align="center">
+                <Box 
+                  w="30px" 
+                  h="30px" 
+                  bg="accent.500" 
+                  borderRadius="full" 
+                  mr={2} 
+                  display="flex" 
+                  alignItems="center" 
+                  justifyContent="center"
+                >
+                  <Box as={FaHandHoldingHeart} color="white" size="16px" />
+                </Box>
+                <Text fontWeight="bold">SadaqahChain</Text>
               </Flex>
             </DrawerHeader>
             <DrawerBody>
-              <VStack spacing={4} align="stretch" mt={4}>
-                {/* Main Navigation Items */}
-                {mainNavItems.map((item) => (
-                  <Link to={item.path} key={item.path} onClick={onClose}>
-                    <Flex align="center">
-                      {item.icon && <Box as={item.icon} mr={2} color={isActive(item.path) ? 'brand.500' : 'gray.400'} />}
-                      <Text 
-                        color={isActive(item.path) ? 'brand.500' : 'white'} 
-                        fontWeight={isActive(item.path) ? 'bold' : 'normal'}
-                        fontSize="lg"
-                        py={2}
-                      >
-                        {item.label}
-                      </Text>
-                    </Flex>
-                  </Link>
-                ))}
-                
-                <Divider borderColor="gray.700" />
-                <Text color="gray.400" fontWeight="bold" fontSize="sm">Features</Text>
-                
-                {/* Secondary Navigation Items */}
-                {secondaryNavItems.map((item) => (
-                  <Link to={item.path} key={item.path} onClick={onClose}>
-                    <Flex align="center">
-                      {item.icon && <Box as={item.icon} mr={2} color={isActive(item.path) ? 'brand.500' : 'gray.400'} />}
-                      <Text 
-                        color={isActive(item.path) ? 'brand.500' : 'white'} 
-                        fontWeight={isActive(item.path) ? 'bold' : 'normal'}
-                      >
-                        {item.label}
-                      </Text>
-                    </Flex>
-                  </Link>
-                ))}
+              <VStack align="stretch" spacing={4} mt={4}>
+                <MobileNavLink to="/dashboard" label="Dashboard" icon={FaChartLine} onClick={onClose} />
+                <MobileNavLink to="/donate" label="Donate" icon={FaHandHoldingHeart} onClick={onClose} isPrimary={true} />
+                <MobileNavLink to="/projects" label="Projects" icon={FaProjectDiagram} onClick={onClose} />
+                <MobileNavLink to="/project-funding" label="Funding Tracker" icon={FaChartLine} onClick={onClose} />
+                <MobileNavLink to="/governance" label="Governance" icon={FaGavel} onClick={onClose} />
                 
                 <Divider borderColor="gray.700" />
                 
-                {/* Auth/Wallet Section */}
-                {!isWalletConnected ? (
-                  <>
-                    <Link to="/login" onClick={onClose}>
-                      <Button variant="outline" w="full" borderColor="brand.500" color="brand.500">
-                        Login
-                      </Button>
-                    </Link>
-                    <Button 
-                      w="full"
-                      leftIcon={<FaWallet />}
-                      variant="gradient"
-                      onClick={() => {
-                        handleConnectWallet();
-                        onClose();
-                      }}
-                    >
-                      Connect Wallet
-                    </Button>
-                  </>
-                ) : (
+                <Text color="gray.400" fontSize="sm" fontWeight="bold" px={3}>More</Text>
+                <MobileNavLink to="/zakat-calculator" label="Zakat Calculator" icon={FaCalculator} onClick={onClose} />
+                <MobileNavLink to="/impact" label="Impact Explorer" icon={FaChartPie} onClick={onClose} />
+                <MobileNavLink to="/beneficiary-feedback" label="Beneficiary Feedback" icon={FaComments} onClick={onClose} />
+                <MobileNavLink to="/learn" label="Learn" icon={FaBookOpen} onClick={onClose} />
+                
+                <Divider borderColor="gray.700" />
+                
+                {isWalletConnected ? (
                   <VStack align="stretch" spacing={4} p={3} bg="gray.700" borderRadius="md">
                     <Flex justify="space-between" align="center">
                       <HStack>
@@ -385,6 +403,33 @@ const Header = () => {
                       Disconnect Wallet
                     </Button>
                   </VStack>
+                ) : (
+                  <VStack spacing={3}>
+                    <Button
+                      w="full"
+                      bg="#00E0FF"
+                      color="gray.800"
+                      _hover={{
+                        bg: "#00B5D8"
+                      }}
+                      leftIcon={<FaWallet />}
+                      onClick={() => {
+                        handleConnectWallet();
+                        onClose();
+                      }}
+                    >
+                      Connect Wallet
+                    </Button>
+                    <Link to="/login" onClick={onClose} style={{ width: '100%' }}>
+                      <Button 
+                        variant="outline" 
+                        w="full"
+                        borderColor="rgba(255, 255, 255, 0.2)"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                  </VStack>
                 )}
               </VStack>
             </DrawerBody>
@@ -392,6 +437,62 @@ const Header = () => {
         </Drawer>
       </Flex>
     </Box>
+  );
+};
+
+// Desktop Navigation Link
+const NavLink = ({ to, label, isActive, isPrimary = false }) => {
+  return (
+    <Link to={to}>
+      <Button
+        variant={isPrimary ? "solid" : "ghost"}
+        size="sm"
+        px={4}
+        bg={isPrimary ? "#00E0FF" : "transparent"}
+        color={isPrimary ? "gray.800" : isActive ? "white" : "gray.300"}
+        fontWeight={isActive ? "bold" : "normal"}
+        position="relative"
+        _hover={{
+          bg: isPrimary ? "#00B5D8" : "rgba(255, 255, 255, 0.1)",
+          color: isPrimary ? "gray.800" : "white"
+        }}
+        _after={{
+          content: '""',
+          position: "absolute",
+          bottom: "0",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: isActive && !isPrimary ? "20px" : "0",
+          height: "2px",
+          bg: "#00E0FF",
+          transition: "all 0.3s ease"
+        }}
+      >
+        {label}
+      </Button>
+    </Link>
+  );
+};
+
+// Mobile Navigation Link
+const MobileNavLink = ({ to, label, icon, onClick, isPrimary = false }) => {
+  const Icon = icon;
+  return (
+    <Link to={to} onClick={onClick} style={{ width: '100%' }}>
+      <Button
+        variant={isPrimary ? "solid" : "ghost"}
+        justifyContent="flex-start"
+        w="full"
+        leftIcon={<Icon />}
+        bg={isPrimary ? "#00E0FF" : "transparent"}
+        color={isPrimary ? "gray.800" : "white"}
+        _hover={{
+          bg: isPrimary ? "#00B5D8" : "rgba(255, 255, 255, 0.1)"
+        }}
+      >
+        {label}
+      </Button>
+    </Link>
   );
 };
 
