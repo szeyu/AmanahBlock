@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { Box, Grid, Heading, Flex, Text, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Table, Thead, Tbody, Tr, Th, Td, Badge, Button, Icon, Divider, HStack, Progress, VStack, SimpleGrid, Image, Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton, useDisclosure} from '@chakra-ui/react';
-import { FaExternalLinkAlt, FaRegClock, FaCheckCircle, FaRegFileAlt, FaCertificate } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import DonationFlow from '../components/DonationFlow';
-import TransactionFlowModal from '../components/TransactionFlowModal';
-import { Pie } from 'react-chartjs-2';
+import { 
+  Box, 
+  Heading, 
+  Text,
+  Flex,
+  useColorModeValue,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// Import extracted components
+import StatCards from '../components/dashboard/StatCards';
+import DonationFlow from '../components/dashboard/DonationFlow';
+import ImpactNFTs from '../components/dashboard/ImpactNFTs';
+import NFTModal from '../components/dashboard/NFTModal';
+import FundAllocationChart from '../components/dashboard/FundAllocationChart';
+import RecentTransactions from '../components/dashboard/RecentTransactions';
+import TransactionFlowModal from '../components/dashboard/TransactionFlowModal';
 
 const Dashboard = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
@@ -48,7 +59,7 @@ const Dashboard = () => {
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(26, 32, 44, 0.8)', // gray.800 with opacity
+        backgroundColor: 'rgba(13, 16, 25, 0.9)', // Dark background with opacity
         titleColor: 'white',
         bodyColor: 'white',
         borderColor: '#4A5568', // gray.600
@@ -71,7 +82,7 @@ const Dashboard = () => {
       name: "School Building #001", 
       image: "/NFTCard/NFTCard.svg",
       type: "Education", 
-      rarity: "Rare", // Added rarity
+      rarity: "Rare",
       issueDate: "2023-04-15"
     },
     { 
@@ -92,6 +103,13 @@ const Dashboard = () => {
     },
   ];
 
+  // Recent transactions data
+  const recentTransactions = [
+    { id: '0xb03b...3c4d', type: 'Waqf', amount: '500 USDT', date: '2023-05-15', status: 'Completed' },
+    { id: '0x56ef...7g8h', type: 'Zakat', amount: '1200 USDT', date: '2023-05-10', status: 'Processing' },
+    { id: '0x901j...1k2l', type: 'Sadaqah', amount: '300 USDT', date: '2023-05-05', status: 'Completed' },
+  ];
+
   // State for selected NFT and modal
   const [selectedNft, setSelectedNft] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -102,348 +120,151 @@ const Dashboard = () => {
     onOpen();
   };
 
-  const recentTransactions = [
-    { id: '0x1a2b...3c4d', type: 'Waqf', amount: '500 USDT', date: '2023-05-15', status: 'Completed' },
-    { id: '0x5e6f...7g8h', type: 'Zakat', amount: '1200 USDT', date: '2023-05-10', status: 'Processing' },
-    { id: '0x9i0j...1k2l', type: 'Sadaqah', amount: '300 USDT', date: '2023-05-05', status: 'Completed' },
-  ];
-
-  const projectProgress = [
-    { name: 'School Building in Yemen', category: 'Education', progress: 65, raised: '32,500', goal: '50,000' },
-    { name: 'Emergency Flood Relief', category: 'Disaster', progress: 85, raised: '25,500', goal: '30,000' },
-    { name: 'Food Bank Initiative', category: 'Food', progress: 40, raised: '10,000', goal: '25,000' },
-  ];
-
+  // State for transaction modal
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
 
-  const handleTransactionDetails = (transaction) => {
+  // Function to handle transaction click
+  const handleTransactionClick = (transaction) => {
     setSelectedTransaction(transaction);
     setIsTransactionModalOpen(true);
   };
 
   return (
-    <Box p={5} maxW="container.xl" mx="auto">
-      <Heading mb={6} color="white">Dashboard</Heading>
-      
-      {/* Stats Overview */}
-      <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={6} mb={8}>
-        <Stat className="card" p={4} borderRadius="md">
-          <StatLabel color="gray.300">Total Donations</StatLabel>
-          <StatNumber color="white">{donationStats.total} USDT</StatNumber>
-          <StatHelpText color="green.400">
-            <StatArrow type="increase" />
-            23.36%
-          </StatHelpText>
-        </Stat>
-        
-        <Stat className="card" p={4} borderRadius="md">
-          <StatLabel color="gray.300">Active Projects</StatLabel>
-          <StatNumber color="white">{donationStats.activeProjects}</StatNumber>
-          <StatHelpText color="gray.300">From 3 pools</StatHelpText>
-        </Stat>
-        
-        <Stat className="card" p={4} borderRadius="md">
-          <StatLabel color="gray.300">Investment Returns</StatLabel>
-          <StatNumber color="white">{donationStats.investmentReturns} USDT</StatNumber>
-          <StatHelpText color="green.400">
-            <StatArrow type="increase" />
-            5.8%
-          </StatHelpText>
-        </Stat>
-        
-        <Stat className="card" p={4} borderRadius="md">
-          <StatLabel color="gray.300">Impact Score</StatLabel>
-          <StatNumber color="white">{donationStats.impactScore}/100</StatNumber>
-          <StatHelpText color="blue.400">Excellent</StatHelpText>
-        </Stat>
-      </Grid>
-      
-      {/* Donation Chart */}
-      <Box className="card" p={6} borderRadius="md" mb={8}>
-        <Heading size="md" mb={4} color="white">Donation Flow</Heading>
-        <DonationFlow />
-      </Box>
-
-      {/* NFT Collection - Added this section */}
-      <Box className="card" p={6} borderRadius="md" mb={8}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Heading size="md" color="white">Impact NFTs</Heading>
-          <Button as={Link} to="/nft-gallery" size="sm" rightIcon={<FaExternalLinkAlt />} variant="outline" colorScheme="purple">
-            View All
-          </Button>
-        </Flex>
-        
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={4}>
-          {nftCollection.map((nft) => (
-            <Box 
-              key={nft.id}
-              bg="gray.800"
-              borderRadius="lg"
-              overflow="hidden"
-              cursor="pointer"
-              transition="all 0.3s"
-              _hover={{ 
-                transform: "translateY(-5px)",
-                boxShadow: "0 10px 20px rgba(138, 43, 226, 0.3)"
-              }}
-              onClick={() => handleNftClick(nft)}
-              className="nft-card"
-            >
-              <Box position="relative">
-                <Image 
-                  src={nft.image} 
-                  alt={nft.name}
-                  h="150px"
-                  w="100%"
-                  objectFit="cover"
-                />
-                <Badge 
-                  position="absolute" 
-                  top="2" 
-                  right="2" 
-                  colorScheme={
-                    nft.rarity === 'Common' ? 'gray' : 
-                    nft.rarity === 'Uncommon' ? 'green' : 
-                    nft.rarity === 'Rare' ? 'blue' : 'purple'
-                  }
-                >
-                  {nft.rarity}
-                </Badge>
-              </Box>
-              <Box p={3}>
-                <Text fontWeight="bold" color="white" noOfLines={1}>{nft.name}</Text>
-                <Flex justify="space-between" align="center" mt={1}>
-                  <Badge colorScheme={
-                    nft.type === 'Education' ? 'blue' : 
-                    nft.type === 'Water' ? 'cyan' : 
-                    nft.type === 'Food' ? 'green' : 'pink'
-                  }>
-                    {nft.type}
-                  </Badge>
-                  <HStack spacing={1}>
-                    <Icon as={FaCertificate} color="purple.300" />
-                    <Text fontSize="xs" color="gray.400">Verified</Text>
-                  </HStack>
-                </Flex>
-              </Box>
-            </Box>
-          ))}
-        </SimpleGrid>
-      </Box>
-      
-      {/* Recent Transactions */}
-      <Box className="card" p={6} borderRadius="md" mb={8}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Heading size="md" color="white">Recent Transactions</Heading>
-          <Button as={Link} to="/audit-trail" size="sm" rightIcon={<FaExternalLinkAlt />} variant="outline" colorScheme="blue">
-            View All
-          </Button>
-        </Flex>
-        
-        <Box overflowX="auto">
-          <Table variant="simple" size="sm">
-            <Thead>
-              <Tr>
-                <Th color="gray.300">Transaction ID</Th>
-                <Th color="gray.300">Type</Th>
-                <Th color="gray.300">Amount</Th>
-                <Th color="gray.300">Date</Th>
-                <Th color="gray.300">Status</Th>
-                <Th color="gray.300">Action</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {recentTransactions.map((tx, idx) => (
-                <Tr key={idx}>
-                  <Td color="blue.300">{tx.id}</Td>
-                  <Td color="white">{tx.type}</Td>
-                  <Td color="white">{tx.amount}</Td>
-                  <Td color="white">{tx.date}</Td>
-                  <Td>
-                    <Badge 
-                      colorScheme={
-                        tx.status === 'Completed' ? 'green' : 
-                        tx.status === 'Processing' ? 'yellow' : 'blue'
-                      }
-                    >
-                      {tx.status}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <Button
-                      size="sm"
-                      colorScheme="blue"
-                      variant="outline"
-                      onClick={() => handleTransactionDetails(tx)}
-                    >
-                      Details
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Box>
-      </Box>
-
-      {/* NFT Modal */}
-      <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered motionPreset="scale">
-        <ModalOverlay backdropFilter="blur(10px)" bg="rgba(0,0,0,0.7)"/>
-        <ModalContent 
-          bg="gray.800" 
-          borderWidth="1px" 
-          borderColor="purple.500"
-          borderRadius="xl"
-          overflow="hidden"
-          className="modal-content"
+    <Box 
+      p={5} 
+      maxW="container.xl" 
+      mx="auto"
+      position="relative"
+      _before={{
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        background: "radial-gradient(circle at top right, rgba(11, 197, 234, 0.1), transparent 70%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      <Box position="relative" zIndex="1">
+        <Flex 
+          direction="column" 
+          mb={8}
         >
-          <ModalCloseButton color="white" />
-          <ModalBody p={0}>
-            {selectedNft && (
-              <Box>
-                <Box 
-                  position="relative" 
-                  h="300px" 
-                  className="nft-animation"
-                >
-                  <Image 
-                    src={selectedNft.image} 
-                    alt={selectedNft.name}
-                    w="100%"
-                    h="100%"
-                    objectFit="cover"
-                  />
-                  <Box 
-                    position="absolute" 
-                    bottom="0" 
-                    left="0" 
-                    right="0" 
-                    bg="rgba(0,0,0,0.7)" 
-                    p={4}
-                    backdropFilter="blur(5px)"
-                  >
-                    <Heading size="md" color="white">{selectedNft.name}</Heading>
-                    <Text color="gray.300" fontSize="sm">Impact Certificate</Text>
-                  </Box>
-                </Box>
-                <Box p={6}>
-                  <Grid templateColumns="1fr 1fr" gap={4}>
-                    <Box>
-                      <Text color="gray.400" fontSize="sm">Type</Text>
-                      <Text color="white" fontWeight="bold">{selectedNft.type}</Text>
-                    </Box>
-                    <Box>
-                      <Text color="gray.400" fontSize="sm">Rarity</Text>
-                      <Text color="white" fontWeight="bold">{selectedNft.rarity}</Text>
-                    </Box>
-                    <Box>
-                      <Text color="gray.400" fontSize="sm">Issue Date</Text>
-                      <Text color="white">{selectedNft.issueDate}</Text>
-                    </Box>
-                    <Box>
-                      <Text color="gray.400" fontSize="sm">Token ID</Text>
-                      <Text color="white">#{selectedNft.id.toString().padStart(4, '0')}</Text>
-                    </Box>
-                  </Grid>
-                  
-                  <Divider my={4} borderColor="gray.700" />
-                  
-                  <Text color="gray.300" fontSize="sm" mb={4}>
-                    This NFT represents your contribution to a real-world impact project. 
-                    It's a permanent record on the blockchain of your support.
-                  </Text>
-                  
-                  <Flex justify="space-between">
-                    <Button 
-                      leftIcon={<FaExternalLinkAlt />} 
-                      colorScheme="purple" 
-                      variant="outline" 
-                      size="sm"
-                    >
-                      View on Explorer
-                    </Button>
-                    <Button 
-                      colorScheme="brand" 
-                      size="sm"
-                      onClick={onClose} // Add close function
-                    >
-                      Close
-                    </Button>
-                  </Flex>
-                </Box>
-              </Box>
-            )}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-      
-      {/* Project Progress */}
-      {/* <Grid templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }} gap={6}> */}
-        {/* Project Progress */}
-        {/* <Box className="card" p={6} borderRadius="md">
-          <Heading size="md" mb={4} color="white">Project Progress</Heading>
-          <VStack spacing={6} align="stretch">
-            {projectProgress.map((project, idx) => (
-              <Box key={idx}>
-                <Flex justify="space-between" mb={1}>
-                  <Text fontWeight="medium" color="white">{project.name}</Text>
-                  <Badge colorScheme={
-                    project.category === 'Education' ? 'blue' : 
-                    project.category === 'Disaster' ? 'red' : 'green'
-                  }>
-                    {project.category}
-                  </Badge>
-                </Flex>
-                <Flex justify="space-between" mb={2}>
-                  <Text fontSize="sm" color="gray.400">
-                    {project.raised} USDT raised of {project.goal} USDT
-                  </Text>
-                  <Text fontSize="sm" color="gray.400">{project.progress}%</Text>
-                </Flex>
-                <Progress 
-                  value={project.progress} 
-                  size="sm" 
-                  colorScheme={
-                    project.category === 'Education' ? 'blue' : 
-                    project.category === 'Disaster' ? 'red' : 'green'
-                  } 
-                  borderRadius="full"
-                />
-              </Box>
-            ))}
-          </VStack>
-        </Box> */}
-        
-      {/* Fund Allocation */}
-      <Box className="card" p={6} borderRadius="md">
-        <Heading size="md" mb={4} color="white">Fund Allocation</Heading>
-        <Box h="250px" borderRadius="md" position="relative">
-          <Pie data={getFundAllocationData()} options={chartOptions} />
-        </Box>
-        <Divider my={4} borderColor="gray.700" />
-        <Flex justify="space-between" wrap="wrap" gap={2}>
-          <HStack>
-            <Box w="12px" h="12px" borderRadius="full" bg="blue.500" />
-            <Text fontSize="sm" color="gray.300">Education (45%)</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" borderRadius="full" bg="red.500" />
-            <Text fontSize="sm" color="gray.300">Disaster Relief (30%)</Text>
-          </HStack>
-          <HStack>
-            <Box w="12px" h="12px" borderRadius="full" bg="green.500" />
-            <Text fontSize="sm" color="gray.300">Food & Water (25%)</Text>
-          </HStack>
+          <Heading 
+            mb={2} 
+            color="white" 
+            size="xl"
+            bgGradient="linear(to-r, brand.400, accent.400)"
+            bgClip="text"
+            fontWeight="bold"
+          >
+            Dashboard
+          </Heading>
+          <Text color="gray.400">
+            Track your donations, investments, and impact in real-time
+          </Text>
         </Flex>
-      </Box>
-      {/* </Grid> */}
+        
+        {/* Stat Cards */}
+        <StatCards donationStats={donationStats} />
+        
+        {/* Donation Chart */}
+        <Box 
+          className="card" 
+          p={6} 
+          borderRadius="xl"
+          mb={8}
+          bg="rgba(13, 16, 25, 0.7)"
+          backdropFilter="blur(10px)"
+          borderWidth="1px"
+          borderColor="gray.700"
+          position="relative"
+          overflow="hidden"
+          boxShadow="0 8px 32px rgba(0, 0, 0, 0.2)"
+          _before={{
+            content: '""',
+            position: "absolute",
+            top: "-1px",
+            left: "-1px",
+            right: "-1px",
+            bottom: "-1px",
+            borderRadius: "xl",
+            padding: "1px",
+            background: "linear-gradient(135deg, rgba(11, 197, 234, 0.3), rgba(95, 21, 242, 0.3))",
+            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            maskComposite: "exclude",
+            zIndex: 0,
+          }}
+        >
+          <Heading 
+            size="md" 
+            mb={4} 
+            color="white"
+            position="relative"
+            zIndex="1"
+            display="flex"
+            alignItems="center"
+            _after={{
+              content: '""',
+              display: 'block',
+              width: '30px',
+              height: '2px',
+              bgGradient: "linear(to-r, brand.500, transparent)",
+              ml: 2
+            }}
+          >
+            Donation Flow
+          </Heading>
+          <Box position="relative" zIndex="1">
+            <DonationFlow />
+          </Box>
+        </Box>
 
-      <TransactionFlowModal
-        isOpen={isTransactionModalOpen}
-        onClose={() => setIsTransactionModalOpen(false)}
-        transaction={selectedTransaction}
-      />
+        {/* NFT Collection */}
+        <ImpactNFTs 
+          nftCollection={nftCollection} 
+          handleNftClick={handleNftClick} 
+        />
+        
+        {/* NFT Modal */}
+        <NFTModal 
+          isOpen={isOpen} 
+          onClose={onClose} 
+          selectedNft={selectedNft} 
+        />
+        
+        {/* Recent Transactions and Fund Allocation in a grid */}
+        <Flex 
+          direction={{ base: "column", lg: "row" }} 
+          gap={6}
+        >
+          {/* Recent Transactions */}
+          <Box flex="3">
+            <RecentTransactions 
+              transactions={recentTransactions} 
+              handleTransactionClick={handleTransactionClick} 
+            />
+          </Box>
+          
+          {/* Fund Allocation Chart */}
+          <Box flex="2">
+            <FundAllocationChart 
+              chartData={getFundAllocationData()} 
+              chartOptions={chartOptions} 
+            />
+          </Box>
+        </Flex>
+
+        {/* Transaction Flow Modal */}
+        <TransactionFlowModal
+          isOpen={isTransactionModalOpen}
+          onClose={() => setIsTransactionModalOpen(false)}
+          transaction={selectedTransaction}
+        />
+      </Box>
     </Box>
   );
 };

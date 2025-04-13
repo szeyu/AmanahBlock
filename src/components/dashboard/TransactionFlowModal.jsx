@@ -146,7 +146,20 @@ const TransactionFlow = ({ transaction }) => {
     const edges = [];
     
     // Calculate investment and profit amounts
-    const amount = transaction?.amount ? parseFloat(transaction.amount.split(' ')[0]) : 0;
+    let amount = 0;
+    
+    // Handle different formats of amount (string "500 USDT" or number 500)
+    if (transaction?.amount) {
+      if (typeof transaction.amount === 'string') {
+        // Try to extract the numeric part if it's a string like "500 USDT"
+        const match = transaction.amount.match(/(\d+)/);
+        amount = match ? parseFloat(match[0]) : 0;
+      } else {
+        // If it's already a number
+        amount = parseFloat(transaction.amount);
+      }
+    }
+    
     const investmentAmount = (amount * 0.9).toFixed(2); // 90% to investment
     const emergencyAmount = (amount * 0.1).toFixed(2); // 10% to emergency fund
     const profitAmount = (amount * 0.9 * 0.05).toFixed(2); // 5% profit from investment
