@@ -20,11 +20,13 @@ import IslamicDefiPage from './pages/IslamicDefiPage';
 import ProjectFundingPage from './pages/ProjectFundingPage';
 import EmergencyFundPage from './pages/EmergencyFundPage';
 import BeneficiaryFeedbackPage from './pages/BeneficiaryFeedbackPage';
+import ScrollToTop from './ScrollToTop';
 
 function App() {
   return (
     <ChakraProvider theme={theme} resetCSS>
       <Router>
+        <ScrollToTop />
         <Header />
         <Routes>
           <Route path="/" element={<LandingPage />} />
