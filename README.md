@@ -4,7 +4,7 @@
 
 AmanahBlock is a decentralized, blockchain-powered system designed to revolutionize charitable giving. It integrates smart contracts, Shariah-compliant financial practices, AI-driven insights, and user-friendly interfaces to address key challenges in the charitable sector.
 
-**Presentation Slides**: [View our detailed presentation](https://drive.google.com/drive/folders/1bMI49ETarfeWw6OeBeJhcQGS7pFzEGnb?usp=sharing)
+**Presentation Slides and Proposal**: [View our detailed presentation and proposal](https://drive.google.com/drive/folders/1bMI49ETarfeWw6OeBeJhcQGS7pFzEGnb?usp=sharing)
 
 ## System Architecture
 
