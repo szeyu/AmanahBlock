@@ -19,12 +19,7 @@ import {
   FaHandHoldingUsd, 
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { QRCodeSVG } from 'qrcode.react';
-import ShariahComplianceBadge from '../components/ShariahComplianceBadge';
-import AIDonationAdvisor from '../components/AIDonationAdvisor';
-
-// Import extracted components
-import DonationTypeSelector from '../components/donation/DonationTypeSelector';
+import AIDonationAdvisor from '../components/donation/AIDonationAdvisor';
 import DonationPoolSelector from '../components/donation/DonationPoolSelector';
 import DonationAmountSection from '../components/donation/DonationAmountSection';
 import WaqfDonationForm from '../components/donation/WaqfDonationForm';
@@ -278,140 +273,236 @@ const DonationPage = () => {
   };
 
   return (
-    <Box p={5} maxW="container.xl" mx="auto">
-      <Heading mb={2} color="white" size="xl">Make a Donation</Heading>
-      <Text color="gray.400" mb={6}>Support Shariah-compliant charitable projects with transparent blockchain tracking</Text>
-      
-      {/* Donation Type Selection */}
-      <Tabs variant="soft-rounded" colorScheme="brand" mb={8} onChange={handleDonationTypeChange}>
-        <TabList>
-          <Tab _selected={{ color: 'white', bg: 'brand.500' }}>Sadaqah (Voluntary)</Tab>
-          <Tab _selected={{ color: 'white', bg: 'accent.500' }}>Zakat (Obligatory)</Tab>
-          <Tab _selected={{ color: 'white', bg: 'green.500' }}>Waqf (Endowment)</Tab>
-        </TabList>
-        <TabPanels mt={4}>
-          <TabPanel px={0}>
-            <Text color="gray.300" mb={4}>
-              Sadaqah is voluntary charity given to help those in need. It can be given at any time, in any amount, and is a beautiful expression of generosity.
-            </Text>
-            
-            {/* Sadaqah Donation Flow */}
-            <Box>
-              {/* Pool Selection - Moved before Donation Amount */}
-              <DonationPoolSelector 
-                poolStats={poolStats} 
-                selectedPool={selectedPool} 
-                setSelectedPool={setSelectedPool} 
-                showAllocation={showAllocation} 
-              />
+    <Box 
+      p={5} 
+      maxW="container.xl" 
+      mx="auto"
+      position="relative"
+      _before={{
+        content: '""',
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        background: "radial-gradient(circle at top right, rgba(11, 197, 234, 0.1), transparent 70%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      <Box position="relative" zIndex="1">
+        <Heading 
+          mb={2} 
+          color="white" 
+          size="xl"
+          bgGradient="linear(to-r, brand.400, accent.400)"
+          bgClip="text"
+          fontWeight="bold"
+        >
+          Make a Donation
+        </Heading>
+        <Text color="gray.400" mb={6}>Support Shariah-compliant charitable projects with transparent blockchain tracking</Text>
+        
+        {/* Donation Type Selection */}
+        <Tabs 
+          variant="soft-rounded" 
+          colorScheme="brand" 
+          mb={8} 
+          onChange={handleDonationTypeChange}
+        >
+          <TabList>
+            <Tab 
+              _selected={{ 
+                color: 'white', 
+                bg: 'brand.500',
+                boxShadow: '0 0 15px rgba(11, 197, 234, 0.5)'
+              }}
+              _hover={{
+                bg: 'rgba(11, 197, 234, 0.1)'
+              }}
+            >
+              Sadaqah (Voluntary)
+            </Tab>
+            <Tab 
+              _selected={{ 
+                color: 'white', 
+                bg: 'accent.500',
+                boxShadow: '0 0 15px rgba(236, 110, 76, 0.5)'
+              }}
+              _hover={{
+                bg: 'rgba(236, 110, 76, 0.1)'
+              }}
+            >
+              Zakat (Obligatory)
+            </Tab>
+            <Tab 
+              _selected={{ 
+                color: 'white', 
+                bg: 'green.500',
+                boxShadow: '0 0 15px rgba(72, 187, 120, 0.5)'
+              }}
+              _hover={{
+                bg: 'rgba(72, 187, 120, 0.1)'
+              }}
+            >
+              Waqf (Endowment)
+            </Tab>
+          </TabList>
+          <TabPanels mt={4}>
+            <TabPanel px={0}>
+              <Text color="gray.300" mb={4}>
+                Sadaqah is voluntary charity given to help those in need. It can be given at any time, in any amount, and is a beautiful expression of generosity.
+              </Text>
+              
+              {/* Sadaqah Donation Flow */}
+              <Box>
+                {/* Pool Selection - Moved before Donation Amount */}
+                <DonationPoolSelector 
+                  poolStats={poolStats} 
+                  selectedPool={selectedPool} 
+                  setSelectedPool={setSelectedPool} 
+                  showAllocation={showAllocation} 
+                />
 
-              {/* AI Donation Advisor */}
-              <AIDonationAdvisor />
-              
-              {/* Donation Amount Section */}
-              <DonationAmountSection 
-                donationMode={donationMode}
-                setDonationMode={setDonationMode}
-                donationAmount={donationAmount}
-                setDonationAmount={setDonationAmount}
-                paymentMethod={paymentMethod}
-                handlePaymentMethodSelect={handlePaymentMethodSelect}
-                onOpen={onOpen}
-              />
-              
-              {/* Food Donation Section */}
-              {donationMode === 'food' && (
-                <FoodDonationSection 
-                  foodItems={foodItems}
-                  selectedFoodItems={selectedFoodItems}
-                  handleAddFoodItem={handleAddFoodItem}
-                  handleUpdateFoodQuantity={handleUpdateFoodQuantity}
-                  handleRemoveFoodItem={handleRemoveFoodItem}
-                  calculateFoodTotal={calculateFoodTotal}
+                {/* AI Donation Advisor */}
+                <AIDonationAdvisor />
+                
+                {/* Donation Amount Section */}
+                <DonationAmountSection 
+                  donationMode={donationMode}
+                  setDonationMode={setDonationMode}
+                  donationAmount={donationAmount}
+                  setDonationAmount={setDonationAmount}
                   paymentMethod={paymentMethod}
                   handlePaymentMethodSelect={handlePaymentMethodSelect}
-                  setDonationAmount={setDonationAmount}
                   onOpen={onOpen}
                 />
-              )}
-            </Box>
-          </TabPanel>
-          
-          <TabPanel px={0}>
-            <Text color="gray.300" mb={4}>
-              Zakat is an obligatory form of charity in Islam, typically 2.5% of one's wealth above a minimum threshold (nisab), given annually.
-            </Text>
+                
+                {/* Food Donation Section */}
+                {donationMode === 'food' && (
+                  <FoodDonationSection 
+                    foodItems={foodItems}
+                    selectedFoodItems={selectedFoodItems}
+                    handleAddFoodItem={handleAddFoodItem}
+                    handleUpdateFoodQuantity={handleUpdateFoodQuantity}
+                    handleRemoveFoodItem={handleRemoveFoodItem}
+                    calculateFoodTotal={calculateFoodTotal}
+                    paymentMethod={paymentMethod}
+                    handlePaymentMethodSelect={handlePaymentMethodSelect}
+                    setDonationAmount={setDonationAmount}
+                    onOpen={onOpen}
+                  />
+                )}
+              </Box>
+            </TabPanel>
             
-            {/* Add Zakat Calculator Button */}
-            <Button 
-              as={Link} 
-              to="/zakat-calculator" 
-              variant="outline" 
-              colorScheme="brand" 
-              mb={6}
-            >
-              Calculate Your Zakat
-            </Button>
-            
-            {/* Zakat Donation Flow */}
-            <Box>
-              {/* Pool Selection */}
-              <DonationPoolSelector 
-                poolStats={poolStats} 
-                selectedPool={selectedPool} 
-                setSelectedPool={setSelectedPool} 
-                showAllocation={showAllocation} 
-              />
+            <TabPanel px={0}>
+              <Text color="gray.300" mb={4}>
+                Zakat is an obligatory form of charity in Islam, typically 2.5% of one's wealth above a minimum threshold (nisab), given annually.
+              </Text>
               
-              {/* AI Donation Advisor */}
-              <AIDonationAdvisor />
+              {/* Add Zakat Calculator Button */}
+              <Button 
+                as={Link} 
+                to="/zakat-calculator" 
+                variant="outline" 
+                colorScheme="brand" 
+                mb={6}
+                borderRadius="xl"
+                borderWidth="1px"
+                borderColor="brand.500"
+                color="brand.400"
+                _hover={{
+                  bg: "rgba(11, 197, 234, 0.1)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
+                }}
+                transition="all 0.3s ease"
+                position="relative"
+                overflow="hidden"
+                _after={{
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "linear-gradient(90deg, transparent, rgba(11, 197, 234, 0.1), transparent)",
+                  zIndex: 0,
+                  transform: "translateX(-100%)",
+                  animation: "shimmer 2s infinite",
+                }}
+                sx={{
+                  "@keyframes shimmer": {
+                    "100%": {
+                      transform: "translateX(100%)",
+                    },
+                  },
+                }}
+              >
+                Calculate Your Zakat
+              </Button>
               
-              {/* Donation Amount Section */}
-              <DonationAmountSection 
-                donationMode={donationMode}
-                setDonationMode={setDonationMode}
-                donationAmount={donationAmount}
-                setDonationAmount={setDonationAmount}
-                paymentMethod={paymentMethod}
-                handlePaymentMethodSelect={handlePaymentMethodSelect}
-                onOpen={onOpen}
-              />
-            </Box>
-          </TabPanel>
-          
-          <TabPanel px={0}>
-            <Text color="gray.300" mb={4}>
-              Waqf is an endowment made by a Muslim to a religious, educational, or charitable cause. The donated assets are held and preserved for specific purposes indefinitely.
-            </Text>
+              {/* Zakat Donation Flow */}
+              <Box>
+                {/* Pool Selection */}
+                <DonationPoolSelector 
+                  poolStats={poolStats} 
+                  selectedPool={selectedPool} 
+                  setSelectedPool={setSelectedPool} 
+                  showAllocation={showAllocation} 
+                />
+                
+                {/* AI Donation Advisor */}
+                <AIDonationAdvisor />
+                
+                {/* Donation Amount Section */}
+                <DonationAmountSection 
+                  donationMode={donationMode}
+                  setDonationMode={setDonationMode}
+                  donationAmount={donationAmount}
+                  setDonationAmount={setDonationAmount}
+                  paymentMethod={paymentMethod}
+                  handlePaymentMethodSelect={handlePaymentMethodSelect}
+                  onOpen={onOpen}
+                />
+              </Box>
+            </TabPanel>
             
-            {/* Waqf Donation Form */}
-            <WaqfDonationForm 
-              waqfForm={waqfForm}
-              handleWaqfFormChange={handleWaqfFormChange}
-              handleWaqfSubmit={handleWaqfSubmit}
-              uploadedFiles={uploadedFiles}
-              handleFileUpload={handleFileUpload}
-              handleRemoveFile={handleRemoveFile}
-              waqfRequests={waqfRequests}
-            />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-      
-      {/* Donation Modals */}
-      <DonationModals 
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        isQRCodeOpen={isQRCodeOpen}
-        onQRCodeClose={onQRCodeClose}
-        donationType={donationType}
-        donationAmount={donationAmount}
-        currency={currency}
-        selectedPool={selectedPool}
-        poolStats={poolStats}
-        handleDonate={handleDonate}
-      />
+            <TabPanel px={0}>
+              <Text color="gray.300" mb={4}>
+                Waqf is an endowment made by a Muslim to a religious, educational, or charitable cause. The donated assets are held and preserved for specific purposes indefinitely.
+              </Text>
+              
+              {/* Waqf Donation Form */}
+              <WaqfDonationForm 
+                waqfForm={waqfForm}
+                handleWaqfFormChange={handleWaqfFormChange}
+                handleWaqfSubmit={handleWaqfSubmit}
+                uploadedFiles={uploadedFiles}
+                handleFileUpload={handleFileUpload}
+                handleRemoveFile={handleRemoveFile}
+                waqfRequests={waqfRequests}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+        
+        {/* Donation Modals */}
+        <DonationModals 
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          isQRCodeOpen={isQRCodeOpen}
+          onQRCodeClose={onQRCodeClose}
+          donationType={donationType}
+          donationAmount={donationAmount}
+          currency={currency}
+          selectedPool={selectedPool}
+          poolStats={poolStats}
+          handleDonate={handleDonate}
+        />
+      </Box>
     </Box>
   );
 };
