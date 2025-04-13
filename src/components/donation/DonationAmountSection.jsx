@@ -19,6 +19,11 @@ import {
   HStack,
   Icon,
   Button,
+  Input,
+  Select,
+  Radio,
+  RadioGroup,
+  Stack,
 } from '@chakra-ui/react';
 import { 
   FaWallet, 
@@ -37,7 +42,8 @@ const DonationAmountSection = ({
   setDonationAmount, 
   paymentMethod, 
   handlePaymentMethodSelect, 
-  onOpen 
+  onOpen,
+  donationType
 }) => {
   // Web3 style colors and effects
   const glassBackground = "rgba(13, 16, 25, 0.7)";
@@ -71,7 +77,7 @@ const DonationAmountSection = ({
     >
       <Heading size="md" color="white" mb={4} fontWeight="600">Donation Amount</Heading>
       
-      {/* Donation Mode Selector */}
+      {/* Donation Mode Selector - Hide food tab for zakat and waqf */}
       <Tabs 
         variant="soft-rounded" 
         colorScheme="brand" 
@@ -92,23 +98,25 @@ const DonationAmountSection = ({
           >
             Donate Money
           </Tab>
-          <Tab 
-            _selected={{ 
-              color: 'white', 
-              bg: 'accent.500',
-              boxShadow: '0 0 15px rgba(236, 110, 76, 0.5)'
-            }}
-            _hover={{
-              bg: 'rgba(236, 110, 76, 0.1)'
-            }}
-          >
-            Donate Food
-          </Tab>
+          {donationType !== 'zakat' && donationType !== 'waqf' && (
+            <Tab 
+              _selected={{ 
+                color: 'white', 
+                bg: 'accent.500',
+                boxShadow: '0 0 15px rgba(236, 110, 76, 0.5)'
+              }}
+              _hover={{
+                bg: 'rgba(236, 110, 76, 0.1)'
+              }}
+            >
+              Donate Food
+            </Tab>
+          )}
         </TabList>
     
         <TabPanels>
           <TabPanel px={0}>
-            {/* Money Donation UI */}
+            {/* Money Donation UI - No changes needed */}
             <FormControl mb={6}>
               <FormLabel color="gray.300">Enter Amount</FormLabel>
               <NumberInput 
@@ -381,6 +389,155 @@ const DonationAmountSection = ({
               </Grid>
             </Box>
 
+            {/* Payment Method Details Sections */}
+            {/* Card Payment Details */}
+            {paymentMethod === 'card' && (
+              <Box mt={4} p={4} bg="rgba(26, 32, 44, 0.6)" borderRadius="md" borderWidth="1px" borderColor="gray.700">
+                <Text color="white" fontWeight="medium" mb={3}>Card Payment Details</Text>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Card Type</FormLabel>
+                  <RadioGroup defaultValue="credit">
+                    <Stack direction="row" spacing={5}>
+                      <Radio value="credit" colorScheme="brand">Credit Card</Radio>
+                      <Radio value="debit" colorScheme="brand">Debit Card</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Card Network</FormLabel>
+                  <RadioGroup defaultValue="visa">
+                    <Stack direction="row" spacing={5}>
+                      <Radio value="visa" colorScheme="brand">Visa</Radio>
+                      <Radio value="mastercard" colorScheme="brand">Mastercard</Radio>
+                      <Radio value="amex" colorScheme="brand">American Express</Radio>
+                    </Stack>
+                  </RadioGroup>
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Card Number</FormLabel>
+                  <Input 
+                    placeholder="XXXX XXXX XXXX XXXX" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                  />
+                </FormControl>
+                
+                <Grid templateColumns="1fr 1fr" gap={3}>
+                  <FormControl>
+                    <FormLabel color="gray.300" fontSize="sm">Expiry Date</FormLabel>
+                    <Input 
+                      placeholder="MM/YY" 
+                      bg="gray.700" 
+                      borderColor="gray.600"
+                    />
+                  </FormControl>
+                  
+                  <FormControl>
+                    <FormLabel color="gray.300" fontSize="sm">CVV</FormLabel>
+                    <Input 
+                      placeholder="XXX" 
+                      bg="gray.700" 
+                      borderColor="gray.600"
+                      type="password"
+                      maxLength={4}
+                    />
+                  </FormControl>
+                </Grid>
+                
+                <FormControl mt={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Cardholder Name (Optional)</FormLabel>
+                  <Input 
+                    placeholder="Name as it appears on card" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                  />
+                </FormControl>
+                
+                <Text color="gray.400" fontSize="xs" mt={3}>
+                  Your payment information is securely processed and we do not store your card details.
+                </Text>
+              </Box>
+            )}
+            
+            {/* Online Banking Details */}
+            {paymentMethod === 'bank' && (
+              <Box mt={4} p={4} bg="rgba(26, 32, 44, 0.6)" borderRadius="md" borderWidth="1px" borderColor="gray.700">
+                <Text color="white" fontWeight="medium" mb={3}>Online Banking Details</Text>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Select Bank</FormLabel>
+                  <Select 
+                    placeholder="Choose your bank" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                  >
+                    <option value="maybank">Maybank</option>
+                    <option value="cimb">CIMB Bank</option>
+                    <option value="publicbank">Public Bank</option>
+                    <option value="rhb">RHB Bank</option>
+                    <option value="hongleong">Hong Leong Bank</option>
+                    <option value="ambank">AmBank</option>
+                    <option value="bsn">Bank Simpanan Nasional</option>
+                    <option value="bankislam">Bank Islam</option>
+                    <option value="ocbc">OCBC Bank</option>
+                    <option value="hsbc">HSBC Bank</option>
+                    <option value="standardchartered">Standard Chartered</option>
+                  </Select>
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Account Number</FormLabel>
+                  <Input 
+                    placeholder="Enter your account number" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                  />
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Account Holder Name</FormLabel>
+                  <Input 
+                    placeholder="Enter account holder name" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                  />
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Transfer Amount</FormLabel>
+                  <NumberInput 
+                    value={donationAmount} 
+                    onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
+                    min={10}
+                    max={1000000}
+                  >
+                    <NumberInputField bg="gray.700" borderColor="gray.600" />
+                    <NumberInputStepper>
+                      <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
+                      <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
+                    </NumberInputStepper>
+                  </NumberInput>
+                </FormControl>
+                
+                <FormControl mb={3}>
+                  <FormLabel color="gray.300" fontSize="sm">Reference/Description</FormLabel>
+                  <Input 
+                    placeholder="e.g., Donation for AmanahBlock" 
+                    bg="gray.700" 
+                    borderColor="gray.600"
+                    defaultValue={`${donationType ? donationType.toUpperCase() : 'Donation'} Donation`}
+                  />
+                </FormControl>
+                
+                <Text color="gray.400" fontSize="xs" mt={2}>
+                  You will be redirected to your bank's secure login page to complete the payment after clicking "Donate Now".
+                </Text>
+              </Box>
+            )}
+
             <Button 
               variant="gradient" 
               size="lg" 
@@ -403,6 +560,7 @@ const DonationAmountSection = ({
               fontSize="md"
               fontWeight="600"
               borderRadius="xl"
+              mt={4}
             >
               Donate Now
             </Button>
@@ -420,4 +578,4 @@ const DonationAmountSection = ({
   );
 };
 
-export default DonationAmountSection; 
+export default DonationAmountSection;
