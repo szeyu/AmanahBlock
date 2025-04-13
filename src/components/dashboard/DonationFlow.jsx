@@ -33,6 +33,7 @@ import {
   FaUserShield,
   FaPiggyBank,
   FaChartLine,
+  FaMedapps,
 } from 'react-icons/fa';
 
 // Custom node component with tooltip and metrics
@@ -377,7 +378,7 @@ const Flow = () => {
         icon: <FaChartLine />,
         metrics: {
           label: 'Monthly Returns',
-          value: 'USDT 3,816',
+          value: 'USDT 5,724',
           change: 15.3
         },
         progress: {
@@ -405,7 +406,7 @@ const Flow = () => {
         icon: <FaSchool />,
         metrics: {
           label: 'Available Funds',
-          value: 'USDT 1,717',
+          value: 'USDT 1,431',
           change: 45
         },
         progress: {
@@ -433,7 +434,7 @@ const Flow = () => {
         icon: <FaWater />,
         metrics: {
           label: 'Available Funds',
-          value: 'USDT 1,145',
+          value: 'USDT 954',
           change: 30
         },
         progress: {
@@ -461,7 +462,7 @@ const Flow = () => {
         icon: <FaUtensils />,
         metrics: {
           label: 'Available Funds',
-          value: 'USDT 954',
+          value: 'USDT 763',
           change: 25
         },
         progress: {
@@ -471,6 +472,34 @@ const Flow = () => {
         }
       },
       position: { x: 2750, y: 550 },
+      style: { 
+        background: '#FFF5F5', 
+        color: '#742A2A', 
+        border: '2px solid #E53E3E',
+        borderRadius: '12px',
+      },
+    },
+    {
+      id: 'healthcarePool',
+      type: 'custom',
+      data: { 
+        label: 'Healthcare Pool',
+        address: '0x1234...5678',
+        created: '2024-03-15',
+        description: 'Healthcare and medical assistance programs',
+        icon: <FaMedapps />,
+        metrics: {
+          label: 'Available Funds',
+          value: 'USDT 1,908',
+          change: 20
+        },
+        progress: {
+          label: 'Medical Aid Progress',
+          value: 70,
+          colorScheme: 'purple'
+        }
+      },
+      position: { x: 2750, y: 800 },
       style: { 
         background: '#FFF5F5', 
         color: '#742A2A', 
@@ -532,7 +561,7 @@ const Flow = () => {
       target: 'profit', 
       animated: true,
       type: 'custom',
-      data: { label: 'USDT 3,816' },
+      data: { label: 'USDT 5,724' },
       style: { stroke: '#319795', strokeWidth: 2 },
     },
     { 
@@ -541,7 +570,7 @@ const Flow = () => {
       target: 'schoolPool', 
       animated: true,
       type: 'custom',
-      data: { label: 'USDT 1,717' },
+      data: { label: 'USDT 1,431' },
       style: { stroke: '#319795', strokeWidth: 2 },
     },
     { 
@@ -550,7 +579,7 @@ const Flow = () => {
       target: 'floodPool', 
       animated: true,
       type: 'custom',
-      data: { label: 'USDT 1,145' },
+      data: { label: 'USDT 954' },
       style: { stroke: '#319795', strokeWidth: 2 },
     },
     { 
@@ -559,7 +588,16 @@ const Flow = () => {
       target: 'foodPool', 
       animated: true,
       type: 'custom',
-      data: { label: 'USDT 954' },
+      data: { label: 'USDT 763' },
+      style: { stroke: '#319795', strokeWidth: 2 },
+    },
+    { 
+      id: 'e7-11', 
+      source: 'profit', 
+      target: 'healthcarePool', 
+      animated: true,
+      type: 'custom',
+      data: { label: 'USDT 1,908' },
       style: { stroke: '#319795', strokeWidth: 2 },
     },
   ];

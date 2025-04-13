@@ -262,10 +262,10 @@ const TransactionFlow = ({ transaction }) => {
     });
     
     nodes.push({
-      id: 'waqfFund',
+      id: 'healthcarePool',
       type: 'transaction',
       data: { 
-        label: 'Waqf Fund',
+        label: 'Healthcare Pool',
         icon: <FaPiggyBank />,
         isHighlighted: transaction?.type === 'Waqf',
       },
@@ -386,7 +386,7 @@ const TransactionFlow = ({ transaction }) => {
     edges.push({
       id: 'e5-7',
       source: 'investmentPool',
-      target: 'waqfFund',
+      target: 'healthcarePool',
       animated: transaction?.type === 'Waqf',
       type: 'transaction',
       data: { label: transaction?.type === 'Waqf' ? `${profitAmount} USDT` : '' },

@@ -34,8 +34,9 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
   return (
     <Box 
       p={6} 
-      borderRadius="xl"
+      borderRadius="md"
       mb={8}
+      height="420px"
       bg="rgba(13, 16, 25, 0.7)"
       backdropFilter="blur(10px)"
       borderWidth="1px"
@@ -101,7 +102,7 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
       </Flex>
       
       <Box overflowX="auto" position="relative" zIndex="1">
-        <Table variant="simple" size="sm">
+        <Table variant="simple" size="sm" height="300px">
           <Thead>
             <Tr>
               <Th color="gray.400" borderColor="gray.700">TRANSACTION ID</Th>
