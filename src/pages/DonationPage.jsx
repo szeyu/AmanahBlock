@@ -204,16 +204,28 @@ const DonationPage = () => {
     }, 2000);
   };
 
+  // Add a new state for Waqf donation amount
+  const [waqfDonationAmount, setWaqfDonationAmount] = useState(100);
+  const [waqfPaymentMethod, setWaqfPaymentMethod] = useState('');
+
   // Update this function to handle donation type changes
   const handleDonationTypeChange = (index) => {
     // Set donation type based on tab index
     const types = ['sadaqah', 'zakat', 'waqf'];
     setDonationType(types[index]);
     
-    // Reset donation mode to 'money' and clear selected food items when switching tabs
-    if (types[index] !== 'sadaqah') {
+    // Reset donation mode to 'money' when switching to zakat or waqf
+    if (types[index] === 'zakat' || types[index] === 'waqf') {
       setDonationMode('money');
       setSelectedFoodItems([]);
+    }
+  };
+
+  // Add a function to handle Waqf payment method selection
+  const handleWaqfPaymentMethodSelect = (method) => {
+    setWaqfPaymentMethod(method);
+    if (method === 'ewallet') {
+      onQRCodeOpen();
     }
   };
 
@@ -456,7 +468,7 @@ const DonationPage = () => {
                 {/* AI Donation Advisor */}
                 <AIDonationAdvisor />
                 
-                {/* Donation Amount Section */}
+                {/* Donation Amount Section - Pass donationType to control UI */}
                 <DonationAmountSection 
                   donationMode={donationMode}
                   setDonationMode={setDonationMode}
@@ -465,10 +477,12 @@ const DonationPage = () => {
                   paymentMethod={paymentMethod}
                   handlePaymentMethodSelect={handlePaymentMethodSelect}
                   onOpen={onOpen}
+                  donationType={donationType}
                 />
               </Box>
             </TabPanel>
             
+            {/* Waqf Panel - Modified to add donation amount section */}
             <TabPanel px={0}>
               <Text color="gray.300" mb={4}>
                 Waqf is an endowment made by a Muslim to a religious, educational, or charitable cause. The donated assets are held and preserved for specific purposes indefinitely.
@@ -484,6 +498,17 @@ const DonationPage = () => {
                 handleRemoveFile={handleRemoveFile}
                 waqfRequests={waqfRequests}
               />
+              {/* Add Donation Amount Section for Waqf */}
+              <DonationAmountSection 
+                donationMode="money"
+                setDonationMode={() => {}} // No-op since we only allow money donations for Waqf
+                donationAmount={waqfDonationAmount}
+                setDonationAmount={setWaqfDonationAmount}
+                paymentMethod={waqfPaymentMethod}
+                handlePaymentMethodSelect={handleWaqfPaymentMethodSelect}
+                onOpen={onOpen}
+                donationType="waqf"
+              />
             </TabPanel>
           </TabPanels>
         </Tabs>
@@ -496,7 +521,7 @@ const DonationPage = () => {
           isQRCodeOpen={isQRCodeOpen}
           onQRCodeClose={onQRCodeClose}
           donationType={donationType}
-          donationAmount={donationAmount}
+          donationAmount={donationType === 'waqf' ? waqfDonationAmount : donationAmount}
           currency={currency}
           selectedPool={selectedPool}
           poolStats={poolStats}

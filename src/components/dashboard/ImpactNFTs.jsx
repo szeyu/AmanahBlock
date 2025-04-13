@@ -129,7 +129,7 @@ const ImpactNFTs = ({ nftCollection, handleNftClick }) => {
                   src={nft.image} 
                   alt={nft.name} 
                   w="100%" 
-                  h="180px" 
+                  h="210px" 
                   objectFit="cover" 
                 />
                 <Badge 

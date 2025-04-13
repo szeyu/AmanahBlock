@@ -273,7 +273,7 @@ const AIDonationAdvisor = ({
             <Icon as={FaRobot} color="brand.500" boxSize={5} />
           </Box>
           <Box>
-            <Heading size="md" color="white" fontWeight="600">AI Donation Advisor</Heading>
+            <Heading size="md" color="white" fontWeight="600">AI Donation Allocation</Heading>
             <Text color="gray.400" fontSize="sm">
               Get personalized recommendations for maximum impact
             </Text>
@@ -351,7 +351,7 @@ const AIDonationAdvisor = ({
                         />
                       </Flex>
                       <Heading size="xs" textAlign="center" color="white" mb={2}>{data.name}</Heading>
-                      <Text fontSize="xs" color="gray.400" textAlign="center" mb={3} noOfLines={2}>
+                      <Text fontSize="xs" color="gray.400" textAlign="center" mb={10} noOfLines={2}>
                         {data.description}
                       </Text>
                       <Badge 
