@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { VStack, HStack, Button, Box, Heading, Text, Grid, useDisclosure } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { VStack, HStack, Button, Box, Heading, Text, Grid, useDisclosure, Skeleton, SkeletonText } from '@chakra-ui/react';
 import ProjectCard from '../components/projects/ProjectCard';
 import ProjectFilters from '../components/projects/ProjectFilters';
 import ProjectDetailsModal from '../components/projects/ProjectDetailsModal';
@@ -10,7 +10,17 @@ const ProjectsPage = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [filters, setFilters] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
+  // Simulate loading delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleProjectClick = (project) => {
     setSelectedProject(project);
     onOpen();
@@ -34,6 +44,31 @@ const ProjectsPage = () => {
     setFilters(filters.filter(f => f !== filter));
   };
 
+  // Project card skeleton for loading state
+  const ProjectCardSkeleton = () => (
+    <Box
+      bg="rgba(13, 16, 31, 0.85)"
+      backdropFilter="blur(10px)"
+      borderRadius="xl"
+      overflow="hidden"
+      borderWidth="1px"
+      borderColor="rgba(255, 255, 255, 0.05)"
+      height="520px"
+    >
+      <Skeleton height="200px" width="100%" />
+      <Box p={5}>
+        <Skeleton height="24px" width="70%" mb={2} />
+        <Skeleton height="16px" width="40%" mb={3} />
+        <SkeletonText mt={2} noOfLines={2} spacing="2" mb={4} />
+        <Skeleton height="1px" width="100%" mb={4} />
+        <Skeleton height="24px" width="60%" mb={2} />
+        <Skeleton height="8px" width="100%" mb={2} />
+        <Skeleton height="16px" width="100%" mb={4} />
+        <Skeleton height="40px" width="100%" />
+      </Box>
+    </Box>
+  );
+
   return (
     <Box p={5} maxW="container.xl" mx="auto">
       <Heading mb={2} color="white" size="xl">Explore Projects</Heading>
@@ -47,15 +82,23 @@ const ProjectsPage = () => {
       />
       
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={6} mb={10}>
-        {projectsExploreData.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            handleProjectClick={handleProjectClick}
-            favorites={favorites}
-            toggleFavorite={toggleFavorite}
-          />
-        ))}
+        {isLoading ? (
+          // Render skeletons while loading
+          Array(6).fill(0).map((_, index) => (
+            <ProjectCardSkeleton key={index} />
+          ))
+        ) : (
+          // Render actual project cards when loaded
+          projectsExploreData.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              handleProjectClick={handleProjectClick}
+              favorites={favorites}
+              toggleFavorite={toggleFavorite}
+            />
+          ))
+        )}
       </Grid>
       
       {/* Bottom CTA Section */}
