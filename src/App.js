@@ -13,7 +13,6 @@ import SignupPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
 import ProjectsPage from './pages/ProjectsPage';
 import LearnPage from './pages/LearnPage';
-import ZakatCalculatorPage from './pages/ZakatCalculatorPage';
 import GovernancePage from './pages/GovernancePage';
 import ImpactExplorerPage from './pages/ImpactExplorerPage';
 import IslamicDefiPage from './pages/IslamicDefiPage';
@@ -37,7 +36,6 @@ function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/audit-trail" element={<AuditTrail />} />
             <Route path="/learn" element={<LearnPage />} />
-            <Route path="/zakat-calculator" element={<ZakatCalculatorPage />} />
             <Route path="/governance" element={<GovernancePage />} />
             <Route path="/impact" element={<ImpactExplorerPage />} />
             <Route path="/islamic-defi" element={<IslamicDefiPage />} />
