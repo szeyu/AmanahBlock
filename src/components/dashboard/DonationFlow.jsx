@@ -45,9 +45,19 @@ import {
   FaCubes,
   FaSearchPlus,
 } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Blockchain Block Component
-const BlockchainBlock = ({ data }) => {
+// Accept isClickable prop for styling purposes
+const BlockchainBlock = ({ data, isClickable }) => {
+  // onClick is removed as Link handles navigation
+
+  // Function to stop propagation if needed, though Link might handle it
+  const handleClick = (event) => {
+    // Stop propagation if necessary to prevent React Flow interference
+    event.stopPropagation();
+  };
+
   return (
     <Box
       p={3}
@@ -57,8 +67,17 @@ const BlockchainBlock = ({ data }) => {
       borderColor={data.status === 'Confirmed' ? 'green.500' : 'yellow.500'}
       position="relative"
       mb={2}
-      _hover={{ transform: 'translateY(-2px)' }}
+      _hover={{
+        // Apply hover styles if it's clickable (wrapped in Link)
+        transform: isClickable ? 'translateY(-3px)' : 'translateY(-2px)',
+        boxShadow: isClickable ? '0 4px 8px rgba(0, 255, 255, 0.3)' : 'none',
+        borderColor: isClickable ? 'cyan.300' : (data.status === 'Confirmed' ? 'green.500' : 'yellow.500')
+      }}
       transition="all 0.2s"
+      // Set cursor if clickable
+      cursor={isClickable ? 'pointer' : 'default'}
+      // Add onClick to stop propagation if Link doesn't prevent it
+      onClick={isClickable ? handleClick : undefined}
     >
       <VStack align="stretch" spacing={2}>
         <HStack justify="space-between">
@@ -67,7 +86,7 @@ const BlockchainBlock = ({ data }) => {
             {data.status}
           </Badge>
         </HStack>
-        <Text color="gray.400" fontSize="sm">Hash: {data.hash}</Text>
+        <Text color="gray.400" fontSize="sm" noOfLines={1} title={data.hash}>Hash: {data.hash}</Text> {/* Added noOfLines and title */}
         <Text color="green.300" fontSize="sm">Amount: {data.amount}</Text>
         <Text color="blue.300" fontSize="xs">{data.timestamp}</Text>
       </VStack>
@@ -76,17 +95,68 @@ const BlockchainBlock = ({ data }) => {
 };
 
 // BlockList Component to handle block display with show more functionality
-const BlockList = ({ blocks }) => {
+const BlockList = ({ blocks, selectedProjectId }) => { // Accept selectedProjectId
   const [showAll, setShowAll] = useState(false);
   const displayBlocks = showAll ? blocks : blocks.slice(-3);
-  
+
+  // Optional: Handler for logging click before navigation
+  const handleLinkClick = (projectId, blockData) => {
+    console.log(`Link clicked for Project ID: ${projectId}`, blockData);
+    // Navigation happens via Link component
+  };
+
+  // Helper function to map string project ID to integer ID
+  const getIntegerProjectId = (stringId) => {
+    switch (stringId) {
+      case 'schoolBuilding':
+        return 1;
+      case 'waterProject':
+        return 2;
+      case 'foodBank':
+        return 3;
+      // Add more cases if needed
+      default:
+        return null; // Or handle unknown IDs appropriately
+    }
+  };
+
   return (
     <VStack align="stretch" spacing={2}>
       {blocks.length > 0 ? (
         <>
-          {displayBlocks.map((block, index) => (
-            <BlockchainBlock key={index} data={block} />
-          ))}
+          {displayBlocks.map((block, index) => {
+            // Determine if this block should be linkable
+            const isLastBlock = index === displayBlocks.length - 1;
+            const isProjectSpecific = selectedProjectId && selectedProjectId !== 'general';
+            const isLinkable = isLastBlock && isProjectSpecific;
+
+            // Get the integer project ID for the link state
+            const integerProjectId = getIntegerProjectId(selectedProjectId);
+
+            // Conditionally wrap the last block with a Link
+            // Ensure integerProjectId is valid before creating the Link
+            return isLinkable && integerProjectId !== null ? (
+              <Link
+                key={index}
+                to="/projects-all" // Target page route
+                // Use the integer project ID in the state
+                state={{ openProjectId: integerProjectId }}
+                style={{ textDecoration: 'none' }} // Remove default underline
+                onClick={() => handleLinkClick(selectedProjectId, block)} // Optional: Log click
+              >
+                <BlockchainBlock
+                  data={block}
+                  isClickable={true} // Pass isClickable for styling
+                />
+              </Link>
+            ) : (
+              <BlockchainBlock
+                key={index}
+                data={block}
+                isClickable={false} // Not linkable
+              />
+            );
+          })}
           {blocks.length > 3 && (
             <Button
               size="sm"
@@ -108,7 +178,7 @@ const BlockList = ({ blocks }) => {
 // Custom node component with tooltip and metrics
 const CustomNode = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
       <Box
         p={4}
@@ -154,24 +224,24 @@ const CustomNode = ({ data }) => {
 
           {data.progress && (
             <Box>
-            <Text fontSize="sm" mb={1} color={data.progress.colorScheme === 'blue' ? '#3182CE' : data.style?.color || '#2C7A7B'}>
-              {data.progress.label}: {data.progress.value}%
-            </Text>
-              <Progress 
-                value={data.progress.value} 
-                size="sm" 
-                colorScheme={data.progress.colorScheme || 'teal'}
-                borderRadius="full"
-                hasStripe={true}
-                isAnimated={true}
-              />
+              <Text fontSize="sm" mb={1} color={data.progress.colorScheme === 'blue' ? '#3182CE' : data.style?.color || '#2C7A7B'}></Text>
+                {data.progress.label}: {data.progress.value}%
+                <Progress 
+                  value={data.progress.value} 
+                  size="sm" 
+                  colorScheme={data.progress.colorScheme || 'teal'}
+                  borderRadius="full"
+                  hasStripe={true}
+                  isAnimated={true}
+                />
             </Box>
           )}
 
           {data.blocks && data.blocks.length > 0 && (
             <Box>
-              <Text fontSize="sm" mb={1}>Latest Block:</Text>
-              <BlockchainBlock data={data.blocks[data.blocks.length - 1]} />
+              <Text fontSize="sm" mb={1} color="gray.300">Recent Activity:</Text> {/* Changed label */}
+              {/* Pass selectedProjectId to BlockList */}
+              <BlockList blocks={data.blocks} selectedProjectId={data.selectedProjectId} />
             </Box>
           )}
         
@@ -447,6 +517,26 @@ const RecipientNode = ({ data }) => {
     return 1;
   };
   
+  // Handle click to navigate to project page - kept for backwards compatibility
+  const handleNavigateToProject = () => {
+    if (data.onNavigateToProject) {
+      data.onNavigateToProject(data.recipient.id || data.recipient.name);
+    }
+  };
+
+  // Use the passed callback function
+  const handleRecipientClick = () => {
+    if (data.onRecipientClick) {
+      // Pass the project ID and recipient ID back to the parent
+      data.onRecipientClick(data.projectId, data.recipient.id);
+    } else if (data.onNavigateToProject) {
+      // Use the navigation prop if callback is not available
+      handleNavigateToProject();
+    } else {
+      console.log("No navigation handlers available for recipient click");
+    }
+  };
+  
   return (
     <Box
       p={4}
@@ -459,6 +549,12 @@ const RecipientNode = ({ data }) => {
       borderWidth="2px"
       borderColor={getBorderColor(data.recipient.status)}
       opacity={getOpacity(data.recipient.status)}
+      cursor="pointer"
+      onClick={handleRecipientClick} // Use the new handler
+      _hover={{
+        boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
+        transform: 'translateY(-2px)'
+      }}
       style={{
         boxShadow: isHovered 
           ? '0 8px 16px rgba(0,0,0,0.3)' 
@@ -617,7 +713,8 @@ const edgeTypes = {
   transaction: TransactionEdge,
 };
 
-const Flow = () => {
+// Add onRecipientClick prop to Flow component
+const Flow = ({ onRecipientClick }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [blockchainData, setBlockchainData] = useState({
     general: [],
@@ -627,8 +724,43 @@ const Flow = () => {
   });
   const prevSelectedProject = useRef(null);
   const isInitialRender = useRef(true);
+  const router = typeof window !== 'undefined' ? window.location : null;
+  const navigate = useNavigate(); // Add useNavigate hook
+  
+  // Handle recipient click without a callback
+  const handleRecipientClickWithoutCallback = (projectId, recipientId) => {
+    console.log(`Navigating to project ${projectId} with recipient ${recipientId}`);
+    // Map string ID to integer ID for navigation state
+    const integerProjectId = getIntegerProjectId(projectId); // Use the helper function
+    if (integerProjectId !== null) {
+      navigate('/projects-all', {
+        state: {
+          openProjectId: integerProjectId, // Use integer ID
+          // recipientId: recipientId, // Uncomment if needed
+          // fromDonationFlow: true // Uncomment if needed
+        }
+      });
+    } else {
+      console.warn(`Could not map project ID "${projectId}" to an integer for navigation.`);
+    }
+  };
 
-  // Sample projects
+  // Helper function to map string project ID to integer ID (can be defined here or imported)
+  const getIntegerProjectId = (stringId) => {
+    switch (stringId) {
+      case 'schoolBuilding':
+        return 1;
+      case 'waterProject':
+        return 2;
+      case 'foodBank':
+        return 3;
+      // Add more cases if needed
+      default:
+        return null; // Or handle unknown IDs appropriately
+    }
+  };
+
+  // Sample projects (IDs remain strings here as they are used as keys/identifiers internally)
   const projects = [
     { id: 'general', name: 'General View', type: 'ALL PROJECTS' },
     { id: 'schoolBuilding', name: 'School Building Project', type: 'EDUCATION' },
@@ -766,7 +898,7 @@ const Flow = () => {
       setEdges(projectEdges);
     } else {
       // For general view, use the original nodes and edges
-      setNodes(getInitialNodes());
+      setNodes(getInitialNodes(selectedProject?.id));
       setEdges(initialEdges);
     }
     
@@ -849,7 +981,7 @@ const Flow = () => {
   }, [selectedProject]);
 
   // Initialize nodes for general view with blockchain data
-  const getInitialNodes = () => {
+  const getInitialNodes = (currentProjectId) => { // Accept currentProjectId
     const baseNodes = [
       {
         id: 'donor',
@@ -870,7 +1002,8 @@ const Flow = () => {
             value: 75,
             colorScheme: 'green'
           },
-          blocks: blockchainData[selectedProject?.id || 'general']
+          blocks: blockchainData[currentProjectId || 'general'], // Use correct blocks
+          selectedProjectId: currentProjectId // Pass the project ID
         },
         position: { x: 50, y: 300 },
         style: { 
@@ -954,7 +1087,9 @@ const Flow = () => {
             label: 'Fund Allocation',
             value: 90,
             colorScheme: 'orange'
-          }
+          },
+          blocks: blockchainData[currentProjectId || 'general'], // Add blocks here too if needed
+          selectedProjectId: currentProjectId // Pass the project ID
         },
         position: { x: 1400, y: 300 },
         style: { 
@@ -1066,7 +1201,9 @@ const Flow = () => {
             label: 'Project Progress',
             value: 35,
             colorScheme: 'yellow'
-          }
+          },
+          blocks: blockchainData['schoolBuilding'] || [], // Show specific project blocks
+          selectedProjectId: 'schoolBuilding' // Hardcode or pass dynamically if needed
         },
         position: { x: 2750, y: 50 },
         style: { 
@@ -1077,7 +1214,7 @@ const Flow = () => {
         },
       },
       {
-        id: 'floodPool',
+        id: 'floodPool', // Assuming this relates to 'waterProject' ID
         type: 'custom',
         data: { 
           label: 'Flood Relief Pool',
@@ -1094,7 +1231,9 @@ const Flow = () => {
             label: 'Aid Distribution',
             value: 60,
             colorScheme: 'blue'
-          }
+          },
+          blocks: blockchainData['waterProject'] || [], // Show specific project blocks
+          selectedProjectId: 'waterProject' // Hardcode or pass dynamically
         },
         position: { x: 2750, y: 320 },
         style: { 
@@ -1105,7 +1244,7 @@ const Flow = () => {
         },
       },
       {
-        id: 'foodPool',
+        id: 'foodPool', // Assuming this relates to 'foodBank' ID
         type: 'custom',
         data: { 
           label: 'Food Bank Pool',
@@ -1122,7 +1261,9 @@ const Flow = () => {
             label: 'Distribution Progress',
             value: 80,
             colorScheme: 'orange'
-          }
+          },
+          blocks: blockchainData['foodBank'] || [], // Show specific project blocks
+          selectedProjectId: 'foodBank' // Hardcode or pass dynamically
         },
         position: { x: 2750, y: 590 },
         style: { 
@@ -1181,6 +1322,7 @@ const Flow = () => {
       if (projectType === 'schoolBuilding') {
         return [
           { 
+            id: 'school-1',
             name: 'Al-Hidayah School', 
             location: 'Kuala Lumpur, Malaysia',
             status: 'COMPLETED', 
@@ -1188,6 +1330,7 @@ const Flow = () => {
             type: 'Education Center'
           },
           { 
+            id: 'school-2',
             name: 'Ar-Rahman Academy', 
             location: 'Johor Bahru, Malaysia',
             status: 'ACTIVE', 
@@ -1196,6 +1339,7 @@ const Flow = () => {
             type: 'Educational Institution'
           },
           { 
+            id: 'school-3',
             name: 'As-Salam Institute', 
             location: 'Penang, Malaysia',
             status: 'INACTIVE', 
@@ -1206,6 +1350,7 @@ const Flow = () => {
       } else if (projectType === 'waterProject') {
         return [
           { 
+            id: 'water-1',
             name: 'Clean Water Initiative', 
             location: 'Kelantan, Malaysia',
             status: 'COMPLETED', 
@@ -1213,6 +1358,7 @@ const Flow = () => {
             type: 'Water Purification'
           },
           { 
+            id: 'water-2',
             name: 'Rural Water Access', 
             location: 'Sabah, Malaysia',
             status: 'ACTIVE', 
@@ -1221,6 +1367,7 @@ const Flow = () => {
             type: 'Well Construction'
           },
           { 
+            id: 'water-3',
             name: 'Irrigation System', 
             location: 'Sarawak, Malaysia',
             status: 'INACTIVE', 
@@ -1231,6 +1378,7 @@ const Flow = () => {
       } else if (projectType === 'foodBank') {
         return [
           { 
+            id: 'food-1',
             name: 'Community Food Bank', 
             location: 'Kuala Lumpur, Malaysia',
             status: 'COMPLETED', 
@@ -1238,6 +1386,7 @@ const Flow = () => {
             type: 'Food Distribution'
           },
           { 
+            id: 'food-2',
             name: 'Fresh Food Network', 
             location: 'Ipoh, Malaysia',
             status: 'ACTIVE', 
@@ -1246,6 +1395,7 @@ const Flow = () => {
             type: 'Storage Facility'
           },
           { 
+            id: 'food-3',
             name: 'Rural Food Access', 
             location: 'Terengganu, Malaysia',
             status: 'INACTIVE', 
@@ -1451,7 +1601,19 @@ const Flow = () => {
             id: `recipient${index + 1}`,
             type: 'recipient',
             data: { 
-              recipient
+              recipient,
+              projectId: project.id, // Pass project ID for context
+              // Pass the onRecipientClick callback from the Flow component props
+              onRecipientClick: onRecipientClick || handleRecipientClickWithoutCallback,
+              // Pass the onNavigateToProject callback from the Flow component props
+              onNavigateToProject: (recipientId) => {
+                console.log(`Navigating to project ${project.id} with recipient ${recipientId}`);
+                navigate('/projects-all', { 
+                  state: { 
+                    openProjectId: project.id, 
+                  } 
+                });
+              }
             },
             position: { 
               x: baseX, 
@@ -1603,6 +1765,26 @@ const Flow = () => {
     return { nodes, edges };
   };
 
+  // Check URL for recipient parameter on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const recipientId = url.searchParams.get('recipient');
+      const projectId = window.location.pathname.split('/').pop();
+      
+      // If there's a recipient ID in the URL, select the corresponding project
+      if (recipientId && projectId) {
+        const project = projects.find(p => p.id === projectId);
+        if (project) {
+          setSelectedProject(project);
+          
+          // You can add additional logic here to expand the specific recipient
+          // This might involve setting state to track which recipient is expanded
+        }
+      }
+    }
+  }, []);
+
   return (
     <Box>
       <Flex mb={4} justify="space-between" align="center">
@@ -1739,12 +1921,14 @@ const Flow = () => {
   );
 };
 
-const DonationFlow = () => {
+// Modify DonationFlow wrapper to accept and pass the callback
+const DonationFlow = ({ onRecipientClick }) => { // Accept the callback prop
   return (
     <ReactFlowProvider>
-      <Flow />
+      {/* Pass the callback down to the Flow component */}
+      <Flow onRecipientClick={onRecipientClick} />
     </ReactFlowProvider>
   );
 };
 
-export default DonationFlow; 
+export default DonationFlow;

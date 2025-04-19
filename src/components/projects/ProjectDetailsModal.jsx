@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -30,6 +30,7 @@ import {
   Avatar,
   AvatarGroup,
   Divider,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { 
   FaShieldAlt, 
@@ -37,12 +38,47 @@ import {
   FaMapMarkerAlt,
   FaEthereum,
   FaExternalLinkAlt,
+  FaUsers,
 } from 'react-icons/fa';
 
-const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
-  if (!project) return null;
+const ProjectDetailsModal = ({ isOpen, onClose, project, highlightedRecipientId }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const recipientRefs = useRef({});
+
+  const recipientsTabIndex = 2;
+
+  useEffect(() => {
+    if (isOpen && highlightedRecipientId) {
+      setActiveTab(recipientsTabIndex);
+
+      const timer = setTimeout(() => {
+        const recipientElement = recipientRefs.current[highlightedRecipientId];
+        if (recipientElement) {
+          recipientElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+          console.log(`Scrolled to recipient: ${highlightedRecipientId}`);
+        } else {
+          console.log(`Recipient element not found for ID: ${highlightedRecipientId}`);
+        }
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, highlightedRecipientId, recipientsTabIndex]);
+
+  useEffect(() => {
+    if (isOpen) {
+      console.log("ProjectDetailsModal opened with project:", project?.title);
+    }
+  }, [isOpen, project]);
   
-  // Default values for potentially missing properties
+  if (!project) {
+    console.log("ProjectDetailsModal: No project provided");
+    return null;
+  }
+  
   const {
     title = '',
     category = '',
@@ -57,10 +93,26 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
     verified = false,
     shariah = 'Pending Review',
     tags = [],
+    recipients = [],
   } = project;
 
+  const projectRecipients = recipients || project.partners?.map(partner => ({
+    id: partner.id,
+    name: partner.name,
+    location: partner.location || 'Unknown location',
+    status: partner.status || 'ACTIVE',
+    amount: partner.amount || `${Math.floor(Math.random() * 500) + 100} USDT`,
+    progress: partner.progress || Math.floor(Math.random() * 70) + 30
+  })) || [];
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      size="xl" 
+      scrollBehavior="inside"
+      motionPreset="slideInBottom"
+    >
       <ModalOverlay backdropFilter="blur(10px)" />
       <ModalContent bg="gray.800" color="white" borderRadius="lg" borderWidth="1px" borderColor="gray.700">
         <ModalHeader pb={0}>{title}</ModalHeader>
@@ -138,12 +190,17 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
             <Progress value={progress} colorScheme="green" borderRadius="full" size="md" />
           </Box>
           
-          <Tabs variant="soft-rounded" colorScheme="brand" mb={6}>
+          <Tabs 
+            variant="soft-rounded" 
+            colorScheme="brand" 
+            mb={6}
+            index={activeTab}
+            onChange={(index) => setActiveTab(index)}
+          >
             <TabList>
               <Tab>Details</Tab>
               <Tab>Updates</Tab>
-              <Tab>Team</Tab>
-              <Tab>Donors</Tab>
+              <Tab>Partners</Tab>
             </TabList>
             <TabPanels mt={4}>
               <TabPanel px={0}>
@@ -188,50 +245,72 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
               <TabPanel px={0}>
                 <VStack align="stretch" spacing={4}>
                   <Box bg="gray.700" p={4} borderRadius="md">
-                    <Heading size="sm" mb={3}>Project Team</Heading>
+                    <Heading size="sm" mb={3}>Project Partners/Recipients</Heading>
                     <Text color="gray.300" fontSize="sm" mb={4}>
-                      Meet the dedicated team working on this project.
+                      These are the recipients benefiting from this project.
                     </Text>
-                    <AvatarGroup size="md" max={5} mb={2}>
-                      <Avatar name="Ahmed Hassan" src="https://randomuser.me/api/portraits/men/1.jpg" />
-                      <Avatar name="Fatima Ali" src="https://randomuser.me/api/portraits/women/2.jpg" />
-                    </AvatarGroup>
-                  </Box>
-                </VStack>
-              </TabPanel>
-              
-              <TabPanel px={0}>
-                <VStack align="stretch" spacing={4}>
-                  <Box bg="gray.700" p={4} borderRadius="md">
-                    <Heading size="sm" mb={1}>Recent Donors</Heading>
-                    <Text color="gray.300" fontSize="sm" mb={4}>
-                      Join these generous donors in supporting this project.
-                    </Text>
-                    <VStack align="stretch" spacing={2}>
-                      <Flex justify="space-between">
-                        <HStack>
-                          <Avatar size="xs" />
-                          <Text>0x71C...93E4</Text>
-                        </HStack>
-                        <Text>500 USDT</Text>
-                      </Flex>
-                      <Divider borderColor="gray.600" />
-                      <Flex justify="space-between">
-                        <HStack>
-                          <Avatar size="xs" />
-                          <Text>0x82D...45F1</Text>
-                        </HStack>
-                        <Text>250 USDT</Text>
-                      </Flex>
-                      <Divider borderColor="gray.600" />
-                      <Flex justify="space-between">
-                        <HStack>
-                          <Avatar size="xs" />
-                          <Text>0x93E...67G2</Text>
-                        </HStack>
-                        <Text>100 USDT</Text>
-                      </Flex>
-                    </VStack>
+                    
+                    {projectRecipients && projectRecipients.length > 0 ? (
+                      projectRecipients.map((recipient, index) => (
+                        <Box 
+                          key={recipient.id || index}
+                          ref={(el) => {
+                            if (recipient.id) {
+                              recipientRefs.current[recipient.id] = el;
+                            }
+                          }}
+                          p={4}
+                          bg={recipient.id === highlightedRecipientId ? "gray.600" : "gray.700"}
+                          borderRadius="md"
+                          borderWidth={recipient.id === highlightedRecipientId ? "2px" : "1px"}
+                          borderColor={recipient.id === highlightedRecipientId ? "cyan.400" : "gray.600"}
+                          mb={3}
+                          transition="all 0.3s ease"
+                          _hover={{ bg: "gray.600" }}
+                          boxShadow={recipient.id === highlightedRecipientId ? "0 0 10px rgba(0, 224, 255, 0.5)" : "none"}
+                        >
+                          <Flex align="center" justify="space-between">
+                            <HStack>
+                              <Avatar size="md" name={recipient.name} />
+                              <Box>
+                                <Text fontWeight="bold">{recipient.name}</Text>
+                                <Text fontSize="sm" color="gray.400">{recipient.location || 'N/A'}</Text>
+                              </Box>
+                            </HStack>
+                            <Badge colorScheme={
+                              recipient.status === "ACTIVE" ? "blue" :
+                              recipient.status === "COMPLETED" ? "green" :
+                              "gray"
+                            }>
+                              {recipient.status || 'UNKNOWN'}
+                            </Badge>
+                          </Flex>
+                          {recipient.progress && (
+                            <Box mt={3}>
+                              <Text fontSize="xs" mb={1}>Project progress: {recipient.progress}%</Text>
+                              <Progress 
+                                value={recipient.progress} 
+                                size="sm" 
+                                colorScheme="blue"
+                                borderRadius="full"
+                              />
+                            </Box>
+                          )}
+                          {recipient.amount && (
+                            <Text fontSize="sm" mt={2}>
+                              Fund allocation: <Text as="span" fontWeight="bold">{recipient.amount}</Text>
+                            </Text>
+                          )}
+                        </Box>
+                      ))
+                    ) : (
+                      <Box p={4} bg="gray.700" borderRadius="md">
+                        <Flex align="center" justify="center" direction="column">
+                          <Icon as={FaUsers} boxSize={8} color="gray.500" mb={3} />
+                          <Text color="gray.500">No recipients information available</Text>
+                        </Flex>
+                      </Box>
+                    )}
                   </Box>
                 </VStack>
               </TabPanel>
@@ -256,4 +335,4 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
   );
 };
 
-export default ProjectDetailsModal; 
+export default ProjectDetailsModal;

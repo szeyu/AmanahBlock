@@ -4,21 +4,23 @@ import { keyframes } from '@emotion/react';
 import hataLogo from '../../assets/images/hata.jpeg'; // Importing the Hata logo
 import lunoLogo from '../../assets/images/luno.png'; // Importing the Luno logo
 import sinergyLogo from '../../assets/images/sinergy.png'; // Importing the Sinergy logo
+import tokenizeLogo from '../../assets/images/tokenize.png'; // Importing the Tokenize logo
+import torumLogo from '../../assets/images/torum.jpg'; // Importing the Torem logo
 
-// Placeholder data for partner logos from logoipsum.com
+
 const partners = [
   { name: 'Hata', logo: hataLogo }, // Using the Hata logo
   { name: 'Luno', logo: lunoLogo },
   { name: 'Sinergy', logo: sinergyLogo },
-  { name: 'Wayne Enterprises', logo: 'https://logoipsum.com/assets/logo/logo-10.svg' },
-  { name: 'Cyberdyne Systems', logo: 'https://logoipsum.com/assets/logo/logo-11.svg' },
-  { name: 'Umbrella Corp', logo: 'https://logoipsum.com/assets/logo/logo-13.svg' },
-  { name: 'Buy N Large', logo: 'https://logoipsum.com/assets/logo/logo-15.svg' },
-  { name: 'Initech', logo: 'https://logoipsum.com/assets/logo/logo-16.svg' },
-  { name: 'Soylent Corp', logo: 'https://logoipsum.com/assets/logo/logo-17.svg' },
-  { name: 'Massive Dynamic', logo: 'https://logoipsum.com/assets/logo/logo-18.svg' },
-  { name: 'Blue Sun', logo: 'https://logoipsum.com/assets/logo/logo-21.svg' },
-  { name: 'Virtucon', logo: 'https://logoipsum.com/assets/logo/logo-23.svg' },
+  { name: 'Tokenize', logo: tokenizeLogo  },
+  { name: 'Torum', logo: torumLogo  },
+  // { name: 'Umbrella Corp', logo: 'https://logoipsum.com/assets/logo/logo-13.svg' },
+  // { name: 'Buy N Large', logo: 'https://logoipsum.com/assets/logo/logo-15.svg' },
+  // { name: 'Initech', logo: 'https://logoipsum.com/assets/logo/logo-16.svg' },
+  // { name: 'Soylent Corp', logo: 'https://logoipsum.com/assets/logo/logo-17.svg' },
+  // { name: 'Massive Dynamic', logo: 'https://logoipsum.com/assets/logo/logo-18.svg' },
+  // { name: 'Blue Sun', logo: 'https://logoipsum.com/assets/logo/logo-21.svg' },
+  // { name: 'Virtucon', logo: 'https://logoipsum.com/assets/logo/logo-23.svg' },
 ];
 
 // Split partners into two rows

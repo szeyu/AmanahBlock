@@ -446,7 +446,7 @@ const GlobalImpactMap = () => {
         {/* Existing markers */}
         <LeafletMarker position={[3.1390, 101.6869]}>
           <Popup className="custom-popup">
-            <Link to="/projects" state={{ openProjectId: 1 }}>
+            <Link to="/projects-all" state={{ openProjectId: 1 }}>
               <Box 
                 bg="gray.800" 
                 color="white" 
@@ -496,7 +496,7 @@ const GlobalImpactMap = () => {
         </LeafletMarker>
         <LeafletMarker position={[5.4164, 100.3298]}>
           <Popup className="custom-popup">
-            <Link to="/projects" state={{ openProjectId: 2 }}>
+            <Link to="/projects-all" state={{ openProjectId: 2 }}>
               <Box 
                 bg="gray.800" 
                 color="white" 
@@ -546,7 +546,7 @@ const GlobalImpactMap = () => {
         </LeafletMarker>
         <LeafletMarker position={[1.3521, 103.8198]}>
           <Popup className="custom-popup">
-            <Link to="/projects" state={{ openProjectId: 3 }}>
+            <Link to="/projects-all" state={{ openProjectId: 3 }}>
               <Box 
                 bg="gray.800" 
                 color="white" 
@@ -596,7 +596,7 @@ const GlobalImpactMap = () => {
         </LeafletMarker>
         <LeafletMarker position={[2.9936, 101.5739]}>
           <Popup className="custom-popup">
-            <Link to="/projects" state={{ openProjectId: 4 }}>
+            <Link to="/projects-all" state={{ openProjectId: 4 }}>
               <Box 
                 bg="gray.800" 
                 color="white" 
