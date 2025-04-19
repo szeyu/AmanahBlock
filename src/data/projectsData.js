@@ -1,11 +1,12 @@
 export const projectsData = [
   {
     id: 1,
-    title: "School Building in Yemen",
+    title: "School Building in Sarawak",
     category: "Education",
-    location: "Sana'a, Yemen",
+    donationType: "waqf",
+    location: "Kuching, Sarawak",
     image: "https://images.pexels.com/photos/8471835/pexels-photo-8471835.jpeg",
-    description: "Construction of a school for 500 children in war-torn Yemen, providing safe access to education.",
+    description: "Construction of a school for 500 children in rural Sarawak, providing safe access to education for indigenous communities.",
     totalFunding: 50000,
     raisedAmount: 32500,
     progress: 65,
@@ -16,7 +17,7 @@ export const projectsData = [
     shariahStatus: "Fully Compliant",
     scholars: ["Dr. Ahmed Al-Haddad", "Dr. Yasmin Ibrahim"],
     partners: [
-      { name: "Yemen Education Foundation", role: "Local Partner" },
+      { name: "Sarawak Education Foundation", role: "Local Partner" },
       { name: "Global Builders Co.", role: "Construction" }
     ],
     milestones: [
@@ -81,11 +82,12 @@ export const projectsData = [
   },
   {
     id: 2,
-    title: "Emergency Flood Relief in Bangladesh",
+    title: "Emergency Flood Relief in Kelantan",
     category: "Disaster Relief",
-    location: "Dhaka, Bangladesh",
+    donationType: "sadaqah",
+    location: "Kota Bharu, Kelantan",
     image: "https://images.unsplash.com/photo-1547683905-f686c993aae5",
-    description: "Emergency relief for families affected by severe flooding in Bangladesh, providing food, clean water, and temporary shelter.",
+    description: "Emergency relief for families affected by severe flooding in East Coast Malaysia, providing food, clean water, and temporary shelter.",
     totalFunding: 30000,
     raisedAmount: 25500,
     progress: 85,
@@ -96,7 +98,7 @@ export const projectsData = [
     shariahStatus: "Fully Compliant",
     scholars: ["Dr. Mufti Taqi Usmani", "Sheikh Mohammed Al-Yaqoubi"],
     partners: [
-      { name: "Bangladesh Relief Organization", role: "Local Partner" },
+      { name: "Kelantan Relief Organization", role: "Local Partner" },
       { name: "Global Water Initiative", role: "Water Purification" }
     ],
     milestones: [

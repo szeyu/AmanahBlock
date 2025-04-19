@@ -15,10 +15,12 @@ import {
   useColorModeValue,
   Tooltip,
   Circle,
-  VStack
+  VStack,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaMapMarkerAlt, FaCalendarAlt, FaEthereum, FaShieldAlt, FaChartLine } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendarAlt, FaEthereum, FaShieldAlt, FaChartLine, FaTag } from 'react-icons/fa';
 import ShariahComplianceBadge from '../ShariahComplianceBadge';
 import { calculateMilestoneProgress } from '../../utils/projectUtils';
 
@@ -37,9 +39,36 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
       default: return "#A0AEC0";
     }
   };
+  
+  // Get donation type styling
+  const getDonationTypeStyle = (type) => {
+    switch(type.toLowerCase()) {
+      case "waqf": return { 
+        bg: "rgba(72, 187, 120, 0.2)", 
+        color: "#48BB78",
+        borderColor: "rgba(72, 187, 120, 0.3)" 
+      };
+      case "sadaqah": return { 
+        bg: "rgba(237, 137, 54, 0.2)", 
+        color: "#ED8936",
+        borderColor: "rgba(237, 137, 54, 0.3)" 
+      };
+      case "zakat": return { 
+        bg: "rgba(214, 188, 0, 0.2)", 
+        color: "#D6BC00",
+        borderColor: "rgba(214, 188, 0, 0.3)" 
+      };
+      default: return { 
+        bg: "rgba(138, 124, 251, 0.2)", 
+        color: "#8A7CFB",
+        borderColor: "rgba(138, 124, 251, 0.3)" 
+      };
+    }
+  };
 
   const statusColor = getStatusColor(project.status);
   const milestoneProgress = calculateMilestoneProgress(project.milestones);
+  const donationStyle = getDonationTypeStyle(project.donationType || 'sadaqah'); // Default to sadaqah if not specified
   
   return (
     <MotionBox
@@ -63,6 +92,29 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
         boxShadow: "0 20px 40px rgba(0, 224, 255, 0.2)",
       }}
     >
+      {/* DONATION TYPE RIBBON - Top left corner */}
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        bg={donationStyle.color}
+        color="white"
+        px={3}
+        py={1.5}
+        fontSize="sm"
+        fontWeight="bold"
+        zIndex={10}
+        clipPath="polygon(0 0, 100% 0, 85% 100%, 0% 100%)"
+        boxShadow="0 2px 5px rgba(0,0,0,0.2)"
+        letterSpacing="wide"
+        textTransform="uppercase"
+        display="flex"
+        alignItems="center"
+      >
+        <Icon as={FaTag} mr={1.5} boxSize={3} />
+        {project.donationType || 'sadaqah'}
+      </Box>
+      
       {/* Glowing orbs for decoration */}
       <Box 
         position="absolute" 
@@ -110,14 +162,11 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
           right={0} 
           bottom={0} 
           bg="linear-gradient(to top, rgba(13, 16, 31, 1) 0%, rgba(13, 16, 31, 0.7) 50%, rgba(13, 16, 31, 0.3) 100%)"
-          // change the size of the gradient overlay to match the enlarged image
           width="100%"
           height="100%"
           transition="all 0.5s"
           transform={isHovered ? "scale(1.05)" : "scale(1)"}
-          // change the opacity of the gradient overlay to match the enlarged image
           opacity={isHovered ? 0.9 : 0.6}
-          // change the position of the gradient overlay to match the enlarged image
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         />
@@ -331,4 +380,4 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
   );
 };
 
-export default ProjectCard; 
+export default ProjectCard;

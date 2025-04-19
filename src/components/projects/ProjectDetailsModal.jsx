@@ -39,8 +39,8 @@ import {
   FaExternalLinkAlt,
 } from 'react-icons/fa';
 
-const ProjectDetailsModal = ({ isOpen, onClose, selectedProject }) => {
-  if (!selectedProject) return null;
+const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
+  if (!project) return null;
   
   // Default values for potentially missing properties
   const {
@@ -57,7 +57,7 @@ const ProjectDetailsModal = ({ isOpen, onClose, selectedProject }) => {
     verified = false,
     shariah = 'Pending Review',
     tags = [],
-  } = selectedProject;
+  } = project;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl" scrollBehavior="inside">
@@ -94,7 +94,7 @@ const ProjectDetailsModal = ({ isOpen, onClose, selectedProject }) => {
                 <Text fontSize="xs">{shariah}</Text>
               </HStack>
             </Badge>
-            {tags.map((tag, index) => (
+            {tags && tags.map((tag, index) => (
               <Badge key={index} colorScheme="gray" borderRadius="full" px={2} py={1}>
                 {tag}
               </Badge>
