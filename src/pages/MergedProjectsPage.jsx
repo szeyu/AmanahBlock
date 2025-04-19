@@ -70,7 +70,7 @@ const MotionHeading = motion(Heading);
 const MotionText = motion(Text);
 const MotionFlex = motion(Flex);
 
-const MergedProjectsPage = () => {
+const MergedProjectsPage = ({ projectApproved }) => {
   const location = useLocation(); // Get location object
 
   // State for projects page
@@ -453,6 +453,11 @@ const MergedProjectsPage = () => {
         );
       }
       
+      // Apply projectApproved filter - remove last project if not approved
+      if (!projectApproved) {
+        filteredExplore = filteredExplore.slice(0, filteredExplore.length - 1);
+      }
+      
       setFilteredExploreProjects(filteredExplore);
       
       // Apply filters to funding projects
@@ -491,11 +496,16 @@ const MergedProjectsPage = () => {
       // Apply any additional fundingFilters
       filteredFunding = filterAndSortProjects(filteredFunding, fundingFilters);
       
+      // Apply projectApproved filter - remove last project if not approved
+      if (!projectApproved) {
+        filteredFunding = filteredFunding.slice(0, filteredFunding.length - 1);
+      }
+      
       setFilteredFundingProjects(filteredFunding);
       
       setIsLoading(false);
     }, 500);
-  }, [searchQuery, categoryFilter, locationFilter, donationTypeFilter, exploreFilters, fundingFilters]);
+  }, [searchQuery, categoryFilter, locationFilter, donationTypeFilter, exploreFilters, fundingFilters, projectApproved]);
   
   // Handle file selection
   const handleFileChange = (e) => {

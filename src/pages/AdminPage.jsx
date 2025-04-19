@@ -27,7 +27,7 @@ import MilestoneTrackingSection from "../components/admin/MilestoneTrackingSecti
  * 1. Proposal review with AI flagging
  * 2. Milestone tracking and fund release approval
  */
-const AdminPage = () => {
+const AdminPage = ({projectApproved, setProjectApproved}) => {
   return (
     <Box
       p={5}
@@ -104,7 +104,7 @@ const AdminPage = () => {
           <TabPanels>
             {/* Proposal Review Tab */}
             <TabPanel p={0}>
-              <ProposalReviewSection proposals={mockProposals} />
+              <ProposalReviewSection proposals={mockProposals} projectApproved = {projectApproved} setProjectApproved = {setProjectApproved} />
             </TabPanel>
 
             {/* Milestone Tracking Tab */}

@@ -45,7 +45,7 @@ const MotionBox = motion(Box);
  *
  * @param {Array} proposals - Array of proposal objects to be reviewed
  */
-const ProposalReviewSection = ({ proposals }) => {
+const ProposalReviewSection = ({ proposals, projectApproved, setProjectApproved }) => {
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -79,6 +79,8 @@ const ProposalReviewSection = ({ proposals }) => {
   // Handle proposal approval
   const handleApprove = () => {
     if (!selectedProposal) return;
+
+    setProjectApproved(true);
 
     toast({
       title: "Proposal Approved",
