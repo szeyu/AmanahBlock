@@ -24,7 +24,8 @@ import {
   CloseButton,
   List,         // Import List
   ListItem,     // Import ListItem
-  ListIcon      // Import ListIcon
+  ListIcon,      // Import ListIcon
+  Container
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import {
@@ -216,17 +217,17 @@ const GlobalImpactMap = () => {
       
       // Create heatmap layer
       const heatmapLayer = L.heatLayer(heatmapDataPoints, {
-        radius: 40, // Increased radius
-        blur: 35,   // Increased blur
+        radius: 40, // Base radius at baseZoom
+        blur: 35,   // Base blur at baseZoom
         maxZoom: 12,
-        max: 100,
+        max: 75,       // Lowered max value from 100
+        minOpacity: 0.2, // Increased minimum opacity from 0.1
         gradient: {
-          0.0: 'blue',
-          0.2: 'cyan',
-          0.4: 'lime',
+          0.1: 'cyan',  // Start gradient slightly warmer
+          0.3: 'lime',
           0.5: 'yellow',
           0.7: 'orange',
-          0.85: 'red'
+          0.9: 'red'   // Push red to higher end
         }
       });
       
@@ -238,15 +239,28 @@ const GlobalImpactMap = () => {
         if (!heatmapLayerRef.current) return;
         
         const currentZoom = map.getZoom();
+        const baseZoom = 6; // Reference zoom level
         
         // Only update if zoom level has actually changed
         if (currentZoom !== lastUpdatedZoomRef.current) {
-          const newRadius = Math.max(20, 40 - (currentZoom * 2.5)); // Adjusted dynamic radius
-          const newBlur = Math.max(25, 35 - (currentZoom * 2));   // Adjusted dynamic blur
+          // Simplified scaling: ensure larger radius at low zooms
+          let newRadius = 40;
+          if (currentZoom < baseZoom) {
+            newRadius = 40 + (baseZoom - currentZoom) * 15; // Increase more aggressively when zoomed out
+          } else {
+            newRadius = Math.max(15, 40 - (currentZoom - baseZoom) * 5); // Decrease less aggressively when zoomed in
+          }
+          
+          let newBlur = 35;
+          if (currentZoom < baseZoom) {
+            newBlur = 35 + (baseZoom - currentZoom) * 12;
+          } else {
+            newBlur = Math.max(15, 35 - (currentZoom - baseZoom) * 4);
+          }
           
           heatmapLayerRef.current.setOptions({
-            radius: newRadius,
-            blur: newBlur
+            radius: Math.round(newRadius),
+            blur: Math.round(newBlur)
           });
           lastUpdatedZoomRef.current = currentZoom; // Record the zoom level we updated for
         }
@@ -707,7 +721,7 @@ const GlobalImpactMap = () => {
           }}
         >
           <Text fontSize="sm" fontWeight="medium">
-            {tooltipContent}
+          {tooltipContent}
           </Text>
         </Box>
       )}
@@ -755,20 +769,37 @@ document.head.appendChild(userLocationStyle);
 
 const ImpactSection = () => {
   return (
-    <Box py={20} bg="gray.900">
-      <Box maxW="container.xl" mx="auto" px={4}>
+    <Box 
+      py={20} 
+      bg="transparent" // Ensure transparent background
+      position="relative" // Keep relative for zIndex context
+      zIndex={1} // Ensure content is above LandingPage background
+      overflow="visible"
+    >
+      <Container maxW="container.xl">
         {/* Featured Impact Stories */}
+        <VStack spacing={4} mb={12} textAlign="center">
+          <Heading
+              as="h2" 
+              size="xl" 
+              mb={2}
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)" 
+              bgClip="text"
+              fontWeight="bold"
+            >
+              Featured Impact Stories
+            </Heading>
+            <Text color="gray.400" textAlign="center">
+              See how your contributions are making a real difference in communities worldwide
+            </Text>
+        </VStack>
+
         <Box mb={16}>
-          <Heading size="xl" color="white" mb={2} textAlign="center">Featured Impact Stories</Heading>
-          <Text color="gray.400" mb={8} textAlign="center">
-            See how your contributions are making a real difference in communities worldwide
-          </Text>
-          
           <Grid templateColumns={{ base: "1fr", lg: "repeat(3, 1fr)" }} gap={6}>
             {impactStories.map((story) => (
               <Box 
                 key={story.id}
-                bg="rgba(26, 32, 44, 0.7)"
+                bg="rgba(26, 32, 44, 0.7)" // Keep card background
                 backdropFilter="blur(10px)"
                 borderRadius="lg"
                 overflow="hidden"
@@ -876,19 +907,28 @@ const ImpactSection = () => {
           </Grid>
         </Box>
 
-        {/* Global Impact Map */}
+        {/* Global Impact Map Container */}
         <Box 
-          bg="rgba(26, 32, 44, 0.7)"
+          bg="rgba(26, 32, 44, 0.7)" // Keep map container background
           backdropFilter="blur(10px)"
           borderRadius="lg"
           p={6}
           borderWidth="1px"
           borderColor="gray.700"
-          height={"700px"}
+          height={{ base: "600px", md: "700px" }} // Adjusted height slightly
         >
           <Flex justify="space-between" align="center" mb={6}>
             <Box>
-              <Heading size="md" color="white" mb={1}>Global Impact Map</Heading>
+            <Heading 
+            as="h2" 
+            size="xl" 
+            mb={2}
+            bgGradient="linear(to-r, #00E0FF, #8A7CFB)" 
+            bgClip="text"
+            fontWeight="bold"
+            >
+              Global Impact Map
+            </Heading>
               <Text color="gray.400">Explore our projects and their impact around the world</Text>
             </Box>
             <Tooltip label="Coming Soon" placement="top">
@@ -906,9 +946,9 @@ const ImpactSection = () => {
           
           <GlobalImpactMap />
         </Box>
-      </Box>
+      </Container>
     </Box>
   );
 };
 
-export default ImpactSection;
+export default ImpactSection; 

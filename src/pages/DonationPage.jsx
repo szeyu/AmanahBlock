@@ -28,7 +28,7 @@ import {
 import { Link } from 'react-router-dom';
 import AIDonationAdvisor from '../components/donation/AIDonationAdvisor';
 import DonationPoolSelector from '../components/donation/DonationPoolSelector';
-import DonationAmountSection from '../components/donation/DonationAmountSection';
+import DonationComponent from '../components/donation/DonationComponent';
 import WaqfDonationForm from '../components/donation/WaqfDonationForm';
 import FoodDonationSection from '../components/donation/FoodDonationSection';
 import DonationModals from '../components/donation/DonationModals';
@@ -518,7 +518,7 @@ const DonationPage = () => {
                 <AIDonationAdvisor />
                 
                 {showDonationAmount ? (
-                  <DonationAmountSection 
+                  <DonationComponent 
                     donationMode={donationMode}
                     setDonationMode={setDonationMode}
                     donationAmount={donationAmount}
@@ -651,7 +651,7 @@ const DonationPage = () => {
                 {showDonationAmount ? (
                   <Box>
                     <Heading size="md" color="white" mb={4}>Make Your Zakat Payment</Heading>
-                    <DonationAmountSection 
+                    <DonationComponent 
                       donationMode="money"
                       setDonationMode={setDonationMode}
                       donationAmount={donationAmount}
@@ -698,7 +698,7 @@ const DonationPage = () => {
               />
               
               {showDonationAmount ? (
-                <DonationAmountSection 
+                <DonationComponent 
                   donationMode="money"
                   setDonationMode={() => {}}
                   donationAmount={waqfDonationAmount}

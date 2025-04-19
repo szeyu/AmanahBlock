@@ -1,137 +1,86 @@
 import React from 'react';
-import { Box, Container, Heading, Text, Button, Link as ChakraLink, Flex } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, Button, VStack, HStack, Icon } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import { keyframes } from '@emotion/react'; // Keep keyframes for shine
+import { FaArrowRight } from 'react-icons/fa';
+
+// Keyframes for button shine animation
+const shine = keyframes`
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+`;
 
 const CTASection = () => {
   return (
     <Box 
-      py={20} 
-      position="relative"
-      bg="#0A0F1E"
-      overflow="hidden"
-      style={{ marginTop: "-2px" }}
+      bg="transparent" // Ensure transparent background
+      py={20}
+      position="relative" // Keep relative for zIndex context
+      zIndex={1} // Ensure content is above LandingPage background
+      overflow="visible"
     >
-      {/* Background elements */}
-      <Box 
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        bgGradient="radial-gradient(circle at 50% 50%, rgba(138, 124, 251, 0.15) 0%, transparent 70%)"
-        opacity={0.8}
-        zIndex={0}
-      />
+      {/* Ensure all background elements (gradients, orbs) specific to this section are removed */}
       
-      <Box className="hexagon-grid" position="absolute" top={0} left={0} right={0} bottom={0} opacity={0.03} />
-      
-      {/* Floating orbs */}
-      <Box 
-        position="absolute" 
-        top="30%" 
-        left="20%" 
-        w="150px" 
-        h="150px" 
-        borderRadius="full" 
-        bg="#00E0FF" 
-        opacity={0.1} 
-        filter="blur(60px)"
-        animation="float 12s infinite alternate ease-in-out"
-      />
-      
-      <Box 
-        position="absolute" 
-        bottom="20%" 
-        right="15%" 
-        w="180px" 
-        h="180px" 
-        borderRadius="full" 
-        bg="#8A7CFB" 
-        opacity={0.1} 
-        filter="blur(70px)"
-        animation="float 15s infinite alternate-reverse ease-in-out"
-      />
-      
-      <Container maxW="container.lg" position="relative" zIndex={1}>
-        <Flex 
-          direction="column" 
-          align="center" 
-          justify="center" 
-          bg="rgba(13, 16, 31, 0.7)"
-          backdropFilter="blur(10px)"
-          borderRadius="2xl"
-          borderWidth="1px"
-          borderColor="rgba(255, 255, 255, 0.05)"
-          p={{ base: 8, md: 16 }}
-          textAlign="center"
-          position="relative"
-          overflow="hidden"
-        >
-          {/* Decorative elements */}
-          <Box 
-            position="absolute" 
-            top="-50px" 
-            left="-50px" 
-            w="200px" 
-            h="200px" 
-            borderRadius="full" 
-            bg="#00E0FF" 
-            opacity={0.05} 
-            filter="blur(60px)" 
-          />
-          
-          <Box 
-            position="absolute" 
-            bottom="-50px" 
-            right="-50px" 
-            w="200px" 
-            h="200px" 
-            borderRadius="full" 
-            bg="#8A7CFB" 
-            opacity={0.05} 
-            filter="blur(60px)" 
-          />
-          
+      <Container maxW="container.lg" textAlign="center">
+        <VStack spacing={6}>
           <Heading 
             as="h2" 
-            size="xl" 
-            mb={6}
-            bgGradient="linear(to-r, #00E0FF, #8A7CFB)" 
+            size="2xl" 
+            fontWeight="bold"
+            bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
             bgClip="text"
-            fontWeight="bold"
           >
-            Ready to Make a Difference?
+            Ready to Make a Transparent Impact?
           </Heading>
-          
-          <Text fontSize="xl" color="gray.300" mb={10} maxW="container.sm">
-            Join thousands of Muslims worldwide who are using blockchain technology to make their charitable giving more impactful.
+          <Text fontSize="xl" color="gray.300" maxW="container.md" mx="auto">
+            Join AmanahBlock today. Explore verified projects, donate securely, and track your contribution's journey on the blockchain.
           </Text>
-          
-          <Button 
-            as={Link} 
-            to="/signup" 
-            size="lg" 
-            bgGradient="linear(to-r, #00E0FF, #8A7CFB)" 
-            _hover={{ 
-              bgGradient: "linear(to-r, #00E0FF, #8A7CFB)",
-              transform: "translateY(-2px)",
-              boxShadow: "0 10px 25px -5px rgba(138, 124, 251, 0.4)"
-            }}
-            color="white"
-            px={10}
-            py={7}
-            borderRadius="xl"
-            mb={4}
-            transition="all 0.3s ease"
-            fontWeight="bold"
-          >
-            Get Started
-          </Button>
-          
-          <Text color="gray.400" fontSize="md" mt={2}>
-            Already have an account? <ChakraLink as={Link} to="/login" color="#00E0FF" _hover={{ textDecoration: "underline" }}>Login here</ChakraLink>
-          </Text>
-        </Flex>
+          <HStack spacing={4} pt={4}>
+            <Button
+              as={Link}
+              to="/projects"
+              size="lg"
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+              color="white"
+              fontWeight="bold"
+              px={8}
+              py={7}
+              position="relative"
+              overflow="hidden"
+              _hover={{ opacity: 0.9, boxShadow: "0 0 20px rgba(0, 224, 255, 0.5)"}}
+              sx={{
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  width: '50%',
+                  height: '100%',
+                  background: 'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+                  animation: `${shine} 1.5s infinite`,
+                  zIndex: 1,
+                }
+              }}
+            >
+              Explore Projects
+            </Button>
+            <Button
+              as={Link}
+              to="/how-it-works" // Or maybe '/about' or '/learn-more'
+              size="lg"
+              variant="outline"
+              borderColor="rgba(255, 255, 255, 0.3)"
+              color="white"
+              fontWeight="medium"
+              px={8}
+              py={7}
+              rightIcon={<FaArrowRight />}
+              _hover={{ borderColor: "#00E0FF", color: "#00E0FF", bg: "rgba(0, 224, 255, 0.1)" }}
+            >
+              Learn More
+            </Button>
+          </HStack>
+        </VStack>
       </Container>
     </Box>
   );
