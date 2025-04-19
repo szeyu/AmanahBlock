@@ -35,7 +35,7 @@ import {
 } from '@chakra-ui/react';
 import { FaCalculator, FaInfoCircle, FaCoins, FaDollarSign, FaQuestionCircle } from 'react-icons/fa';
 
-const ZakatCalculator = ({ onZakatCalculated }) => {
+const ZakatCalculator = ({ onZakatCalculated, initialValues = null }) => {
   // Gold price state (in RM per gram)
   const [goldPrice, setGoldPrice] = useState(485.03); // Example from Selangor 2025
   
@@ -78,72 +78,143 @@ const ZakatCalculator = ({ onZakatCalculated }) => {
     setNisabThreshold(calculatedNisab);
   }, [goldPrice]);
   
-  // Calculate Zakat for each category
+  // Effect to handle initialValues
   useEffect(() => {
-    // Cash Zakat
-    const cashZakat = parseFloat(assets.cash) >= nisabThreshold ? parseFloat(assets.cash) * 0.025 : 0;
-    
-    // Gold Zakat
-    const goldZakat = (parseFloat(assets.goldWeight) >= 85 && parseFloat(assets.goldValue) >= nisabThreshold) 
-      ? parseFloat(assets.goldValue) * 0.025 
+    if (initialValues) {
+      const newAssets = {
+        ...assets,  // Keep existing values
+        cash: parseFloat(initialValues.cash) || 0,
+        goldWeight: parseFloat(initialValues.gold_weight) || 0,
+        goldValue: parseFloat(initialValues.gold_value) || 0,
+        stocksValue: parseFloat(initialValues.stocks_value) || 0,
+        stocksDividends: parseFloat(initialValues.stocks_dividends) || 0,
+        businessCash: parseFloat(initialValues.business_cash) || 0,
+        businessReceivables: parseFloat(initialValues.business_receivables) || 0,
+        businessInventory: parseFloat(initialValues.business_inventory) || 0,
+        income: parseFloat(initialValues.income) || 0,
+        incomeDeductions: parseFloat(initialValues.income_deductions) || 0
+      };
+      
+      setAssets(newAssets);
+      
+      // Calculate total Zakat with the new values
+      const totalZakat = calculateTotalZakat(newAssets);
+      
+      // Update Zakat results
+      setZakatResults({
+        cashZakat: parseFloat(newAssets.cash) >= nisabThreshold ? parseFloat(newAssets.cash) * 0.025 : 0,
+        goldZakat: (parseFloat(newAssets.goldWeight) >= 85 && parseFloat(newAssets.goldValue) >= nisabThreshold) 
+          ? parseFloat(newAssets.goldValue) * 0.025 
+          : 0,
+        stocksZakat: (parseFloat(newAssets.stocksValue) + parseFloat(newAssets.stocksDividends)) >= nisabThreshold 
+          ? (parseFloat(newAssets.stocksValue) + parseFloat(newAssets.stocksDividends)) * 0.025 
+          : 0,
+        businessZakat: (parseFloat(newAssets.businessCash) + parseFloat(newAssets.businessReceivables) + parseFloat(newAssets.businessInventory)) >= nisabThreshold 
+          ? (parseFloat(newAssets.businessCash) + parseFloat(newAssets.businessReceivables) + parseFloat(newAssets.businessInventory)) * 0.025 
+          : 0,
+        incomeZakat: parseFloat(newAssets.income) >= nisabThreshold ? parseFloat(newAssets.income) * 0.025 : 0,
+        totalZakat: totalZakat
+      });
+      
+      // Notify parent component
+      if (onZakatCalculated) {
+        onZakatCalculated(totalZakat);
+      }
+    }
+  }, [initialValues, nisabThreshold, onZakatCalculated]);
+  
+  // Helper function to calculate total Zakat
+  const calculateTotalZakat = (currentAssets) => {
+    const cashZakat = parseFloat(currentAssets.cash) >= nisabThreshold ? parseFloat(currentAssets.cash) * 0.025 : 0;
+    const goldZakat = (parseFloat(currentAssets.goldWeight) >= 85 && parseFloat(currentAssets.goldValue) >= nisabThreshold) 
+      ? parseFloat(currentAssets.goldValue) * 0.025 
       : 0;
-    
-    // Stocks Zakat
-    const stocksZakatableAmount = parseFloat(assets.stocksValue) + 
-      parseFloat(assets.stocksDividends) - 
-      parseFloat(assets.stocksFinancing) - 
-      parseFloat(assets.stocksCosts);
+    const stocksZakatableAmount = parseFloat(currentAssets.stocksValue) + 
+      parseFloat(currentAssets.stocksDividends) - 
+      parseFloat(currentAssets.stocksFinancing) - 
+      parseFloat(currentAssets.stocksCosts);
     const stocksZakat = stocksZakatableAmount >= nisabThreshold ? stocksZakatableAmount * 0.025 : 0;
-    
-    // Business Zakat
-    const businessZakatableAmount = parseFloat(assets.businessCash) + 
-      parseFloat(assets.businessReceivables) + 
-      parseFloat(assets.businessInventory) - 
+    const businessZakatableAmount = parseFloat(currentAssets.businessCash) + 
+      parseFloat(currentAssets.businessReceivables) + 
+      parseFloat(currentAssets.businessInventory) - 
       parseFloat(liabilities.businessLiabilities);
     const businessZakat = businessZakatableAmount >= nisabThreshold ? businessZakatableAmount * 0.025 : 0;
-    
-    // Income Zakat
-    const incomeZakatableAmount = parseFloat(assets.income) - parseFloat(assets.incomeDeductions);
+    const incomeZakatableAmount = parseFloat(currentAssets.income) - parseFloat(currentAssets.incomeDeductions);
     const incomeZakat = incomeZakatableAmount >= nisabThreshold ? incomeZakatableAmount * 0.025 : 0;
     
-    // Total Zakat
-    const totalZakat = cashZakat + goldZakat + stocksZakat + businessZakat + incomeZakat;
-    
-    setZakatResults({
-      cashZakat,
-      goldZakat,
-      stocksZakat,
-      businessZakat,
-      incomeZakat,
-      totalZakat
-    });
-
-    // Call the callback with the total amount
-    if (onZakatCalculated) {
-      onZakatCalculated(totalZakat);
-    }
-  }, [assets, liabilities, nisabThreshold, onZakatCalculated]);
+    return cashZakat + goldZakat + stocksZakat + businessZakat + incomeZakat;
+  };
   
   const handleAssetChange = (asset, value) => {
-    setAssets(prev => ({
-      ...prev,
-      [asset]: value
-    }));
+    const numericValue = parseFloat(value) || 0;
     
+    // Create new assets object with updated value
+    const newAssets = {
+      ...assets,
+      [asset]: numericValue
+    };
+
     // Update gold value when weight changes
     if (asset === 'goldWeight') {
-      setAssets(prev => ({
-        ...prev,
-        goldValue: value * goldPrice
-      }));
+      newAssets.goldValue = numericValue * goldPrice;
+    }
+
+    // Update assets state
+    setAssets(newAssets);
+
+    // Calculate new total Zakat
+    const totalZakat = calculateTotalZakat(newAssets);
+
+    // Update Zakat results
+    setZakatResults({
+      cashZakat: parseFloat(newAssets.cash) >= nisabThreshold ? parseFloat(newAssets.cash) * 0.025 : 0,
+      goldZakat: (parseFloat(newAssets.goldWeight) >= 85 && parseFloat(newAssets.goldValue) >= nisabThreshold) 
+        ? parseFloat(newAssets.goldValue) * 0.025 
+        : 0,
+      stocksZakat: (parseFloat(newAssets.stocksValue) + parseFloat(newAssets.stocksDividends)) >= nisabThreshold 
+        ? (parseFloat(newAssets.stocksValue) + parseFloat(newAssets.stocksDividends)) * 0.025 
+        : 0,
+      businessZakat: (parseFloat(newAssets.businessCash) + parseFloat(newAssets.businessReceivables) + parseFloat(newAssets.businessInventory)) >= nisabThreshold 
+        ? (parseFloat(newAssets.businessCash) + parseFloat(newAssets.businessReceivables) + parseFloat(newAssets.businessInventory)) * 0.025 
+        : 0,
+      incomeZakat: parseFloat(newAssets.income) >= nisabThreshold ? parseFloat(newAssets.income) * 0.025 : 0,
+      totalZakat: totalZakat
+    });
+
+    // Notify parent component
+    if (onZakatCalculated) {
+      onZakatCalculated(totalZakat);
     }
   };
   
   const handleLiabilityChange = (liability, value) => {
-    setLiabilities(prev => ({
+    const numericValue = parseFloat(value) || 0;
+    
+    // Create new liabilities object
+    const newLiabilities = {
+      ...liabilities,
+      [liability]: numericValue
+    };
+
+    // Update liabilities state
+    setLiabilities(newLiabilities);
+
+    // Calculate new total Zakat with current assets
+    const totalZakat = calculateTotalZakat(assets);
+
+    // Update Zakat results
+    setZakatResults(prev => ({
       ...prev,
-      [liability]: value
+      businessZakat: (parseFloat(assets.businessCash) + parseFloat(assets.businessReceivables) + parseFloat(assets.businessInventory) - numericValue) >= nisabThreshold 
+        ? (parseFloat(assets.businessCash) + parseFloat(assets.businessReceivables) + parseFloat(assets.businessInventory) - numericValue) * 0.025 
+        : 0,
+      totalZakat: totalZakat
     }));
+
+    // Notify parent component
+    if (onZakatCalculated) {
+      onZakatCalculated(totalZakat);
+    }
   };
   
   const resetCalculator = () => {

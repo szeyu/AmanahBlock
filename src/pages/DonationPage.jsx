@@ -290,16 +290,19 @@ const DonationPage = () => {
   };
 
   const [calculatedZakat, setCalculatedZakat] = useState(0);
-  // Add conversion rate state
+  const [extractedMetrics, setExtractedMetrics] = useState(null);
   const usdtToMyrRate = 4.72; // 1 USDT = 4.72 MYR
 
   // Handler for Zakat calculation
   const handleZakatCalculated = (amount) => {
-    setCalculatedZakat(amount);
+    // Ensure amount is a number
+    const zakatAmount = parseFloat(amount) || 0;
+    setCalculatedZakat(zakatAmount);
+    
     // When zakat is calculated, update the donation amount with converted USDT value
     if (donationType === 'zakat') {
       // Convert MYR to USDT
-      const usdtAmount = amount / usdtToMyrRate;
+      const usdtAmount = zakatAmount / usdtToMyrRate;
       setDonationAmount(usdtAmount);
     }
   };
@@ -387,21 +390,19 @@ const DonationPage = () => {
       if (data.zakat_metrics) {
         console.log('Extracted Zakat metrics:', data.zakat_metrics);
         
-        // Convert "NaN" strings to 0 for the calculator
-        const metrics = Object.fromEntries(
-          Object.entries(data.zakat_metrics).map(([key, value]) => 
-            [key, value === "NaN" ? 0 : parseFloat(value)]
-          )
+        // Convert any "NaN" strings to actual numbers
+        const processedMetrics = Object.fromEntries(
+          Object.entries(data.zakat_metrics).map(([key, value]) => [
+            key,
+            value === "NaN" ? "0" : value.toString()
+          ])
         );
         
-        // Update the calculator
-        if (handleZakatCalculated) {
-          handleZakatCalculated(metrics);
-        }
+        setExtractedMetrics(processedMetrics);
         
         toast({
           title: "Document processed successfully",
-          description: "Financial metrics have been extracted and applied to the calculator",
+          description: `Financial metrics have been extracted and applied to the calculator. Income found: RM ${processedMetrics.income}`,
           status: "success",
           duration: 5000,
           isClosable: true,
@@ -642,7 +643,10 @@ const DonationPage = () => {
                   )}
                 </Box>
 
-                <ZakatCalculator onZakatCalculated={handleZakatCalculated} />
+                <ZakatCalculator 
+                  onZakatCalculated={handleZakatCalculated}
+                  initialValues={extractedMetrics}
+                />
                 
                 {showDonationAmount ? (
                   <Box>
@@ -662,7 +666,6 @@ const DonationPage = () => {
                   <Button
                     onClick={() => {
                       setShowDonationAmount(true);
-                      // Convert MYR to USDT when clicking the button
                       const usdtAmount = calculatedZakat / usdtToMyrRate;
                       setDonationAmount(usdtAmount);
                     }}
