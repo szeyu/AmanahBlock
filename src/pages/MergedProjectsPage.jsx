@@ -40,10 +40,16 @@ import {
   Td,
   useColorModeValue,
   Tooltip,
-  Circle
+  Circle,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Select,
+  Textarea,
+  useToast
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup, FaInfoCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup, FaInfoCircle, FaArrowUp, FaArrowDown, FaPlus, FaFileUpload, FaUser, FaEnvelope, FaPhone, FaFileAlt } from 'react-icons/fa';
 
 // Project components
 import ProjectCardExplore from '../components/projects/ProjectCard';
@@ -102,6 +108,22 @@ const MergedProjectsPage = () => {
     totalFundsRaised: [15000, 35000, 65000, 95000, 120000, 150000, 185000, 220000, 260000, 290000, 320000, 350000],
     successRate: [40, 42, 45, 48, 51, 55, 62, 68, 71, 78, 82, 85],
   });
+  
+  // State for proposal form
+  const { isOpen: isProposalModalOpen, onOpen: onProposalModalOpen, onClose: onProposalModalClose } = useDisclosure();
+  const [proposalForm, setProposalForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    projectType: '',
+    description: '',
+    category: '',
+    location: '',
+    file: null
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const fileInputRef = useRef(null);
+  const toast = useToast();
   
   // Adding/removing filters for explore projects
   const addFilter = (filter) => {
@@ -350,6 +372,87 @@ const MergedProjectsPage = () => {
     }, 500);
   }, [searchQuery, categoryFilter, locationFilter, donationTypeFilter, exploreFilters, fundingFilters]);
   
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProposalForm({
+        ...proposalForm,
+        file: file
+      });
+    }
+  };
+  
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProposalForm({
+      ...proposalForm,
+      [name]: value
+    });
+  };
+  
+  // Validate form
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!proposalForm.name.trim()) errors.name = "Name is required";
+    if (!proposalForm.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(proposalForm.email)) {
+      errors.email = "Email is invalid";
+    }
+    
+    if (!proposalForm.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/.test(proposalForm.phone)) {
+      errors.phone = "Phone number is invalid (Malaysian format)";
+    }
+    
+    if (!proposalForm.projectType) errors.projectType = "Project type is required";
+    if (!proposalForm.description.trim()) errors.description = "Description is required";
+    if (!proposalForm.category) errors.category = "Category is required";
+    if (!proposalForm.location) errors.location = "Location is required";
+    if (!proposalForm.file) errors.file = "Proposal document is required";
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  
+  // Handle form submission
+  const handleSubmitProposal = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      // Here we would typically send the form data to an API
+      console.log("Form submission:", proposalForm);
+      
+      // Show success toast
+      toast({
+        title: "Proposal submitted",
+        description: "Your project proposal has been submitted successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right"
+      });
+      
+      // Reset form and close modal
+      setProposalForm({
+        name: '',
+        email: '',
+        phone: '',
+        projectType: '',
+        description: '',
+        category: '',
+        location: '',
+        file: null
+      });
+      
+      onProposalModalClose();
+    }
+  };
+  
   return (
     <Box 
       minH="100vh" 
@@ -362,32 +465,311 @@ const MergedProjectsPage = () => {
       pb={20}
     >
       {/* Page Header */}
-      <Container maxW="container.xl" mb={10} textAlign="center">
-        <Icon 
-          as={FaProjectDiagram}
-          color="#00E0FF"
-          boxSize="50px"
+      <Container maxW="container.xl" mb={10}>
+        <Flex justifyContent="space-between" alignItems="center" mb={6}>
+          <Box textAlign={{base: "center", md: "left"}}>
+            <Icon 
+              as={FaProjectDiagram}
+              color="#00E0FF"
+              boxSize="50px"
+              mb={6}
+            />
+            <Heading
+              fontSize={{ base: "4xl", md: "5xl" }}
+              mb={4}
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+              bgClip="text"
+              fontWeight="bold"
+            >
+              Project Funding
+            </Heading>
+            <Text
+              fontSize={{ base: "lg", md: "xl" }}
+              color="gray.400"
+              maxW="container.md"
+              mb={10}
+            >
+              Track the progress of funded projects with milestone-based verification on the blockchain
+            </Text>
+          </Box>
+          
+          {/* Create Project Proposal Button */}
+          <Button
+            leftIcon={<FaPlus />}
+            onClick={onProposalModalOpen}
+            size="lg"
+            bg="rgba(138, 124, 251, 0.2)"
+            color="white"
+            _hover={{
+              bg: "rgba(138, 124, 251, 0.3)",
+            }}
+            borderRadius="lg"
+            px={6}
+            height="60px"
+            display={{base: "none", md: "flex"}}
+            alignItems="center"
+            justifyContent="center"
+            borderWidth="1px"
+            borderColor="rgba(138, 124, 251, 0.3)"
+            boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
+            transition="all 0.3s"
+            _active={{
+              transform: "scale(0.98)"
+            }}
+          >
+            Create Project Proposal
+          </Button>
+        </Flex>
+        
+        {/* Mobile Create Button */}
+        <Button
+          leftIcon={<FaPlus />}
+          onClick={onProposalModalOpen}
+          width="full"
+          bg="rgba(138, 124, 251, 0.2)"
+          color="white"
+          _hover={{
+            bg: "rgba(138, 124, 251, 0.3)",
+          }}
+          borderRadius="lg"
+          height="50px"
+          display={{base: "flex", md: "none"}}
+          alignItems="center"
+          justifyContent="center"
           mb={6}
-        />
-        <Heading
-          fontSize={{ base: "4xl", md: "5xl" }}
-          mb={4}
-          bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-          bgClip="text"
-          fontWeight="bold"
+          borderWidth="1px"
+          borderColor="rgba(138, 124, 251, 0.3)"
         >
-          Project Funding
-        </Heading>
-        <Text
-          fontSize={{ base: "lg", md: "xl" }}
-          color="gray.400"
-          maxW="container.md"
-          mx="auto"
-          mb={10}
-        >
-          Track the progress of funded projects with milestone-based verification on the blockchain
-        </Text>
+          Create Project Proposal
+        </Button>
       </Container>
+
+      {/* Project Proposal Modal */}
+      <Modal isOpen={isProposalModalOpen} onClose={onProposalModalClose} size="xl">
+        <ModalOverlay backdropFilter="blur(10px)" />
+        <ModalContent bg="rgba(13, 16, 31, 0.95)" borderColor="rgba(255, 255, 255, 0.05)" borderWidth="1px">
+          <ModalHeader color="white">Create Project Proposal</ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody pb={6}>
+            <form onSubmit={handleSubmitProposal}>
+              <VStack spacing={5} align="stretch">
+                <Heading size="sm" color="gray.300" mb={2}>Person in Charge Details</Heading>
+                
+                <FormControl isInvalid={formErrors.name}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaUser} />
+                      <Text>Name</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="name"
+                    value={proposalForm.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter your full name"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.name && <FormErrorMessage>{formErrors.name}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.email}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaEnvelope} />
+                      <Text>Email</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="email"
+                    value={proposalForm.email}
+                    onChange={handleInputChange}
+                    placeholder="Enter your email address"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.email && <FormErrorMessage>{formErrors.email}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.phone}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaPhone} />
+                      <Text>Phone Number</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="phone"
+                    value={proposalForm.phone}
+                    onChange={handleInputChange}
+                    placeholder="Enter your phone number (Malaysian format)"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.phone && <FormErrorMessage>{formErrors.phone}</FormErrorMessage>}
+                </FormControl>
+                
+                <Box h="1px" bg="rgba(255, 255, 255, 0.1)" my={2}></Box>
+                
+                <Heading size="sm" color="gray.300" mb={2}>Project Details</Heading>
+                
+                <FormControl isInvalid={formErrors.projectType}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaCoins} />
+                      <Text>Project Type</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Select
+                    name="projectType"
+                    value={proposalForm.projectType}
+                    onChange={handleInputChange}
+                    placeholder="Select project type"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Waqf">Waqf</option>
+                    <option value="Zakat">Zakat</option>
+                    <option value="Sadaqah">Sadaqah</option>
+                  </Select>
+                  {formErrors.projectType && <FormErrorMessage>{formErrors.projectType}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.category}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaLayerGroup} />
+                      <Text>Category</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Select
+                    name="category"
+                    value={proposalForm.category}
+                    onChange={handleInputChange}
+                    placeholder="Select category"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Food">Food</option>
+                    <option value="Water">Water</option>
+                    <option value="Education">Education</option>
+                    <option value="Healthcare">Healthcare</option>
+                  </Select>
+                  {formErrors.category && <FormErrorMessage>{formErrors.category}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.location}>
+                  <FormLabel color="gray.300">Location</FormLabel>
+                  <Select
+                    name="location"
+                    value={proposalForm.location}
+                    onChange={handleInputChange}
+                    placeholder="Select location"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Johor">Johor</option>
+                    <option value="Kedah">Kedah</option>
+                    <option value="Kelantan">Kelantan</option>
+                    <option value="Kuala Lumpur">Kuala Lumpur</option>
+                    <option value="Labuan">Labuan</option>
+                    <option value="Melaka">Melaka</option>
+                    <option value="Negeri Sembilan">Negeri Sembilan</option>
+                    <option value="Pahang">Pahang</option>
+                    <option value="Penang">Penang</option>
+                    <option value="Perak">Perak</option>
+                    <option value="Perlis">Perlis</option>
+                    <option value="Putrajaya">Putrajaya</option>
+                    <option value="Sabah">Sabah</option>
+                    <option value="Sarawak">Sarawak</option>
+                    <option value="Selangor">Selangor</option>
+                    <option value="Terengganu">Terengganu</option>
+                  </Select>
+                  {formErrors.location && <FormErrorMessage>{formErrors.location}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.description}>
+                  <FormLabel color="gray.300">Project Description</FormLabel>
+                  <Textarea
+                    name="description"
+                    value={proposalForm.description}
+                    onChange={handleInputChange}
+                    placeholder="Describe your project in detail..."
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                    minH="120px"
+                  />
+                  {formErrors.description && <FormErrorMessage>{formErrors.description}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.file}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaFileAlt} />
+                      <Text>Proposal Document (PDF)</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Button
+                    leftIcon={<FaFileUpload />}
+                    w="full"
+                    onClick={() => fileInputRef.current?.click()}
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    borderWidth="1px"
+                    borderStyle="dashed"
+                    borderRadius="md"
+                    p={6}
+                    _hover={{ bg: "rgba(13, 16, 31, 0.9)" }}
+                    color={proposalForm.file ? "white" : "gray.400"}
+                  >
+                    {proposalForm.file ? proposalForm.file.name : "Click to upload proposal document"}
+                  </Button>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    display="none"
+                  />
+                  {formErrors.file && <FormErrorMessage>{formErrors.file}</FormErrorMessage>}
+                </FormControl>
+              </VStack>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onProposalModalClose} mr={3} variant="outline" colorScheme="gray">
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmitProposal}
+              colorScheme="blue" 
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+              _hover={{
+                bgGradient: "linear(to-r, #00C5FF, #7A6CFB)",
+              }}
+              _active={{
+                bgGradient: "linear(to-r, #00B5FF, #6A5CFB)",
+              }}
+            >
+              Submit Proposal
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Stats Cards */}
       <Container maxW="container.xl" mb={10}>
