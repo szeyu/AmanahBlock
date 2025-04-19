@@ -22,9 +22,7 @@ export const mockTransactions = [
       id: '0x112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00', 
       receiptNo: 'AB-2025-0003', 
       items: [
-        { type: 'Sadaqah', description: 'Rice', quantity: 1, price: 40.00 },
-        { type: 'Sadaqah', description: 'Oil', quantity: 2, price: 40.00 },
-        { type: 'Sadaqah', description: 'Water', quantity: 5, price: 40.00 },
+        { type: 'Sadaqah', description: 'Donation', quantity: 1, price: 100.00 },
       ],
       date: new Date().toLocaleDateString(),
       status: 'Completed' 

@@ -1,7 +1,7 @@
 make commit-jack:
 	@git add .
 	@git commit -m $message
-	@git push origin jack-branch-2
+	@git push origin jack-branch-3
 
 make commit:
 	@git add .
