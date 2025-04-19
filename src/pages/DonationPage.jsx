@@ -25,6 +25,7 @@ import DonationAmountSection from '../components/donation/DonationAmountSection'
 import WaqfDonationForm from '../components/donation/WaqfDonationForm';
 import FoodDonationSection from '../components/donation/FoodDonationSection';
 import DonationModals from '../components/donation/DonationModals';
+import { useWeb3 } from '../context/Web3Context';
 
 const DonationPage = () => {
   const [donationType, setDonationType] = useState('sadaqah');
@@ -188,20 +189,16 @@ const DonationPage = () => {
     }
   };
 
-  // Handle donation submission
-  const handleDonate = () => {
-    // In a real app, this would connect to a wallet and execute a transaction
-    setTimeout(() => {
-      toast({
-        title: "Donation successful!",
-        description: `Your ${donationType} of ${donationAmount} ${currency} has been processed.`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      });
-      onClose();
-    }, 2000);
+  const { makeDonation, makeFoodDonation, loading } = useWeb3();
+
+  // Update handleDonate function to use smart contract
+  const handleDonate = async () => {
+    if (donationMode === 'food') {
+      await makeFoodDonation(selectedFoodItems);
+    } else {
+      await makeDonation(donationAmount, donationType, selectedPool);
+    }
+    onClose();
   };
 
   // Add a new state for Waqf donation amount
@@ -526,6 +523,7 @@ const DonationPage = () => {
           selectedPool={selectedPool}
           poolStats={poolStats}
           handleDonate={handleDonate}
+          loading={loading}
         />
       </Box>
     </Box>

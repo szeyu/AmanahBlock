@@ -16,6 +16,8 @@ import {
   Heading,
   Icon,
   Flex,
+  Image,
+  Spinner,
 } from '@chakra-ui/react';
 import { FaWallet, FaQrcode, FaCheckCircle, FaShieldAlt } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
@@ -31,7 +33,8 @@ const DonationModals = ({
   currency,
   selectedPool,
   poolStats,
-  handleDonate
+  handleDonate,
+  loading
 }) => {
   return (
     <>
@@ -165,6 +168,7 @@ const DonationModals = ({
                 borderColor: "gray.500",
                 bg: "rgba(255, 255, 255, 0.05)"
               }}
+              isDisabled={loading}
             >
               Cancel
             </Button>
@@ -183,6 +187,8 @@ const DonationModals = ({
               leftIcon={<FaWallet />}
               onClick={handleDonate}
               borderRadius="xl"
+              isLoading={loading}
+              loadingText="Processing..."
             >
               Confirm Donation
             </Button>
