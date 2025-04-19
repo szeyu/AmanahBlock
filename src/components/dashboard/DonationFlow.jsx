@@ -181,7 +181,7 @@ const CustomNode = ({ data }) => {
         
         {data.description && (
           <Text fontSize="xs" color="gray.500" noOfLines={2}>{data.description}</Text>
-        )}
+          )}
         </VStack>
         <Handle type="source" position={Position.Right} />
       </Box>
@@ -309,7 +309,7 @@ const TransactionNode = ({ data }) => {
   );
 };
 
-// Milestone Node Component for Project-Specific Flows
+// Recipient Node Component for Project-Specific Flows
 const MilestoneNode = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -424,6 +424,109 @@ const MilestoneNode = ({ data }) => {
   );
 };
 
+// Create new RecipientNode component to replace MilestoneNode
+const RecipientNode = ({ data }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Get status-specific colors
+  const getBgColor = (status) => {
+    if (status === "ACTIVE") return "#EBF8FF"; // Light blue background
+    if (status === "COMPLETED") return "#E6FFFA"; // Light teal background
+    return "#F7FAFC"; // Light gray background for other states
+  };
+  
+  const getBorderColor = (status) => {
+    if (status === "ACTIVE") return "#3182CE"; // Blue border
+    if (status === "COMPLETED") return "#319795"; // Teal border
+    return "#A0AEC0"; // Gray border for other states
+  };
+
+  // Set opacity based on status
+  const getOpacity = (status) => {
+    if (status === "INACTIVE") return 0.6;
+    return 1;
+  };
+  
+  return (
+    <Box
+      p={4}
+      borderRadius="xl"
+      transform={isHovered ? 'translateY(-2px)' : 'none'}
+      transition="all 0.2s"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      bg={getBgColor(data.recipient.status)}
+      borderWidth="2px"
+      borderColor={getBorderColor(data.recipient.status)}
+      opacity={getOpacity(data.recipient.status)}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 16px rgba(0,0,0,0.3)' 
+          : '0 4px 12px rgba(0,0,0,0.2)',
+        width: '220px',
+        borderRadius: '12px',
+      }}
+    >
+      <Handle type="target" position={Position.Left} />
+      <VStack spacing={3} align="stretch">
+        <HStack spacing={3} justify="space-between">
+          <Text fontSize="md" fontWeight="bold" color="#2C7A7B">
+            {data.recipient.name}
+          </Text>
+          <Badge 
+            colorScheme={
+              data.recipient.status === "ACTIVE" ? "blue" : 
+              data.recipient.status === "COMPLETED" ? "green" : 
+              "gray"
+            }
+            fontSize="xs"
+            px={2}
+            py={0.5}
+            borderRadius="full"
+            color="white"
+            bg={
+              data.recipient.status === "ACTIVE" ? "#3182CE" : 
+              data.recipient.status === "COMPLETED" ? "#38A169" : 
+              "#718096"
+            }
+            fontWeight="bold"
+            boxShadow="0 2px 4px rgba(0,0,0,0.1)"
+          >
+            {data.recipient.status}
+          </Badge>
+        </HStack>
+        
+        <Text fontSize="xs" color="gray.600">{data.recipient.location}</Text>
+        
+        {/* Add progress bar for active recipients */}
+        {data.recipient.progress && (
+          <Box mt={1}>
+            <Text fontSize="xs" mb={1} color="#3182CE">Project progress: {data.recipient.progress}%</Text>
+            <Progress 
+              value={data.recipient.progress} 
+              size="sm" 
+              colorScheme="blue"
+              borderRadius="full"
+              hasStripe={true}
+              isAnimated={true}
+            />
+          </Box>
+        )}
+        
+        {data.recipient.amount && (
+          <Stat>
+            <StatLabel color="#2C7A7B">Fund allocation</StatLabel>
+            <StatNumber fontSize="md" color="#2C7A7B">
+              {data.recipient.amount}
+            </StatNumber>
+          </Stat>
+        )}
+      </VStack>
+      <Handle type="source" position={Position.Right} />
+    </Box>
+  );
+};
+
 // Transaction Edge Component for Project-Specific Flows
 const TransactionEdge = ({
   id,
@@ -446,6 +549,14 @@ const TransactionEdge = ({
     targetPosition,
     curvature: 0.2 // Add slight curvature to all edges
   });
+  
+  // Adjust label position to be below the edge (increase Y position)
+  const adjustedLabelY = labelY + 40;
+  
+  // Calculate width based on label length to accommodate longer text
+  const labelText = data?.label || "";
+  const labelWidth = Math.max(130, labelText.length * 10); // Base width or width based on text length
+  const labelX_adjusted = labelX;
 
   return (
     <>
@@ -459,11 +570,11 @@ const TransactionEdge = ({
       {data?.label && (
         <>
           <rect
-            x={labelX - 65}
-            y={labelY - 18}
-            width={130}
+            x={labelX_adjusted - (labelWidth/2)}
+            y={adjustedLabelY - 18}
+            width={labelWidth}
             height={36}
-            fill={data.label.includes('Phase') ? '#06B6D4' : 'white'} // Cyan-500 for Phase labels, white for others
+            fill={'#06B6D4'} // Cyan-500 for all project type labels
             rx={10}
             style={{
               filter: 'drop-shadow(0px 3px 6px rgba(0,0,0,0.3))',
@@ -472,12 +583,12 @@ const TransactionEdge = ({
             }}
           />
           <text
-            x={labelX}
-            y={labelY}
+            x={labelX_adjusted}
+            y={adjustedLabelY}
             textAnchor="middle"
             alignmentBaseline="middle"
             style={{
-              fill: data.label.includes('Phase') ? 'white' : '#0BC5EA', // White text for Phase labels, teal for others
+              fill: 'white', // White text for better contrast
               fontSize: '16px',
               fontWeight: 700,
               pointerEvents: 'none',
@@ -497,6 +608,7 @@ const nodeTypes = {
   custom: CustomNode,
   transaction: TransactionNode,
   milestone: MilestoneNode,
+  recipient: RecipientNode,
 };
 
 // Define edge types
@@ -1064,63 +1176,81 @@ const Flow = () => {
     const emergencyAmount = (amount * 0.1).toFixed(2); // 10% to emergency fund
     const profitAmount = (amount * 0.9 * 0.05).toFixed(2); // 5% profit from investment
 
-    // Sample milestones data based on project types
-    const getMilestones = (projectType) => {
+    // Sample recipients data based on project types
+    const getRecipients = (projectType) => {
       if (projectType === 'schoolBuilding') {
         return [
           { 
-            title: 'Land Acquisition', 
+            name: 'Al-Hidayah School', 
+            location: 'Kuala Lumpur, Malaysia',
             status: 'COMPLETED', 
-            amount: 'USDT 500' 
+            amount: 'USDT 500',
+            type: 'Education Center'
           },
           { 
-            title: 'Foundation Work', 
-            status: 'IN PROGRESS', 
+            name: 'Ar-Rahman Academy', 
+            location: 'Johor Bahru, Malaysia',
+            status: 'ACTIVE', 
             amount: 'USDT 350',
-            progress: 65 // 65% complete
+            progress: 65, // 65% complete
+            type: 'Educational Institution'
           },
           { 
-            title: 'Building Construction', 
-            status: 'PENDING', 
-            amount: 'USDT 600'
+            name: 'As-Salam Institute', 
+            location: 'Penang, Malaysia',
+            status: 'INACTIVE', 
+            amount: 'USDT 600',
+            type: 'University'
           }
         ];
       } else if (projectType === 'waterProject') {
         return [
           { 
-            title: 'Site Survey', 
+            name: 'Clean Water Initiative', 
+            location: 'Kelantan, Malaysia',
             status: 'COMPLETED', 
-            amount: 'USDT 200' 
+            amount: 'USDT 200',
+            type: 'Water Purification'
           },
           { 
-            title: 'Well Drilling', 
-            status: 'IN PROGRESS', 
+            name: 'Rural Water Access', 
+            location: 'Sabah, Malaysia',
+            status: 'ACTIVE', 
             amount: 'USDT 450',
-            progress: 40 // 40% complete
+            progress: 40, // 40% complete
+            type: 'Well Construction'
           },
           { 
-            title: 'Pump Installation', 
-            status: 'PENDING', 
-            amount: 'USDT 300'
+            name: 'Irrigation System', 
+            location: 'Sarawak, Malaysia',
+            status: 'INACTIVE', 
+            amount: 'USDT 300',
+            type: 'Agricultural Support'
           }
         ];
       } else if (projectType === 'foodBank') {
         return [
           { 
-            title: 'Initial Supplies', 
+            name: 'Community Food Bank', 
+            location: 'Kuala Lumpur, Malaysia',
             status: 'COMPLETED', 
-            amount: 'USDT 300' 
+            amount: 'USDT 300',
+            type: 'Food Distribution'
           },
           { 
-            title: 'Storage Facility', 
-            status: 'IN PROGRESS', 
+            name: 'Fresh Food Network', 
+            location: 'Ipoh, Malaysia',
+            status: 'ACTIVE', 
             amount: 'USDT 250',
-            progress: 75 // 75% complete
+            progress: 75, // 75% complete
+            type: 'Storage Facility'
           },
           { 
-            title: 'Distribution Network', 
-            status: 'PENDING', 
-            amount: 'USDT 200'
+            name: 'Rural Food Access', 
+            location: 'Terengganu, Malaysia',
+            status: 'INACTIVE', 
+            amount: 'USDT 200',
+            type: 'Distribution Network'
           }
         ];
       }
@@ -1290,21 +1420,23 @@ const Flow = () => {
         },
       });
     }
-    
-    // Add milestone nodes based on the selected project
+     
+    // Add recipient nodes based on the selected project
     if (project?.id) {
-      const milestones = getMilestones(project.id);
+      const recipients = getRecipients(project.id);
       
-      // Add milestone nodes with proper positioning
-      if (milestones.length > 0) {
-        // Position milestone nodes vertically to the right of the project pool
+      // Add recipient nodes with proper positioning
+      if (recipients.length > 0) {
+        // Position recipient nodes vertically to the right of the project pool
         const sourceNodeId = project.id === 'schoolBuilding' ? 'schoolBuildingPool' : 
-                            project.id === 'foodBank' ? 'healthcarePool' : 
-                            project.id === 'waterProject' ? 'waterProject' : '';
-                            
-        const baseX = 2000; // Increased horizontal spacing from 1850 to 2000
-        let baseY;
+                           project.id === 'foodBank' ? 'healthcarePool' : 
+                           project.id === 'waterProject' ? 'waterProject' : '';
+                           
+        // Horizontal positioning - spread out around the pool
+        const baseX = 2050; // Further to the right of the project pool
         
+        // Initial vertical position - based on the project pool
+        let baseY;
         if (project.id === 'schoolBuilding') {
           baseY = 30; // Match the Y position of schoolBuildingPool
         } else if (project.id === 'foodBank') {
@@ -1313,23 +1445,23 @@ const Flow = () => {
           baseY = 370; // Match the Y position of waterProject
         }
         
-        // Add each milestone as a node in a vertical stack with much more space between them
-        milestones.forEach((milestone, index) => {
+        // Add each recipient as a node in a vertical stack with space between them
+        recipients.forEach((recipient, index) => {
           nodes.push({
-            id: `milestone${index + 1}`,
-            type: 'milestone',
+            id: `recipient${index + 1}`,
+            type: 'recipient',
             data: { 
-              milestone
+              recipient
             },
             position: { 
-              x: baseX,
-              y: baseY + (index * 300) // Significantly increased spacing between milestone nodes from 220 to 300
+              x: baseX, 
+              y: baseY + (index * 340) // Increased spacing between recipient nodes
             },
           });
         });
       }
     }
-    
+     
     // Connect general nodes regardless of project
     edges.push({
       id: 'donor-to-userWallet',
@@ -1378,7 +1510,7 @@ const Flow = () => {
     
     // Add edges to connect project pools to their corresponding project-specific nodes
     if (project?.id === 'schoolBuilding') {
-      const milestones = getMilestones('schoolBuilding');
+      const recipients = getRecipients('schoolBuilding');
       
       // Connect projectPools to schoolBuildingPool
       edges.push({
@@ -1390,53 +1522,25 @@ const Flow = () => {
         style: { stroke: '#319795', strokeWidth: 2 },
       });
       
-      // First edge from school building pool to milestone 1
-      edges.push({
-        id: 'edge-schoolBuildingPool-milestone1',
-        source: 'schoolBuildingPool',
-        target: 'milestone1',
-        animated: milestones[0].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 1' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
-        },
+      // Connect school building pool directly to each recipient
+      recipients.forEach((recipient, index) => {
+        edges.push({
+          id: `edge-schoolBuildingPool-recipient${index + 1}`,
+          source: 'schoolBuildingPool',
+          target: `recipient${index + 1}`,
+          animated: recipient.status !== 'INACTIVE',
+          type: 'transaction',
+          data: { label: recipient.type },
+          style: { 
+            stroke: '#319795', 
+            strokeWidth: 2,
+            opacity: recipient.status === 'INACTIVE' ? 0.6 : 1
+          },
+        });
       });
-
-      // Connect milestones sequentially with better positioned labels
-      // Edge from milestone 1 to milestone 2 with increased curvature
-      edges.push({
-        id: 'edge-milestone1-milestone2',
-        source: 'milestone1',
-        target: 'milestone2',
-        animated: milestones[1].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 2' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
-        },
-      });
-
-      // Edge from milestone 2 to milestone 3 with increased curvature
-      edges.push({
-        id: 'edge-milestone2-milestone3',
-        source: 'milestone2',
-        target: 'milestone3',
-        animated: milestones[2].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 3' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
-        },
-      });
+      
     } else if (project?.id === 'foodBank') {
-      const milestones = getMilestones('foodBank');
+      const recipients = getRecipients('foodBank');
       
       // Connect projectPools to healthcarePool
       edges.push({
@@ -1448,53 +1552,25 @@ const Flow = () => {
         style: { stroke: '#319795', strokeWidth: 2 },
       });
       
-      // First edge from healthcare pool to milestone 1
-      edges.push({
-        id: 'edge-foodBankPool-milestone1',
-        source: 'healthcarePool',
-        target: 'milestone1',
-        animated: milestones[0].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 1' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
-        },
+      // Connect healthcare pool directly to each recipient
+      recipients.forEach((recipient, index) => {
+        edges.push({
+          id: `edge-healthcarePool-recipient${index + 1}`,
+          source: 'healthcarePool',
+          target: `recipient${index + 1}`,
+          animated: recipient.status !== 'INACTIVE',
+          type: 'transaction',
+          data: { label: recipient.type },
+          style: { 
+            stroke: '#319795', 
+            strokeWidth: 2,
+            opacity: recipient.status === 'INACTIVE' ? 0.6 : 1
+          },
+        });
       });
-
-      // Connect milestones sequentially with better positioned labels
-      // Edge from milestone 1 to milestone 2 with increased curvature
-      edges.push({
-        id: 'edge-milestone1-milestone2',
-        source: 'milestone1',
-        target: 'milestone2',
-        animated: milestones[1].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 2' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
-        },
-      });
-
-      // Edge from milestone 2 to milestone 3 with increased curvature
-      edges.push({
-        id: 'edge-milestone2-milestone3',
-        source: 'milestone2',
-        target: 'milestone3',
-        animated: milestones[2].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 3' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
-        },
-      });
+      
     } else if (project?.id === 'waterProject') {
-      const milestones = getMilestones('waterProject');
+      const recipients = getRecipients('waterProject');
       
       // Connect projectPools to waterProject
       edges.push({
@@ -1506,50 +1582,21 @@ const Flow = () => {
         style: { stroke: '#319795', strokeWidth: 2 },
       });
       
-      // First edge from water project pool to milestone 1
-      edges.push({
-        id: 'edge-waterProject-milestone1',
-        source: 'waterProject',
-        target: 'milestone1',
-        animated: milestones[0].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 1' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
-        },
-      });
-
-      // Connect milestones sequentially with better positioned labels
-      // Edge from milestone 1 to milestone 2 with increased curvature
-      edges.push({
-        id: 'edge-milestone1-milestone2',
-        source: 'milestone1',
-        target: 'milestone2',
-        animated: milestones[1].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 2' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
-        },
-      });
-
-      // Edge from milestone 2 to milestone 3 with increased curvature
-      edges.push({
-        id: 'edge-milestone2-milestone3',
-        source: 'milestone2',
-        target: 'milestone3',
-        animated: milestones[2].status !== 'PENDING',
-        type: 'transaction',
-        data: { label: 'Phase 3' },
-        style: { 
-          stroke: '#319795', 
-          strokeWidth: 2,
-          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
-        },
+      // Connect water project pool directly to each recipient
+      recipients.forEach((recipient, index) => {
+        edges.push({
+          id: `edge-waterProject-recipient${index + 1}`,
+          source: 'waterProject',
+          target: `recipient${index + 1}`,
+          animated: recipient.status !== 'INACTIVE',
+          type: 'transaction',
+          data: { label: recipient.type },
+          style: { 
+            stroke: '#319795', 
+            strokeWidth: 2,
+            opacity: recipient.status === 'INACTIVE' ? 0.6 : 1
+          },
+        });
       });
     }
 
@@ -1653,8 +1700,8 @@ const Flow = () => {
         h="650px" 
         w="100%" 
         bg="rgba(11, 197, 234, 0.05)" 
-        borderRadius="md" 
-        boxShadow="0 4px 12px rgba(0,0,0,0.1)" 
+        borderRadius="md"
+        boxShadow="0 4px 12px rgba(0,0,0,0.1)"
         overflow="hidden"
       >
         <ReactFlow
