@@ -260,8 +260,7 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
                 <Th color="gray.400" borderColor="gray.700">DATE</Th>
                 <Th color="gray.400" borderColor="gray.700">STATUS</Th>
                 <Th color="gray.400" borderColor="gray.700">ACTION</Th>
-                <Th color="gray.400" borderColor="gray.700">VIEW RECEIPT</Th>
-                <Th color="gray.400" borderColor="gray.700">DOWNLOAD RECEIPT</Th>
+                <Th color="gray.400" borderColor="gray.700">RECEIPT</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -344,11 +343,11 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
                         }}
                         transition="all 0.2s"
                       >
-                        View
+                        Receipt
                       </Button>
                     </Td>
                     {/* New column for Download Receipt */}
-                    <Td borderColor="gray.700">
+                    {/* <Td borderColor="gray.700">
                       <Button 
                         size="xs" 
                         colorScheme="green"
@@ -363,7 +362,7 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
                       >
                         Download
                       </Button>
-                    </Td>
+                    </Td> */}
                   </Tr>
                 );
               })}
