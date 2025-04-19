@@ -1,12 +1,15 @@
 import React from 'react';
 import { Box, Heading, Text, Flex, Image, useColorModeValue } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
+import hataLogo from '../../assets/images/hata.jpeg'; // Importing the Hata logo
+import lunoLogo from '../../assets/images/luno.png'; // Importing the Luno logo
+import sinergyLogo from '../../assets/images/sinergy.png'; // Importing the Sinergy logo
 
 // Placeholder data for partner logos from logoipsum.com
 const partners = [
-  { name: 'Acme Corp', logo: 'https://logoipsum.com/assets/logo/logo-3.svg' },
-  { name: 'Globex', logo: 'https://logoipsum.com/assets/logo/logo-5.svg' },
-  { name: 'Stark Industries', logo: 'https://logoipsum.com/assets/logo/logo-7.svg' },
+  { name: 'Hata', logo: hataLogo }, // Using the Hata logo
+  { name: 'Luno', logo: lunoLogo },
+  { name: 'Sinergy', logo: sinergyLogo },
   { name: 'Wayne Enterprises', logo: 'https://logoipsum.com/assets/logo/logo-10.svg' },
   { name: 'Cyberdyne Systems', logo: 'https://logoipsum.com/assets/logo/logo-11.svg' },
   { name: 'Umbrella Corp', logo: 'https://logoipsum.com/assets/logo/logo-13.svg' },
@@ -88,7 +91,6 @@ const PartnersSection = () => {
           position="absolute"
           width="max-content" 
           animation={`${scrollDirection} 30s linear infinite`}
-          // Remove hover pause effect
         >
           {duplicatedPartners.map((partner, index) => renderLogoItem(partner, index))}
         </Flex>
@@ -97,7 +99,6 @@ const PartnersSection = () => {
           ml="0"
           width="max-content"
           animation={`${scrollDirection} 30s linear infinite`}
-          // Remove hover pause effect
         >
           {duplicatedPartners.map((partner, index) => renderLogoItem(partner, `dup-${index}`))}
         </Flex>
@@ -130,9 +131,6 @@ const PartnersSection = () => {
 
       {/* First row scrolling left */}
       {createLogoRow(firstRowPartners, scrollLeft)}
-      
-      {/* Second row scrolling right */}
-      {createLogoRow(secondRowPartners, scrollRight)}
     </Box>
   );
 };

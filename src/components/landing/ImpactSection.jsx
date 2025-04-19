@@ -243,19 +243,19 @@ const GlobalImpactMap = () => {
         
         // Only update if zoom level has actually changed
         if (currentZoom !== lastUpdatedZoomRef.current) {
-          // Simplified scaling: ensure larger radius at low zooms
+          // Reversed scaling: smaller radius when zoomed out, larger when zoomed in
           let newRadius = 40;
           if (currentZoom < baseZoom) {
-            newRadius = 40 + (baseZoom - currentZoom) * 15; // Increase more aggressively when zoomed out
+            newRadius = Math.max(15, 40 - (baseZoom - currentZoom) * 5); // Decrease when zoomed out
           } else {
-            newRadius = Math.max(15, 40 - (currentZoom - baseZoom) * 5); // Decrease less aggressively when zoomed in
+            newRadius = 40 + (currentZoom - baseZoom) * 5; // Increase when zoomed in
           }
           
           let newBlur = 35;
           if (currentZoom < baseZoom) {
-            newBlur = 35 + (baseZoom - currentZoom) * 12;
+            newBlur = Math.max(15, 35 - (baseZoom - currentZoom) * 4); // Decrease when zoomed out
           } else {
-            newBlur = Math.max(15, 35 - (currentZoom - baseZoom) * 4);
+            newBlur = 35 + (currentZoom - baseZoom) * 4; // Increase when zoomed in
           }
           
           heatmapLayerRef.current.setOptions({
