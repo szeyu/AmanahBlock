@@ -97,7 +97,7 @@ const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
           }}
           transition="all 0.3s ease"
         >
-          View Receipt
+          View All
         </Button>
       </Flex>
       

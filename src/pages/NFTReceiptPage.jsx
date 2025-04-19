@@ -10,73 +10,14 @@ import {
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 // Import extracted components
-import StatCards from '../components/dashboard/StatCards';
-import DonationFlow from '../components/dashboard/DonationFlow';
 import ImpactNFTs from '../components/dashboard/ImpactNFTs';
 import NFTModal from '../components/dashboard/NFTModal';
-import FundAllocationChart from '../components/dashboard/FundAllocationChart';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
 import TransactionFlowModal from '../components/dashboard/TransactionFlowModal';
 import ReceiptModal from '../components/dashboard/ReceiptModal';
 import { mockTransactions } from '../data/receiptData';
 
-const Dashboard = () => {
-  ChartJS.register(ArcElement, Tooltip, Legend);
-
-  // Mock data for the dashboard
-  const donationStats = {
-    total: 3700,
-    activeProjects: 7,
-    investmentReturns: 215,
-    impactScore: 87
-  };
-
-  const getFundAllocationData = () => {
-    return {
-      labels: ['Education', 'Disaster Relief', 'Food & Water'],
-      datasets: [
-        {
-          data: [45, 30, 25], // Percentages
-          backgroundColor: ['#04CEEB', '#FF5A5A', '#47BB78'], // blue.500, red.500, green.500
-          borderColor: ['#2C5282', '#C53030', '#2F855A'], // Darker versions for borders
-          borderWidth: 1,
-          hoverOffset: 10,
-        },
-      ],
-    };
-  };
-  
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#CBD5E0', // gray.300
-          font: {
-            size: 12,
-          },
-          padding: 20,
-        },
-      },
-      tooltip: {
-        backgroundColor: 'rgba(13, 16, 25, 0.9)', // Dark background with opacity
-        titleColor: 'white',
-        bodyColor: 'white',
-        borderColor: '#4A5568', // gray.600
-        borderWidth: 1,
-        padding: 12,
-        displayColors: true,
-        callbacks: {
-          label: function(context) {
-            return `${context.label}: ${context.raw}%`;
-          }
-        }
-      }
-    },
-  };
-
+const NFTReceiptPage = () => {
   // Add NFT data
   const nftCollection = [
     { 
@@ -170,81 +111,26 @@ const Dashboard = () => {
             bgClip="text"
             fontWeight="bold"
           >
-            Dashboard
+            NFT & Receipt
           </Heading>
           <Text color="gray.400">
             Track your donations, investments, and impact in real-time
           </Text>
         </Flex>
-        
-        {/* Stat Cards */}
-        <StatCards donationStats={donationStats} />
-        
-        {/* Donation Chart */}
-        <Box 
-          className="card" 
-          p={6} 
-          borderRadius="xl"
-          mb={8}
-          bg="rgba(13, 16, 25, 0.7)"
-          backdropFilter="blur(10px)"
-          borderWidth="1px"
-          borderColor="gray.700"
-          position="relative"
-          overflow="hidden"
-          boxShadow="0 8px 32px rgba(0, 0, 0, 0.2)"
-          _before={{
-            content: '""',
-            position: "absolute",
-            top: "-1px",
-            left: "-1px",
-            right: "-1px",
-            bottom: "-1px",
-            borderRadius: "xl",
-            padding: "1px",
-            background: "linear-gradient(135deg, rgba(11, 197, 234, 0.3), rgba(95, 21, 242, 0.3))",
-            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            maskComposite: "exclude",
-            zIndex: 0,
-          }}
-        >
-          <Heading 
-            size="md" 
-            mb={4} 
-            color="white"
-            position="relative"
-            zIndex="1"
-            display="flex"
-            alignItems="center"
-            _after={{
-              content: '""',
-              display: 'block',
-              width: '30px',
-              height: '2px',
-              bgGradient: "linear(to-r, brand.500, transparent)",
-              ml: 2
-            }}
-          >
-            Donation Flow
-          </Heading>
-          <Box position="relative" zIndex="1">
-            <DonationFlow />
-          </Box>
-        </Box>
 
         {/* NFT Collection */}
-        {/* <ImpactNFTs 
+        <ImpactNFTs 
           nftCollection={nftCollection} 
           handleNftClick={handleNftClick} 
           onOpenReceiptModal={onOpenReceiptModal} 
-        /> */}
+        />
         
         {/* NFT Modal */}
-        {/* <NFTModal 
+        <NFTModal 
           isOpen={isOpen} 
           onClose={onClose} 
           selectedNft={selectedNft} 
-        /> */}
+        />
         
         {/* Recent Transactions and Fund Allocation in a grid */}
         <Flex 
@@ -254,20 +140,11 @@ const Dashboard = () => {
           align="flex-start" // Align items at the top
         >
           {/* Recent Transactions */}
-          <Box flex="1" maxWidth={{ lg: "65%" }}>
             <RecentTransactions 
               transactions={mockTransactions} 
               handleTransactionClick={handleTransactionClick} 
             />
-          </Box>
           
-          {/* Fund Allocation Chart */}
-          <Box flex="1" maxWidth={{ lg: "32%" }}>
-            <FundAllocationChart 
-              chartData={getFundAllocationData()} 
-              chartOptions={chartOptions} 
-            />
-          </Box>
         </Flex>
 
         {/* Transaction Flow Modal */}
@@ -287,4 +164,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default NFTReceiptPage; 
