@@ -1089,8 +1089,6 @@ const Flow = ({ onRecipientClick, userDonate }) => {
             value: 90,
             colorScheme: 'orange'
           },
-          blocks: blockchainData[currentProjectId || 'general'], // Add blocks here too if needed
-          selectedProjectId: currentProjectId // Pass the project ID
         },
         position: { x: 1400, y: 300 },
         style: { 
