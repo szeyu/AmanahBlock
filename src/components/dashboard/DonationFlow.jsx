@@ -338,6 +338,18 @@ const MilestoneNode = ({ data }) => {
     return data.milestone.progress || Math.floor(Math.random() * 50) + 30; // Returns a value between 30-80%
   };
   
+  // Get status-specific badge colors
+  const getBadgeBg = (status) => {
+    if (status === "COMPLETED") return "#38A169"; // Green 600
+    if (status === "IN PROGRESS") return "#3182CE"; // Blue 600
+    return "#718096"; // Gray 600
+  };
+  
+  // Get status-specific text colors
+  const getBadgeColor = (status) => {
+    return "white"; // White text for all badges for better contrast
+  };
+  
   return (
     <Box
       p={4}
@@ -375,6 +387,9 @@ const MilestoneNode = ({ data }) => {
             py={0.5}
             borderRadius="full"
             color="white"
+            bg={getBadgeBg(data.milestone.status)}
+            fontWeight="bold"
+            boxShadow="0 2px 4px rgba(0,0,0,0.1)"
           >
             {data.milestone.status}
           </Badge>
@@ -448,7 +463,7 @@ const TransactionEdge = ({
             y={labelY - 18}
             width={130}
             height={36}
-            fill="white"
+            fill={data.label.includes('Phase') ? '#06B6D4' : 'white'} // Cyan-500 for Phase labels, white for others
             rx={10}
             style={{
               filter: 'drop-shadow(0px 3px 6px rgba(0,0,0,0.3))',
@@ -462,7 +477,7 @@ const TransactionEdge = ({
             textAnchor="middle"
             alignmentBaseline="middle"
             style={{
-              fill: '#0BC5EA',
+              fill: data.label.includes('Phase') ? 'white' : '#0BC5EA', // White text for Phase labels, teal for others
               fontSize: '16px',
               fontWeight: 700,
               pointerEvents: 'none',
