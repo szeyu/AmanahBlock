@@ -6,9 +6,7 @@ import {
   TabPanels,
   TabPanel,
   Text,
-  Button,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
 
 const DonationTypeSelector = ({ donationType, handleDonationTypeChange }) => {
   return (
@@ -28,15 +26,6 @@ const DonationTypeSelector = ({ donationType, handleDonationTypeChange }) => {
           <Text color="gray.300" mb={4}>
             Zakat is an obligatory form of charity in Islam, typically 2.5% of one's wealth above a minimum threshold (nisab), given annually.
           </Text>
-          <Button 
-            as={Link} 
-            to="/zakat-calculator" 
-            variant="outline" 
-            colorScheme="brand" 
-            mb={4}
-          >
-            Calculate Your Zakat
-          </Button>
         </TabPanel>
         <TabPanel px={0}>
           <Text color="gray.300" mb={4}>

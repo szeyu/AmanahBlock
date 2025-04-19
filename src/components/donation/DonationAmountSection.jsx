@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Heading,
@@ -49,6 +49,9 @@ const DonationAmountSection = ({
   const glassBackground = "rgba(13, 16, 25, 0.7)";
   const selectedGlow = "0 0 15px rgba(11, 197, 234, 0.4)";
   const hoverGlow = "0 4px 15px rgba(11, 197, 234, 0.3)";
+  
+  // Mock exchange rate (in practice, this would come from an API)
+  const usdtToMyrRate = 4.72; // 1 USDT = 4.72 MYR
   
   return (
     <Box 
@@ -116,9 +119,9 @@ const DonationAmountSection = ({
     
         <TabPanels>
           <TabPanel px={0}>
-            {/* Money Donation UI - No changes needed */}
+            {/* Money Donation UI */}
             <FormControl mb={6}>
-              <FormLabel color="gray.300">Enter Amount</FormLabel>
+              <FormLabel color="gray.300">Enter Amount (USDT)</FormLabel>
               <NumberInput 
                 value={donationAmount} 
                 onChange={(valueString) => setDonationAmount(parseFloat(valueString))}
@@ -135,12 +138,19 @@ const DonationAmountSection = ({
                   }}
                   fontSize="lg"
                   height="50px"
+                  pl="2.5rem"
                 />
+                <Box position="absolute" left="1rem" top="50%" transform="translateY(-50%)" color="gray.400" zIndex="1">
+                  $
+                </Box>
                 <NumberInputStepper>
                   <NumberIncrementStepper borderColor="gray.600" color="gray.400" />
                   <NumberDecrementStepper borderColor="gray.600" color="gray.400" />
                 </NumberInputStepper>
               </NumberInput>
+              <Text color="gray.400" mt={2} fontSize="sm">
+                ≈ RM {(donationAmount * usdtToMyrRate).toFixed(2)} MYR
+              </Text>
             </FormControl>
 
             {/* Payment Method Selection */}
