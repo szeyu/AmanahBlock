@@ -20,7 +20,7 @@ import TransactionFlowModal from '../components/dashboard/TransactionFlowModal';
 import ReceiptModal from '../components/dashboard/ReceiptModal';
 import { mockTransactions } from '../data/receiptData';
 
-const Dashboard = () => {
+const Dashboard = ({userDonate}) => {
   ChartJS.register(ArcElement, Tooltip, Legend);
 
   // Mock data for the dashboard
@@ -228,7 +228,7 @@ const Dashboard = () => {
             Donation Flow
           </Heading>
           <Box position="relative" zIndex="1">
-            <DonationFlow />
+            <DonationFlow userDonate={userDonate}/>
           </Box>
         </Box>
 

@@ -17,7 +17,7 @@ import TransactionFlowModal from '../components/dashboard/TransactionFlowModal';
 import ReceiptModal from '../components/dashboard/ReceiptModal';
 import { mockTransactions } from '../data/receiptData';
 
-const NFTReceiptPage = () => {
+const NFTReceiptPage = ({userDonate, setUserDonate}) => {
   // Add NFT data
   const nftCollection = [
     { 
@@ -111,7 +111,7 @@ const NFTReceiptPage = () => {
             bgClip="text"
             fontWeight="bold"
           >
-            NFT & Receipt
+            NFTs & Receipts
           </Heading>
           <Text color="gray.400">
             Track your donations, investments, and impact in real-time
@@ -123,6 +123,8 @@ const NFTReceiptPage = () => {
           nftCollection={nftCollection} 
           handleNftClick={handleNftClick} 
           onOpenReceiptModal={onOpenReceiptModal} 
+          userDonate={userDonate}
+          setUserDonate={setUserDonate}
         />
         
         {/* NFT Modal */}
@@ -143,6 +145,8 @@ const NFTReceiptPage = () => {
             <RecentTransactions 
               transactions={mockTransactions} 
               handleTransactionClick={handleTransactionClick} 
+              userDonate={userDonate}
+              setUserDonate={setUserDonate}
             />
           
         </Flex>
@@ -158,6 +162,8 @@ const NFTReceiptPage = () => {
         <ReceiptModal
           isOpen={isReceiptModalOpen}
           onClose={onCloseReceiptModal}
+          userDonate={userDonate}
+          setUserDonate={setUserDonate}
         />
       </Box>
     </Box>

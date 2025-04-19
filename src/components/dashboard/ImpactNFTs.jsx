@@ -13,7 +13,7 @@ import {
 import { Link } from 'react-router-dom';
 import { FaReceipt, FaCertificate } from 'react-icons/fa';
 
-const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
+const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal, userDonate, setUserDonate }) => {
   // Define rarity styles
   const rarityStyles = {
     'Platinum': {
@@ -32,6 +32,15 @@ const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
       glow: '0 0 15px rgba(192, 86, 33, 0.7)',
     },
   };
+
+  const handleDonateClick = () => {
+    // Set userDonate to true when the donate button is clicked
+    setUserDonate(true);
+  };
+
+  const filteredNFTs = userDonate
+  ? nftCollection
+  : nftCollection.slice(0, nftCollection.length - 1);
 
   return (
     <Box 
@@ -82,9 +91,11 @@ const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
           }}
         >
           Impact NFTs
+          
         </Heading>
         <Button 
-          onClick={onOpenReceiptModal}
+          onClick={handleDonateClick}
+          
           size="sm" 
           rightIcon={<FaReceipt />} 
           variant="outline" 
@@ -102,9 +113,8 @@ const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
       </Flex>
       
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={6} position="relative" zIndex="1">
-        {nftCollection.map((nft) => {
+        {filteredNFTs.map((nft) => {
           const rarity = rarityStyles[nft.rarity] || rarityStyles.Bronze;
-          
           return (
             <Box 
               key={nft.id}

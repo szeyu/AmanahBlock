@@ -714,7 +714,7 @@ const edgeTypes = {
 };
 
 // Add onRecipientClick prop to Flow component
-const Flow = ({ onRecipientClick }) => {
+const Flow = ({ onRecipientClick, userDonate }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [blockchainData, setBlockchainData] = useState({
     general: [],
@@ -766,6 +766,7 @@ const Flow = ({ onRecipientClick }) => {
     { id: 'schoolBuilding', name: 'School Building Project', type: 'EDUCATION' },
     { id: 'waterProject', name: 'Clean Water Initiative', type: 'INFRASTRUCTURE' },
     { id: 'foodBank', name: 'Food Bank Program', type: 'HUMANITARIAN' },
+    ...(userDonate ? [{ id: 'newProject', name: 'New Project', type: 'NEW PROJECT' }] : [])
   ];
 
   // Initialize edges for general view
@@ -1471,39 +1472,43 @@ const Flow = ({ onRecipientClick }) => {
         border: '2px solid #E53E3E',
       },
     });
+
+    if (project?.id !== 'newProject') {
+      // Position the investment pool and emergency fund without overlap
+      nodes.push({
+        id: 'emergencyFund',
+        type: 'transaction',
+        data: { 
+          label: 'Emergency Fund',
+          icon: <FaUserShield />,
+          amount: `USDT ${emergencyAmount}`,
+        },
+        position: { x: 1250, y: 30 },
+        style: { 
+          background: '#FFF5F5', 
+          color: '#742A2A', 
+          border: '2px solid #E53E3E',
+        },
+      });
+
+      nodes.push({
+        id: 'investmentPool',
+        type: 'transaction',
+        data: { 
+          label: 'Investment Pool',
+          icon: <FaChartLine />,
+          amount: `USDT ${investmentAmount}`,
+        },
+        position: { x: 1250, y: 270 },
+        style: { 
+          background: '#EDFDFD', 
+          color: '#065666', 
+          border: '2px solid #0BC5EA',
+        },
+      });
+    }
     
-    // Position the investment pool and emergency fund without overlap
-    nodes.push({
-      id: 'emergencyFund',
-      type: 'transaction',
-      data: { 
-        label: 'Emergency Fund',
-        icon: <FaUserShield />,
-        amount: `USDT ${emergencyAmount}`,
-      },
-      position: { x: 1250, y: 30 },
-      style: { 
-        background: '#FFF5F5', 
-        color: '#742A2A', 
-        border: '2px solid #E53E3E',
-      },
-    });
     
-    nodes.push({
-      id: 'investmentPool',
-      type: 'transaction',
-      data: { 
-        label: 'Investment Pool',
-        icon: <FaChartLine />,
-        amount: `USDT ${investmentAmount}`,
-      },
-      position: { x: 1250, y: 270 },
-      style: { 
-        background: '#EDFDFD', 
-        color: '#065666', 
-        border: '2px solid #0BC5EA',
-      },
-    });
     
     // Define which node should be highlighted based on project type
     const getIsHighlighted = (nodeId, projectType) => {
@@ -1922,11 +1927,11 @@ const Flow = ({ onRecipientClick }) => {
 };
 
 // Modify DonationFlow wrapper to accept and pass the callback
-const DonationFlow = ({ onRecipientClick }) => { // Accept the callback prop
+const DonationFlow = ({ onRecipientClick, userDonate }) => { // Accept the callback prop
   return (
     <ReactFlowProvider>
       {/* Pass the callback down to the Flow component */}
-      <Flow onRecipientClick={onRecipientClick} />
+      <Flow onRecipientClick={onRecipientClick} userDonate={userDonate} />
     </ReactFlowProvider>
   );
 };

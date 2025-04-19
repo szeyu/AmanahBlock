@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChakraProvider, CSSReset } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import theme from './styles/theme';
@@ -28,6 +28,8 @@ import MergedProjectsPage from './pages/MergedProjectsPage';
 import NFTReceiptPage from './pages/NFTReceiptPage';
 
 function App() {
+  const [showProject, setShowProject] = useState(false);
+  const [userDonate, setUserDonate] = useState(false);
   return (
     <ChakraProvider theme={theme} resetCSS>
       <Web3Provider>
@@ -36,7 +38,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard userDonate={userDonate}/>} />
             <Route path="/donate" element={<DonationPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/audit-trail" element={<AuditTrail />} />
@@ -53,7 +55,7 @@ function App() {
             <Route path="/donation-flow/:transactionId" element={<DonationFlowPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/projects-all" element={<MergedProjectsPage />} />
-            <Route path="/nftreceipt" element={<NFTReceiptPage />} />
+            <Route path="/nftreceipt" element={<NFTReceiptPage userDonate={userDonate} setUserDonate={setUserDonate}/>} />
           </Routes>
           <Footer />
         </Router>
