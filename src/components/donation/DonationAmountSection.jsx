@@ -17,6 +17,7 @@ import {
   NumberDecrementStepper,
   Grid,
   HStack,
+  VStack,
   Icon,
   Button,
   Input,
@@ -24,6 +25,9 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Image,
+  Link,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import { 
   FaWallet, 
@@ -32,8 +36,16 @@ import {
   FaMobileAlt, 
   FaMoneyBillWave, 
   FaBitcoin, 
-  FaClock 
+  FaClock,
+  FaExternalLinkAlt 
 } from 'react-icons/fa';
+
+// Import crypto exchange logos
+import lunoLogo from '../../assets/images/luno.png';
+import sinergyLogo from '../../assets/images/sinergy.png';
+import tokenizeLogo from '../../assets/images/tokenize.png';
+import mxLogo from '../../assets/images/logo-MX-blue.png';
+import torumLogo from '../../assets/images/torum.jpg';
 
 const DonationAmountSection = ({ 
   donationMode, 
@@ -504,6 +516,194 @@ const DonationAmountSection = ({
                 
                 <Text color="gray.400" fontSize="xs" mt={2}>
                   You will be redirected to your bank's secure login page to complete the payment after clicking "Donate Now".
+                </Text>
+              </Box>
+            )}
+
+            {/* Crypto Payment Details */}
+            {paymentMethod === 'crypto' && (
+              <Box mt={4} p={4} bg="rgba(26, 32, 44, 0.6)" borderRadius="md" borderWidth="1px" borderColor="gray.700">
+                <Text color="white" fontWeight="medium" mb={3}>Select Crypto Exchange</Text>
+                <Text color="gray.400" fontSize="sm" mb={4}>
+                  Choose your preferred regulated crypto exchange platform to make the donation
+                </Text>
+                
+                <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4}>
+                  {/* Luno */}
+                  <Box
+                    p={4}
+                    bg="rgba(26, 32, 44, 0.8)"
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    cursor="pointer"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
+                      borderColor: "brand.500"
+                    }}
+                    onClick={() => window.open('https://www.luno.com', '_blank')}
+                  >
+                    <VStack spacing={3}>
+                      <Image
+                        src={lunoLogo}
+                        alt="Luno"
+                        height="40px"
+                        objectFit="contain"
+                      />
+                      <Text color="gray.300" fontSize="sm">Luno</Text>
+                      <HStack>
+                        <Icon as={FaExternalLinkAlt} color="brand.500" boxSize="12px" />
+                        <Text color="brand.500" fontSize="xs">Open Platform</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  {/* Sinergy */}
+                  <Box
+                    p={4}
+                    bg="rgba(26, 32, 44, 0.8)"
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    cursor="pointer"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
+                      borderColor: "brand.500"
+                    }}
+                    onClick={() => window.open('https://sinergy.exchange', '_blank')}
+                  >
+                    <VStack spacing={3}>
+                      <Image
+                        src={sinergyLogo}
+                        alt="Sinergy"
+                        height="40px"
+                        objectFit="contain"
+                      />
+                      <Text color="gray.300" fontSize="sm">Sinergy</Text>
+                      <HStack>
+                        <Icon as={FaExternalLinkAlt} color="brand.500" boxSize="12px" />
+                        <Text color="brand.500" fontSize="xs">Open Platform</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  {/* Tokenize */}
+                  <Box
+                    p={4}
+                    bg="rgba(26, 32, 44, 0.8)"
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    cursor="pointer"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
+                      borderColor: "brand.500"
+                    }}
+                    onClick={() => window.open('https://tokenize.exchange', '_blank')}
+                  >
+                    <VStack spacing={3}>
+                      <Image
+                        src={tokenizeLogo}
+                        alt="Tokenize"
+                        height="40px"
+                        objectFit="contain"
+                      />
+                      <Text color="gray.300" fontSize="sm">Tokenize</Text>
+                      <HStack>
+                        <Icon as={FaExternalLinkAlt} color="brand.500" boxSize="12px" />
+                        <Text color="brand.500" fontSize="xs">Open Platform</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  {/* MX Global */}
+                  <Box
+                    p={4}
+                    bg="rgba(26, 32, 44, 0.8)"
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    cursor="pointer"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
+                      borderColor: "brand.500"
+                    }}
+                    onClick={() => window.open('https://www.mx.global', '_blank')}
+                  >
+                    <VStack spacing={3}>
+                      <Image
+                        src={mxLogo}
+                        alt="MX Global"
+                        height="40px"
+                        objectFit="contain"
+                      />
+                      <Text color="gray.300" fontSize="sm">MX Global</Text>
+                      <HStack>
+                        <Icon as={FaExternalLinkAlt} color="brand.500" boxSize="12px" />
+                        <Text color="brand.500" fontSize="xs">Open Platform</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+
+                  {/* Torum */}
+                  <Box
+                    p={4}
+                    bg="rgba(26, 32, 44, 0.8)"
+                    borderRadius="xl"
+                    borderWidth="1px"
+                    borderColor="gray.700"
+                    cursor="pointer"
+                    transition="all 0.3s"
+                    _hover={{
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
+                      borderColor: "brand.500"
+                    }}
+                    onClick={() => window.open('https://torum.com', '_blank')}
+                  >
+                    <VStack spacing={3}>
+                      <Image
+                        src={torumLogo}
+                        alt="Torum"
+                        height="40px"
+                        objectFit="contain"
+                      />
+                      <Text color="gray.300" fontSize="sm">Torum</Text>
+                      <HStack>
+                        <Icon as={FaExternalLinkAlt} color="brand.500" boxSize="12px" />
+                        <Text color="brand.500" fontSize="xs">Open Platform</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
+                </SimpleGrid>
+
+                <Box mt={6} p={4} bg="rgba(26, 32, 44, 0.4)" borderRadius="md">
+                  <Text color="gray.300" fontSize="sm" mb={2}>Donation Wallet Address:</Text>
+                  <Input
+                    value="0x1234...5678" // Replace with your actual wallet address
+                    isReadOnly
+                    bg="gray.700"
+                    borderColor="gray.600"
+                    color="white"
+                    fontFamily="monospace"
+                  />
+                  <Text color="gray.400" fontSize="xs" mt={2}>
+                    Send your USDT donation to this wallet address through your chosen exchange platform.
+                    Make sure to use the USDT network that matches your exchange (e.g., TRC20, ERC20).
+                  </Text>
+                </Box>
+
+                <Text color="gray.400" fontSize="xs" mt={4}>
+                  All listed exchanges are regulated in Malaysia and comply with local cryptocurrency regulations.
+                  Please ensure you follow the exchange's KYC and transaction procedures.
                 </Text>
               </Box>
             )}
