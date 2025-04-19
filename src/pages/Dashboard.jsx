@@ -17,6 +17,8 @@ import NFTModal from '../components/dashboard/NFTModal';
 import FundAllocationChart from '../components/dashboard/FundAllocationChart';
 import RecentTransactions from '../components/dashboard/RecentTransactions';
 import TransactionFlowModal from '../components/dashboard/TransactionFlowModal';
+import ReceiptModal from '../components/dashboard/ReceiptModal';
+import { mockTransactions } from '../data/receiptData';
 
 const Dashboard = () => {
   ChartJS.register(ArcElement, Tooltip, Legend);
@@ -82,7 +84,7 @@ const Dashboard = () => {
       name: "School Building #001", 
       image: "/NFTCard/NFTCard.svg",
       type: "Education", 
-      rarity: "Rare",
+      rarity: "Platinum",
       issueDate: "2023-04-15"
     },
     { 
@@ -90,7 +92,7 @@ const Dashboard = () => {
       name: "Water Well #042", 
       image: "/NFTCard/NFTCard2.svg", 
       type: "Food", 
-      rarity: "Common", 
+      rarity: "Gold", 
       issueDate: "2023-05-02"
     },
     { 
@@ -98,16 +100,16 @@ const Dashboard = () => {
       name: "Food Bank #013", 
       image: "/NFTCard/NFTCard3.svg",
       type: "Food", 
-      rarity: "Uncommon",
+      rarity: "Bronze",
       issueDate: "2023-03-28"
     },
   ];
 
   // Recent transactions data
   const recentTransactions = [
-    { id: '0xb03b...3c4d', type: 'Waqf', amount: '500 USDT', date: '2023-05-15', status: 'Completed' },
-    { id: '0x56ef...7g8h', type: 'Zakat', amount: '1200 USDT', date: '2023-05-10', status: 'Processing' },
-    { id: '0x901j...1k2l', type: 'Sadaqah', amount: '300 USDT', date: '2023-05-05', status: 'Completed' },
+    { id: '0x7f2c1a9a1f4e7f6d3b5c8a9e0f1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t', receiptNo: 'AB-2025-0001', type: 'Waqf', amount: '500 USDT', date: '2023-05-15', status: 'Completed' },
+    { id: '0xabc123def456ghi789jkl012mno345pqr678stu901vwx234yz567abc890def123', receiptNo: 'AB-2025-0012', type: 'Zakat', amount: '1200 USDT', date: '2023-05-10', status: 'Processing' },
+    { id: '0x112233445566778899aabbccddeeff00112233445566778899aabbccddeeff00', receiptNo: 'AB-2023-1023', type: 'Sadaqah', amount: '300 USDT', date: '2023-05-05', status: 'Completed' },
   ];
 
   // State for selected NFT and modal
@@ -123,6 +125,13 @@ const Dashboard = () => {
   // State for transaction modal
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+
+  // Add state for receipt modal
+  const { 
+    isOpen: isReceiptModalOpen, 
+    onOpen: onOpenReceiptModal, 
+    onClose: onCloseReceiptModal 
+  } = useDisclosure();
 
   // Function to handle transaction click
   const handleTransactionClick = (transaction) => {
@@ -227,6 +236,7 @@ const Dashboard = () => {
         <ImpactNFTs 
           nftCollection={nftCollection} 
           handleNftClick={handleNftClick} 
+          onOpenReceiptModal={onOpenReceiptModal} 
         />
         
         {/* NFT Modal */}
@@ -239,18 +249,20 @@ const Dashboard = () => {
         {/* Recent Transactions and Fund Allocation in a grid */}
         <Flex 
           direction={{ base: "column", lg: "row" }} 
-          gap={6}
+          gap={4}
+          justify="space-between" // Added to distribute space evenly
+          align="flex-start" // Align items at the top
         >
           {/* Recent Transactions */}
-          <Box flex="3">
+          <Box flex="1" maxWidth={{ lg: "65%" }}>
             <RecentTransactions 
-              transactions={recentTransactions} 
+              transactions={mockTransactions} 
               handleTransactionClick={handleTransactionClick} 
             />
           </Box>
           
           {/* Fund Allocation Chart */}
-          <Box flex="2">
+          <Box flex="1" maxWidth={{ lg: "32%" }}>
             <FundAllocationChart 
               chartData={getFundAllocationData()} 
               chartOptions={chartOptions} 
@@ -263,6 +275,12 @@ const Dashboard = () => {
           isOpen={isTransactionModalOpen}
           onClose={() => setIsTransactionModalOpen(false)}
           transaction={selectedTransaction}
+        />
+
+        {/* Add Receipt Modal */}
+        <ReceiptModal
+          isOpen={isReceiptModalOpen}
+          onClose={onCloseReceiptModal}
         />
       </Box>
     </Box>

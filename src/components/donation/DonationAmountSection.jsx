@@ -356,46 +356,6 @@ const DonationAmountSection = ({
                     <Text color="white">Crypto</Text>
                   </HStack>
                 </Box>
-
-                {/* Buy Now Pay Later */}
-                <Box
-                  p={4}
-                  bg={paymentMethod === 'bnpl' ? "rgba(11, 197, 234, 0.1)" : "rgba(26, 32, 44, 0.6)"}
-                  borderWidth="1px"
-                  borderColor={paymentMethod === 'bnpl' ? "brand.500" : "gray.700"}
-                  borderRadius="xl"
-                  cursor="pointer"
-                  onClick={() => handlePaymentMethodSelect('bnpl')}
-                  transition="all 0.3s ease"
-                  boxShadow={paymentMethod === 'bnpl' ? selectedGlow : "none"}
-                  _hover={{
-                    borderColor: "brand.400",
-                    transform: "translateY(-2px)",
-                    boxShadow: hoverGlow
-                  }}
-                  position="relative"
-                  overflow="hidden"
-                  _after={paymentMethod === 'bnpl' ? {
-                    content: '""',
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    width: "30%",
-                    height: "100%",
-                    background: "linear-gradient(90deg, transparent, rgba(11, 197, 234, 0.1))",
-                    zIndex: 0,
-                  } : {}}
-                >
-                  <HStack spacing={3} position="relative" zIndex="1">
-                    <Icon 
-                      as={FaClock} 
-                      boxSize="24px" 
-                      color={paymentMethod === 'bnpl' ? "brand.500" : "gray.400"}
-                      filter={paymentMethod === 'bnpl' ? "drop-shadow(0 0 5px rgba(11, 197, 234, 0.5))" : "none"}
-                    />
-                    <Text color="white">Buy Now Pay Later</Text>
-                  </HStack>
-                </Box>
               </Grid>
             </Box>
 

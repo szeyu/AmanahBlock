@@ -16,8 +16,8 @@ class ZakatMetricsExtractor:
 
     def extract_metrics(self, text: str) -> dict:
         """
-        Extract Zakat-relevant metrics from the given text using prompt engineering.
-        Returns a dictionary with standardized metric names and values.
+        Extract Zakat-relevant metrics from the given text using a simplified and clear prompt structure.
+        Returns a dictionary with standardized metric names and NaN for missing values.
         """
         prompt = """
         Extract Zakat-relevant financial metrics from the following text. Return ONLY a JSON object with these fields:
@@ -37,6 +37,22 @@ class ZakatMetricsExtractor:
 
         If a value is not found in the text, use "NaN". Extract any numbers that could represent these values, considering context clues and common financial statement terminology. Convert any non-MYR currencies to MYR using appropriate exchange rates.
 
+        For bank statements:
+        - Use the final balance for "cash"
+        - Look for investment transactions for "stocks_value"
+        - Check for dividend payments for "stocks_dividends"
+        - For business accounts, use the balance for "business_cash"
+
+        For tax forms:
+        - Look for annual income under "Pendapatan"
+        - Check for business income if present
+        - Include any declared investments or dividends
+
+        For investment statements:
+        - Sum up all stock holdings for "stocks_value"
+        - Include mutual funds and unit trusts
+        - Calculate annual dividends if shown
+
         Text to analyze:
         """
         
@@ -49,7 +65,6 @@ class ZakatMetricsExtractor:
                 json_str = json_str[4:].strip()
                 
             # Use eval to safely convert the string to a Python dict
-            # This assumes the response is in the correct format
             metrics = eval(json_str)
             
             # Validate all required fields are present
@@ -65,21 +80,14 @@ class ZakatMetricsExtractor:
                 if field not in metrics:
                     metrics[field] = "NaN"
             
+            print("Extracted metrics:", metrics)  # Debug print
             return metrics
             
         except Exception as e:
             print(f"Error extracting metrics: {str(e)}")
-            # Return default structure with all NaN values
-            return {
-                "cash": "NaN",
-                "gold_weight": "NaN",
-                "gold_value": "NaN",
-                "stocks_value": "NaN",
-                "stocks_dividends": "NaN",
-                "business_cash": "NaN",
-                "business_inventory": "NaN",
-                "business_receivables": "NaN",
-                "business_liabilities": "NaN",
-                "income": "NaN",
-                "income_deductions": "NaN"
-            } 
+            return {field: "NaN" for field in [
+                "cash", "gold_weight", "gold_value", "stocks_value",
+                "stocks_dividends", "business_cash", "business_inventory",
+                "business_receivables", "business_liabilities",
+                "income", "income_deductions"
+            ]} 

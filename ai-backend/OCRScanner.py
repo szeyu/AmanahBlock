@@ -52,6 +52,8 @@ class OCRScanner:
             ])
 
             markdown_output += f"## Page {i+1}\n\n{response.text}\n\n"
+        
+        print(markdown_output)
 
         return markdown_output
 

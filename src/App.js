@@ -13,12 +13,15 @@ import SignupPage from './pages/SignupPage';
 import ProfilePage from './pages/ProfilePage';
 import ProjectsPage from './pages/ProjectsPage';
 import LearnPage from './pages/LearnPage';
+import ZakatCalculatorPage from './pages/ZakatCalculatorPage';
 import GovernancePage from './pages/GovernancePage';
 import ImpactExplorerPage from './pages/ImpactExplorerPage';
 import IslamicDefiPage from './pages/IslamicDefiPage';
 import ProjectFundingPage from './pages/ProjectFundingPage';
 import EmergencyFundPage from './pages/EmergencyFundPage';
 import BeneficiaryFeedbackPage from './pages/BeneficiaryFeedbackPage';
+import DonationFlowPage from './pages/DonationFlowPage';
+import AdminPage from "./pages/AdminPage";
 import ScrollToTop from './ScrollToTop';
 import { Web3Provider } from './context/Web3Context';
 import MergedProjectsPage from './pages/MergedProjectsPage';
@@ -46,7 +49,8 @@ function App() {
             <Route path="/project-funding" element={<ProjectFundingPage />} />
             <Route path="/emergency-fund" element={<EmergencyFundPage />} />
             <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
-            <Route path="/projects-all" element={<MergedProjectsPage />} />
+            <Route path="/donation-flow/:transactionId" element={<DonationFlowPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Footer />
         </Router>
