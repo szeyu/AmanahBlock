@@ -22,13 +22,55 @@ The platform is structured into six key layers:
 ---
 
 ## ✨ Key Features
-- **Multi-Modal Donations**: Crypto, online banking (FPX), e-wallets (TnG), physical goods (via Lalamove)
-- **Shariah-Compliant Investments**: Musharakah & Mudarabah-based fund growth
-- **Milestone-Driven Disbursement**: Ensures transparency and accountability
-- **AI + Blockchain Auditing**: Real-time status updates & traceability
-- **DAO Voting System**: Crowd-based emergency fund prioritization
-- **Smart Zakat Tools**: OCR-based zakat calculator & 8-asnaf fund pool
-- **Malaysia Impact Map**: Geolocation-based donation insights
+- **Multi-Modal Donations**:
+  - Support for crypto donations via Metamask, including ETH, BNB, and USDT.
+  - FPX integration allows MYR transfers via 21+ Malaysian banks.
+  - Touch 'n Go e-wallet support for rapid local transactions.
+  - Physical goods donation system with real-time pickup scheduling via Lalamove.
+  - Self-donation kiosk locator using OpenStreetMap integration.
+- **Shariah-Compliant Investments**:
+  - Idle funds are grown through verified halal investment platforms like HAQQ and Firoza.
+  - Investment contracts use musharakah and mudarabah structures.
+  - Generates passive income for donation pools with full on-chain visibility.
+- **Milestone-Driven Disbursement**:
+  - Projects are only funded upon verified completion of previous milestones.
+  - Each milestone includes visual proof and blockchain verification.
+  - Corporate sponsors can pause or redirect funding based on progress.
+- **AI + Blockchain Auditing**:
+  - AI models pre-screen donation proposals for Shariah compliance.
+  - Blockchain ledger tracks every transaction, editable by none, visible to all.
+  - NFT and QR-coded receipts offer tamper-proof proof of donation.
+- **DAO Voting System**:
+  - Emergency funding proposals undergo donor and scholar voting.
+  - Real-time proposal ranking and voting via smart contracts.
+  - Prevents political or biased fund allocations with full transparency.
+- **Smart Zakat Tools**:
+  - OCR-based zakat calculator for uploading bank statements, payslips, or portfolios.
+  - Auto-assigns funds to the 8 asnaf categories with trackable outcomes.
+  - Personalized Zakat history with visual summaries of impact.
+- **Malaysia Impact Map**:
+  - Interactive map shows verified donation needs within user proximity.
+  - Tap-to-navigate to project cards, donation in one click.
+  - Updated in real-time using OpenStreetMap and AI-curated data.
+- **Decentralized Financial Management**:
+  - Funds are managed via smart contracts, with DAO oversight.
+  - Transparent pooling and programmable disbursement logic.
+- **Recipient Validation & Identification**:
+  - KYC via Onfido for all recipients.
+  - Verified partnership with Jabatan Pendaftaran Pertubuhan Malaysia for NGOs.
+  - Impact report includes recipient data (with privacy safeguards).
+- **Enhanced Security & Verification**:
+  - Cryptographic encryption for all user data.
+  - QR-coded receipts tied to NFT hashes on IPFS.
+  - Proposal tracking with AI chat verification reduces fraud.
+- **Multiform Payment Integration**:
+  - Privy for seamless wallet onboarding.
+  - Luno integration as optional crypto exchange pathway.
+  - In-app toggles for switching between payment methods.
+- **Halal DeFi Profit Sharing**:
+  - Excess funds are pooled into halal DeFi liquidity protocols.
+  - All profits are redistributed to charity pools monthly.
+  - Growth rates and allocations are published in a monthly transparency report.
 
 ---
 
@@ -45,38 +87,49 @@ The platform is structured into six key layers:
 ---
 
 ## 🛠️ Admin Dashboard - AI Proposal Review
-**Problem**: Manual review of proposals is slow and prone to Shariah non-compliance.  
-**Solution**: AI scans proposals for compliance and enables chat-based review for accuracy and speed.
+🧠 AI-powered scanning of proposals detects non-compliant elements.  
+🗣️ Integrated AI chat allows admin to clarify proposal issues and receive reform suggestions instantly.  
+🛡️ Ensures all proposals are verified Shariah-compliant before reaching human reviewers.
 
 ---
 
 ## 💸 Donation Journey - More Payment Options
-**Problem**: Traditional platforms lack inclusive payment options.  
-**Solution**: Accepts crypto, FPX, TnG, and physical goods. Includes map for drop-offs and delivery integration via Lalamove.
+💰 Supports 5+ payment modes including Metamask (ETH, BNB, USDT), FPX, TnG, and physical goods.  
+📍 Donors without bank accounts can choose drop-off via nearest donation kiosk (live map via OpenStreetMap).  
+🚚 Lalamove API enables real-time scheduling and pickup of food/clothes donations.  
+🔀 Unified interface allows users to switch seamlessly between donation modes.
 
 ---
 
 ## 🔗 Transparency - Real-Time Donation Flow
-**Problem**: Donors can't trace where funds go.  
-**Solution**: Blockchain-backed transaction history, live status blocks, NFTs, QR-coded receipts for traceability.
+⛓️ Each donation is stored on a tamper-proof blockchain ledger.  
+📈 Donors view real-time transaction flow and see fund movement across pools.  
+📃 NFT-backed receipts with embedded QR codes provide verifiable donation status.  
+👤 Personalized dashboards track every cent donated with timestamps and fund tags.
 
 ---
 
 ## 🏗️ Project Tracking & Partnerships
-**Problem**: Vague project updates reduce trust.  
-**Solution**: Milestone-verified funding, blockchain records, and corporate CSR integration for sustainable support.
+✅ Project milestones verified by Shariah board and blockchain-logged.  
+🏢 CSR partners can monitor project completion and control fund disbursement at each milestone.  
+🧾 Real-time progress cards show % of milestone completion with visual proof (images, receipts).  
+🔄 Unmet project expectations allow partners to redirect or pause funds.
 
 ---
 
 ## 🗳️ DAO Voting - Public Emergency Fund Decisions
-**Problem**: Emergency fund distribution lacks community input.  
-**Solution**: On-chain voting empowers donors and scholars to decide funding priorities.
+🗳️ Emergency proposals are opened to public votes through on-chain smart contract mechanisms.  
+🤝 Scholars provide advisory scoring while public votes influence fund priority.  
+📍 Example: Flood in Johor vs gas explosion in Putra Heights — voters decide which gets funds first.  
+📬 Results logged publicly and instantly reflected in fund distribution logic.
 
 ---
 
 ## 📋 Smart Zakat Calculator
-**Problem**: Manual Zakat calculations are slow and error-prone.  
-**Solution**: OCR scanning autofills fields for fast, accurate Zakat fulfillment.
+📸 Users upload payslips, bank statements, or investment docs.  
+🔍 OCR scans extract values and auto-calculate zakat according to national guidelines.  
+📤 Auto-fill feature reduces input time by 80%.  
+✅ Final output breaks zakat by category (cash, investment, property) with recommended total.
 
 ---
 
