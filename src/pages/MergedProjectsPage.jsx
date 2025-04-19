@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import {
   Box,
   Heading,
@@ -64,6 +65,8 @@ const MotionText = motion(Text);
 const MotionFlex = motion(Flex);
 
 const MergedProjectsPage = () => {
+  const location = useLocation(); // Get location object
+
   // State for projects page
   const [selectedProjectExplore, setSelectedProjectExplore] = useState(null);
   const { isOpen: isOpenExplore, onOpen: onOpenExplore, onClose: onCloseExplore } = useDisclosure();
@@ -103,6 +106,100 @@ const MergedProjectsPage = () => {
     successRate: [40, 42, 45, 48, 51, 55, 62, 68, 71, 78, 82, 85],
   });
   
+  // Add state to track which project should be expanded
+  const [expandedProjectId, setExpandedProjectId] = useState(null);
+
+  // State for recipient highlighting
+  const [highlightedRecipientId, setHighlightedRecipientId] = useState(null);
+  
+  // Check URL for recipient and project type parameters on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const recipientId = url.searchParams.get('recipient');
+      const projectType = url.searchParams.get('type');
+      const shouldExpand = url.searchParams.get('expand') === 'true';
+      
+      // Store the recipient ID for highlighting in the modal
+      if (recipientId) {
+        setHighlightedRecipientId(recipientId);
+      }
+      
+      // If we have parameters and should expand, find the matching project
+      if (recipientId && projectType && shouldExpand) {
+        // First set the active view based on the project type
+        if (projectType.toLowerCase() === 'schoolbuilding' || 
+            projectType.toLowerCase() === 'education') {
+          setActiveView('pending'); // School building projects are in the pending view
+        } else if (projectType.toLowerCase() === 'waterproject' || 
+                 projectType.toLowerCase() === 'floodrelief') {
+          setActiveView('ongoing'); // Water projects are in the ongoing view
+        }
+        
+        // Delay the search to ensure state is updated and components are rendered
+        setTimeout(() => {
+          // Look in both data sets for the matching project
+          let matchingProject = null;
+          
+          // First check in pending projects (projectsExploreData)
+          matchingProject = projectsExploreData.find(p => {
+            // Check project type match - try multiple approaches
+            const matchesType = 
+              p.category?.toLowerCase() === projectType.toLowerCase() || 
+              p.pool?.toLowerCase() === projectType.toLowerCase() ||
+              p.donationType?.toLowerCase() === projectType.toLowerCase() ||
+              p.tags?.some(tag => tag.toLowerCase() === projectType.toLowerCase());
+            
+            // Check for recipient match in various possible properties
+            const hasRecipient = 
+              p.recipients?.some(r => r.id === recipientId || r.name === recipientId) || 
+              p.partners?.some(p => p.id === recipientId || p.name === recipientId) ||
+              p.milestones?.some(m => m.id === recipientId || m.title === recipientId);
+            
+            return matchesType && hasRecipient;
+          });
+          
+          // If not found, check in ongoing projects (projectsData)
+          if (!matchingProject) {
+            matchingProject = projectsData.find(p => {
+              // Check project type match - try multiple approaches
+              const matchesType = 
+                p.category?.toLowerCase() === projectType.toLowerCase() || 
+                p.pool?.toLowerCase() === projectType.toLowerCase() ||
+                p.donationType?.toLowerCase() === projectType.toLowerCase() ||
+                p.tags?.some(tag => tag.toLowerCase() === projectType.toLowerCase());
+              
+              // Check for recipient match in various possible properties
+              const hasRecipient = 
+                p.recipients?.some(r => r.id === recipientId || r.name === recipientId) || 
+                p.partners?.some(p => p.id === recipientId || p.name === recipientId) ||
+                p.milestones?.some(m => m.id === recipientId || m.title === recipientId);
+              
+              return matchesType && hasRecipient;
+            });
+          }
+          
+          // If we found a matching project, set it as expanded and open the modal
+          if (matchingProject) {
+            console.log("Found matching project:", matchingProject);
+            setExpandedProjectId(matchingProject.id);
+            
+            // Select the right handler based on which dataset the project was found in
+            if (projectsExploreData.some(p => p.id === matchingProject.id)) {
+              setSelectedProjectExplore(matchingProject);
+              onOpenExplore();
+            } else {
+              setSelectedProjectFunding(matchingProject);
+              onOpenFunding();
+            }
+          } else {
+            console.log("No matching project found for type:", projectType, "and recipient:", recipientId);
+          }
+        }, 500); // Delay to ensure components are rendered
+      }
+    }
+  }, []);
+  
   // Adding/removing filters for explore projects
   const addFilter = (filter) => {
     if (!exploreFilters.includes(filter)) {
@@ -125,12 +222,40 @@ const MergedProjectsPage = () => {
   
   // Handle project card clicks
   const handleProjectExploreClick = (project) => {
+    if (!project) {
+      console.log("Error: No project provided to handleProjectExploreClick");
+      return;
+    }
+    
+    console.log("Opening project explore modal for:", project.title);
     setSelectedProjectExplore(project);
+    
+    // If this is the expanded project, mark it as such
+    if (project.id === expandedProjectId) {
+      console.log("Opening expanded project:", project.id);
+      // Additional logic for expanded projects can go here
+    }
+    
+    // Make sure to call onOpenExplore to open the modal
     onOpenExplore();
   };
   
   const handleProjectFundingClick = (project) => {
+    if (!project) {
+      console.log("Error: No project provided to handleProjectFundingClick");
+      return;
+    }
+    
+    console.log("Opening project funding modal for:", project.title);
     setSelectedProjectFunding(project);
+    
+    // If this is the expanded project, mark it as such
+    if (project.id === expandedProjectId) {
+      console.log("Opening expanded funding project:", project.id);
+      // Additional logic for expanded funding projects can go here
+    }
+    
+    // Make sure to call onOpenFunding to open the modal
     onOpenFunding();
   };
   
@@ -349,6 +474,71 @@ const MergedProjectsPage = () => {
       setIsLoading(false);
     }, 500);
   }, [searchQuery, categoryFilter, locationFilter, donationTypeFilter, exploreFilters, fundingFilters]);
+
+  // Effect to check location state on mount
+  useEffect(() => {
+    const handleProjectOpening = () => {
+      // Check for URL parameters
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        const projectIdParam = url.searchParams.get('openProject');
+        const recipientIdParam = url.searchParams.get('recipient');
+        
+        if (projectIdParam) {
+          console.log("Found project ID in URL params:", projectIdParam);
+          tryOpenProject(projectIdParam, recipientIdParam);
+          return;
+        }
+      }
+      
+      // Check for state from React Router navigation
+      if (location.state?.openProjectId) {
+        const projectIdToOpen = location.state.openProjectId;
+        const recipientIdToHighlight = location.state.recipientId;
+        
+        console.log("Found project ID in Router state:", projectIdToOpen);
+        tryOpenProject(projectIdToOpen, recipientIdToHighlight);
+      }
+    };
+    
+    // Helper function to find and open the project
+    const tryOpenProject = (projectId, recipientId) => {
+      // Set recipient ID for highlighting
+      if (recipientId) {
+        setHighlightedRecipientId(recipientId);
+      }
+      
+      // First try finding the project in the 'pending' (explore) data
+      let projectToOpen = projectsExploreData.find(p => p.id === projectId);
+      if (projectToOpen) {
+        console.log("Found project in explore data:", projectToOpen.title);
+        setActiveView('pending'); // Switch to the correct view
+        // Use setTimeout to ensure the view switch completes before opening modal
+        setTimeout(() => handleProjectExploreClick(projectToOpen), 100);
+        return; // Exit after finding
+      }
+      
+      // If not found, try finding in the 'ongoing' (funding) data
+      projectToOpen = projectsData.find(p => p.id === projectId);
+      if (projectToOpen) {
+        console.log("Found project in funding data:", projectToOpen.title);
+        setActiveView('ongoing'); // Switch to the correct view
+        // Use setTimeout to ensure the view switch completes before opening modal
+        setTimeout(() => handleProjectFundingClick(projectToOpen), 100);
+        return; // Exit after finding
+      }
+      
+      console.log("Project with ID", projectId, "not found in either dataset.");
+    };
+    
+    // Execute once when component mounts
+    handleProjectOpening();
+    
+    // Clean up state in location to prevent reopening on subsequent renders
+    if (location.state?.openProjectId) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
   
   return (
     <Box 
@@ -893,13 +1083,15 @@ const MergedProjectsPage = () => {
       <ProjectDetailsModalExplore 
         isOpen={isOpenExplore} 
         onClose={onCloseExplore} 
-        project={selectedProjectExplore} 
+        project={selectedProjectExplore}
+        highlightedRecipientId={highlightedRecipientId}
       />
       
       <ProjectDetailsModalFunding 
         isOpen={isOpenFunding} 
         onClose={onCloseFunding} 
-        project={selectedProjectFunding} 
+        project={selectedProjectFunding}
+        highlightedRecipientId={highlightedRecipientId}
       />
     </Box>
   );

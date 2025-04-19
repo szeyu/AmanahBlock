@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -58,8 +58,18 @@ import MilestoneTimeline from '../VerticalTimeline';
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
 
-const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
+const ProjectDetailsModal = ({ isOpen, onClose, project, highlightedRecipientId }) => {
   const [activeTab, setActiveTab] = useState(0);
+  
+  // Check URL for recipient parameter on component mount and when recipient changes
+  useEffect(() => {
+    if (isOpen && highlightedRecipientId) {
+      // If we have a recipient ID, switch to the Partners tab since that's where recipients are shown
+      setActiveTab(2); // Partners tab is at index 2
+      
+      // TODO: If needed, add logic to scroll to the highlighted partner
+    }
+  }, [isOpen, highlightedRecipientId]);
   
   if (!project) return null;
   
@@ -575,7 +585,12 @@ const ProjectDetailsModal = ({ isOpen, onClose, project }) => {
                         bg="rgba(26, 32, 44, 0.4)"
                         borderRadius="xl"
                         borderWidth="1px"
-                        borderColor="rgba(255, 255, 255, 0.05)"
+                        borderColor={partner.id === highlightedRecipientId ? "cyan.400" : "rgba(255, 255, 255, 0.05)"}
+                        boxShadow={partner.id === highlightedRecipientId ? "0 0 15px rgba(0, 224, 255, 0.4)" : "none"}
+                        // If this is the highlighted partner, add a ref to scroll to it
+                        ref={partner.id === highlightedRecipientId ? (el) => {
+                          if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                        } : null}
                       >
                         <Flex align="center">
                           <Avatar 

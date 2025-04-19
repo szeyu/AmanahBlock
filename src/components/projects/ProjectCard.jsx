@@ -111,7 +111,12 @@ const ProjectCard = ({ project, handleProjectClick, favorites, toggleFavorite })
       borderColor={cardBorderColor}
       boxShadow={isHovered ? `0 8px 32px ${glowColor}` : "none"}
       transition="all 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67)"
-      onClick={() => handleProjectClick(project)}
+      onClick={(e) => {
+        // Only handle click if not coming from the button
+        if (e.target.tagName.toLowerCase() !== 'button') {
+          handleProjectClick(project);
+        }
+      }}
       cursor="pointer"
       animate={controls}
       onMouseEnter={() => setIsHovered(true)}
@@ -338,13 +343,16 @@ const ProjectCard = ({ project, handleProjectClick, favorites, toggleFavorite })
           borderColor="rgba(0, 224, 255, 0.3)"
           _hover={{
             bg: "rgba(0, 224, 255, 0.2)",
+            borderColor: "rgba(0, 224, 255, 0.5)",
           }}
           onClick={(e) => {
             e.stopPropagation();
             handleProjectClick(project);
           }}
-          opacity={isHovered ? 1 : 0}
-          transition="opacity 0.3s ease"
+          opacity={1}
+          transition="all 0.3s ease"
+          mt={2}
+          py={2}
         >
           View Project
         </Button>

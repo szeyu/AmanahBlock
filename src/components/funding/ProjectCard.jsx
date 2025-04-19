@@ -357,7 +357,12 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
           color="white"
           fontWeight="bold"
           borderRadius="xl"
-          onClick={() => openMilestoneDetails(project)}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            if (typeof openMilestoneDetails === 'function') {
+              openMilestoneDetails(project);
+            }
+          }}
           transition="all 0.3s"
           position="relative"
           overflow="hidden"
