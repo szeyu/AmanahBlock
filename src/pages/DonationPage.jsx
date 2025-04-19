@@ -42,7 +42,7 @@ const DonationPage = () => {
   const [currency, setCurrency] = useState('USDT');
   const [showAllocation, setShowAllocation] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [showDonationAmount, setShowDonationAmount] = useState(false);
+  const [showDonationAmount, setShowDonationAmount] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isQRCodeOpen, onOpen: onQRCodeOpen, onClose: onQRCodeClose } = useDisclosure();
   const toast = useToast();
@@ -218,7 +218,7 @@ const DonationPage = () => {
   const handleDonationTypeChange = (index) => {
     const types = ['sadaqah', 'zakat', 'waqf'];
     setDonationType(types[index]);
-    setShowDonationAmount(false);
+    setShowDonationAmount(true);
     
     if (types[index] === 'zakat' || types[index] === 'waqf') {
       setDonationMode('money');
