@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Heading,
@@ -18,10 +18,32 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem
+  MenuItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  Progress,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useColorModeValue,
+  Tooltip,
+  Circle
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup } from 'react-icons/fa';
+import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup, FaInfoCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 // Project components
 import ProjectCardExplore from '../components/projects/ProjectCard';
@@ -66,6 +88,20 @@ const MergedProjectsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [donationTypeFilter, setDonationTypeFilter] = useState('');
+  
+  // New state for stats interactivity
+  const [selectedStat, setSelectedStat] = useState(null);
+  const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure();
+  const [statsTrend, setStatsTrend] = useState({
+    totalProjects: { value: 5, label: 'New projects this month' },
+    totalFundsRaised: { value: 12.5, label: 'Increase since last month' },
+    successRate: { value: 7.2, label: 'Improvement since last quarter' }
+  });
+  const [statsHistory, setStatsHistory] = useState({
+    totalProjects: [28, 32, 36, 42, 48, 52, 58, 65, 72, 80, 88, 95],
+    totalFundsRaised: [15000, 35000, 65000, 95000, 120000, 150000, 185000, 220000, 260000, 290000, 320000, 350000],
+    successRate: [40, 42, 45, 48, 51, 55, 62, 68, 71, 78, 82, 85],
+  });
   
   // Adding/removing filters for explore projects
   const addFilter = (filter) => {
@@ -130,24 +166,95 @@ const MergedProjectsPage = () => {
 
   const { totalProjects, totalFundsRaised, successRate } = calculateStats();
 
+  // Handle stat card click
+  const handleStatClick = (statType) => {
+    setSelectedStat(statType);
+    onStatsModalOpen();
+  };
+
+  const getModalContent = () => {
+    if (!selectedStat) return null;
+
+    // Content based on selected stat
+    switch (selectedStat) {
+      case 'totalProjects':
+        return {
+          title: 'Projects Overview',
+          data: {
+            current: totalProjects,
+            trend: statsTrend.totalProjects.value,
+            trendLabel: statsTrend.totalProjects.label,
+            breakdown: [
+              { label: 'Education', value: projectsData.filter(p => p.category === 'Education').length + projectsExploreData.filter(p => p.category === 'Education').length, color: '#48BB78' },
+              { label: 'Healthcare', value: projectsData.filter(p => p.category === 'Healthcare').length + projectsExploreData.filter(p => p.category === 'Healthcare').length, color: '#3182CE' },
+              { label: 'Food', value: projectsData.filter(p => p.category === 'Food').length + projectsExploreData.filter(p => p.category === 'Food').length, color: '#DD6B20' },
+              { label: 'Water', value: projectsData.filter(p => p.category === 'Water').length + projectsExploreData.filter(p => p.category === 'Water').length, color: '#00E0FF' },
+              { label: 'Other', value: projectsData.filter(p => !['Education', 'Healthcare', 'Food', 'Water'].includes(p.category)).length + projectsExploreData.filter(p => !['Education', 'Healthcare', 'Food', 'Water'].includes(p.category)).length, color: '#8A7CFB' },
+            ],
+            history: statsHistory.totalProjects
+          }
+        };
+      case 'totalFundsRaised':
+        return {
+          title: 'Funds Raised Overview',
+          data: {
+            current: totalFundsRaised,
+            trend: statsTrend.totalFundsRaised.value,
+            trendLabel: statsTrend.totalFundsRaised.label,
+            breakdown: [
+              { label: 'Sadaqah', value: Math.round(totalFundsRaised * 0.65), color: '#48BB78' },
+              { label: 'Waqf', value: Math.round(totalFundsRaised * 0.25), color: '#3182CE' },
+              { label: 'Zakat', value: Math.round(totalFundsRaised * 0.10), color: '#DD6B20' },
+            ],
+            history: statsHistory.totalFundsRaised
+          }
+        };
+      case 'successRate':
+        return {
+          title: 'Success Rate Overview',
+          data: {
+            current: successRate,
+            trend: statsTrend.successRate.value,
+            trendLabel: statsTrend.successRate.label,
+            breakdown: [
+              { label: 'Completed', value: Math.round(successRate * 0.75), color: '#48BB78' }, 
+              { label: 'On track', value: Math.round(successRate * 0.15), color: '#3182CE' },
+              { label: 'Delayed', value: Math.round(successRate * 0.10), color: '#DD6B20' },
+            ],
+            history: statsHistory.successRate
+          }
+        };
+      default:
+        return null;
+    }
+  };
+
+  const modalContent = getModalContent();
+
   const stats = [
     { 
       label: "Total Projects", 
       value: totalProjects,
       icon: FaProjectDiagram,
-      color: "#00E0FF"
+      color: "#00E0FF",
+      key: "totalProjects",
+      description: "Click for detailed breakdown of all projects",
     },
     { 
       label: "Funds Raised", 
       value: `$${totalFundsRaised.toLocaleString()}`,
       icon: FaChartLine,
-      color: "#8A7CFB"
+      color: "#8A7CFB",
+      key: "totalFundsRaised",
+      description: "Click to see funding breakdown and trends",
     },
     { 
       label: "Success Rate", 
       value: `${successRate}%`,
       icon: FaRegLightbulb,
-      color: "#48BB78"
+      color: "#48BB78",
+      key: "successRate",
+      description: "Click to view success metrics and analysis",
     }
   ];
   
@@ -288,33 +395,26 @@ const MergedProjectsPage = () => {
           {stats.map((stat, index) => (
             <Box
               key={index}
+              as={motion.div}
+              whileHover={{ 
+                y: -5,
+                boxShadow: "0 8px 30px rgba(0, 0, 0, 0.3)"
+              }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStatClick(stat.key)}
               bg="rgba(13, 16, 31, 0.7)"
               backdropFilter="blur(10px)"
               borderRadius="xl"
               borderWidth="1px"
-              borderColor="rgba(255, 255, 255, 0.05)"
+              borderColor={selectedStat === stat.key ? stat.color : "rgba(255, 255, 255, 0.05)"}
               p={6}
               textAlign="center"
               position="relative"
               overflow="hidden"
-              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              transition="all 0.3s"
               _hover={{
-                transform: "translateY(-8px)",
-                boxShadow: `0 20px 30px -10px ${stat.color}30`,
-                borderColor: `${stat.color}50`,
-                "& > .stat-icon": {
-                  opacity: "0.2",
-                  transform: "scale(1.2) rotate(10deg)",
-                },
-                "& > .content > .visible-icon": {
-                  transform: "rotateY(360deg)",
-                  color: stat.color,
-                },
-                "& > .content > .stat-value": {
-                  transform: "scale(1.05)",
-                  color: "white",
-                },
-                cursor: "pointer"
+                borderColor: stat.color,
               }}
             >
               {/* Background icon */}
@@ -325,66 +425,157 @@ const MergedProjectsPage = () => {
                 top="-15px" 
                 right="-15px" 
                 opacity="0.1" 
-                boxSize="80px"
-                className="stat-icon"
-                transition="all 0.5s ease"
+                boxSize="80px" 
               />
               
-              {/* Decorative elements that appear on hover */}
-              <Box
-                position="absolute"
-                bottom="-50px"
-                left="-50px"
-                width="100px"
-                height="100px"
-                borderRadius="full"
-                bg={stat.color}
-                opacity="0"
-                filter="blur(30px)"
-                transition="opacity 0.5s ease"
-                _groupHover={{ opacity: "0.1" }}
-              />
-              
-              {/* Visible icon and content */}
-              <Flex 
-                direction="column" 
-                align="center" 
-                justify="center" 
-                position="relative" 
-                zIndex={1}
-                className="content"
-              >
-                <Icon 
-                  as={stat.icon} 
-                  color={stat.color} 
-                  boxSize={8} 
-                  mb={3}
-                  className="visible-icon"
-                  transition="all 0.6s ease"
-                />
+              {/* Visible icon */}
+              <Flex direction="column" align="center" justify="center" position="relative" zIndex={1}>
+                <Icon as={stat.icon} color={stat.color} boxSize={8} mb={3} />
                 <Text 
                   color="white" 
                   fontSize={{ base: "2xl", md: "3xl" }} 
                   fontWeight="bold"
                   mb={2}
-                  className="stat-value"
-                  transition="all 0.3s ease"
                 >
                   {stat.value}
                 </Text>
-                <Text 
-                  color="gray.400" 
-                  fontSize="sm"
-                  transition="color 0.3s ease"
-                  _groupHover={{ color: "gray.300" }}
-                >
-                  {stat.label}
-                </Text>
+                <Text color="gray.400" fontSize="sm" mb={2}>{stat.label}</Text>
+                
+                {/* Add trend indicators */}
+                {statsTrend[stat.key] && (
+                  <HStack fontSize="xs" color={statsTrend[stat.key].value > 0 ? "green.400" : "red.400"} spacing={1}>
+                    <Icon as={statsTrend[stat.key].value > 0 ? FaArrowUp : FaArrowDown} boxSize={3} />
+                    <Text>{Math.abs(statsTrend[stat.key].value)}%</Text>
+                  </HStack>
+                )}
+                
+                {/* Info text */}
+                <HStack color="gray.500" fontSize="xs" mt={3} spacing={1}>
+                  <Icon as={FaInfoCircle} boxSize={3} />
+                  <Text>Click for details</Text>
+                </HStack>
               </Flex>
             </Box>
           ))}
         </Grid>
       </Container>
+      
+      {/* Stats Modal */}
+      <Modal isOpen={isStatsModalOpen} onClose={onStatsModalClose} size="lg">
+        <ModalOverlay backdropFilter="blur(10px)" />
+        <ModalContent bg="rgba(13, 16, 31, 0.95)" borderColor="rgba(255, 255, 255, 0.05)" borderWidth="1px">
+          <ModalHeader color="white">{modalContent?.title}</ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody pb={6}>
+            {modalContent && (
+              <VStack spacing={6} align="stretch">
+                {/* Current value with trend */}
+                <Stat>
+                  <StatLabel color="gray.400">Current Value</StatLabel>
+                  <StatNumber color="white" fontSize="3xl">
+                    {selectedStat === 'totalFundsRaised' 
+                      ? `$${modalContent.data.current.toLocaleString()}` 
+                      : selectedStat === 'successRate' 
+                        ? `${modalContent.data.current}%` 
+                        : modalContent.data.current}
+                  </StatNumber>
+                  <StatHelpText>
+                    <StatArrow type={modalContent.data.trend > 0 ? 'increase' : 'decrease'} />
+                    {Math.abs(modalContent.data.trend)}% {modalContent.data.trendLabel}
+                  </StatHelpText>
+                </Stat>
+                
+                {/* Breakdown by category */}
+                <Box>
+                  <Text color="white" fontWeight="medium" mb={3}>Breakdown</Text>
+                  <VStack align="stretch" spacing={3}>
+                    {modalContent.data.breakdown.map((item, idx) => (
+                      <Box key={idx}>
+                        <Flex justify="space-between" mb={1}>
+                          <HStack>
+                            <Circle size="12px" bg={item.color} />
+                            <Text color="gray.300" fontSize="sm">{item.label}</Text>
+                          </HStack>
+                          <Text color="white" fontWeight="medium">
+                            {selectedStat === 'totalFundsRaised' 
+                              ? `$${item.value.toLocaleString()}` 
+                              : selectedStat === 'successRate' 
+                                ? `${item.value}%` 
+                                : item.value}
+                          </Text>
+                        </Flex>
+                        <Progress 
+                          value={item.value} 
+                          max={selectedStat === 'totalFundsRaised' 
+                            ? modalContent.data.current 
+                            : selectedStat === 'successRate' 
+                              ? 100 
+                              : modalContent.data.current}
+                          size="sm"
+                          colorScheme={item.color.includes('#48BB78') ? 'green' : 
+                                        item.color.includes('#3182CE') ? 'blue' : 
+                                        item.color.includes('#DD6B20') ? 'orange' : 
+                                        item.color.includes('#00E0FF') ? 'cyan' : 
+                                        'purple'}
+                          borderRadius="full"
+                        />
+                      </Box>
+                    ))}
+                  </VStack>
+                </Box>
+                
+                {/* Historical data */}
+                <Box>
+                  <Text color="white" fontWeight="medium" mb={3}>12-Month History</Text>
+                  <Box h="150px" position="relative" mt={4}>
+                    {/* Simple chart visualization */}
+                    <Flex h="100%" position="relative" align="flex-end">
+                      {modalContent.data.history.map((value, idx) => {
+                        const maxValue = Math.max(...modalContent.data.history);
+                        const height = (value / maxValue) * 100;
+                        const color = selectedStat === 'totalProjects' ? '#00E0FF' : 
+                                      selectedStat === 'totalFundsRaised' ? '#8A7CFB' : '#48BB78';
+                        
+                        return (
+                          <Tooltip 
+                            key={idx} 
+                            label={selectedStat === 'totalFundsRaised' 
+                              ? `$${value.toLocaleString()}` 
+                              : selectedStat === 'successRate' 
+                                ? `${value}%` 
+                                : value}
+                            placement="top"
+                          >
+                            <Box
+                              w="8.33%"
+                              h={`${height}%`}
+                              bg={color}
+                              opacity={0.7}
+                              _hover={{ opacity: 1 }}
+                              borderTopRadius="md"
+                              mx="1px"
+                              transition="all 0.2s"
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </Flex>
+                  </Box>
+                  <Flex justify="space-between" mt={2}>
+                    <Text color="gray.500" fontSize="xs">12 Months Ago</Text>
+                    <Text color="gray.500" fontSize="xs">Current</Text>
+                  </Flex>
+                </Box>
+              </VStack>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onStatsModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       
       <Container maxW="container.xl">
         {/* Toggle Buttons for Pending/Ongoing */}
