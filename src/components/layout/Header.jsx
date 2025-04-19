@@ -427,6 +427,12 @@ const Header = () => {
                 />
 
                 <Divider borderColor="gray.700" />
+                
+                <Text color="gray.400" fontSize="sm" fontWeight="bold" px={3}>More</Text>
+                <MobileNavLink to="/impact" label="Impact Explorer" icon={FaChartPie} onClick={onClose} />
+                <MobileNavLink to="/beneficiary-feedback" label="Beneficiary Feedback" icon={FaComments} onClick={onClose} />
+                <MobileNavLink to="/learn" label="Learn" icon={FaBookOpen} onClick={onClose} />
+                
 
                 <MobileNavLink
                   to="/admin"

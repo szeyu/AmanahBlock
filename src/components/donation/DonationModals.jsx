@@ -234,7 +234,7 @@ const DonationModals = ({
               <Text color="white">Scan QR Code to Pay</Text>
             </HStack>
           </ModalHeader>
-          <ModalCloseButton color="white" />
+          <ModalCloseButton color="white" zIndex="2" />
           <ModalBody py={6} position="relative" zIndex="1">
             <VStack spacing={6}>
               <Box 

@@ -38,7 +38,6 @@ function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/audit-trail" element={<AuditTrail />} />
             <Route path="/learn" element={<LearnPage />} />
-            <Route path="/zakat-calculator" element={<ZakatCalculatorPage />} />
             <Route path="/governance" element={<GovernancePage />} />
             <Route path="/impact" element={<ImpactExplorerPage />} />
             <Route path="/islamic-defi" element={<IslamicDefiPage />} />
