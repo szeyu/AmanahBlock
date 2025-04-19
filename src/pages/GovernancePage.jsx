@@ -4,8 +4,6 @@ import {
   Heading, 
   Text, 
   Flex, 
-  Button, 
-  VStack, 
   Tabs, 
   TabList, 
   Tab, 
@@ -16,12 +14,10 @@ import {
   Grid,
   HStack,
   Icon,
-  useColorModeValue,
-  Badge,
-  Divider,
-  Image,
-  chakra,
   SimpleGrid,
+  Tooltip,
+  VStack,
+  Badge,
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,19 +26,8 @@ import {
   FaGavel,
   FaVoteYea,
   FaHistory,
-  FaRegLightbulb,
-  FaNetworkWired,
-  FaUsers,
-  FaEthereum,
-  FaChartPie,
-  FaChartLine,
-  FaRegClock,
-  FaShieldAlt,
-  FaBalanceScale,
-  FaExclamationTriangle,
-  FaHandHoldingUsd,
-  FaTools,
-  FaFileContract,
+  FaCoins,
+  FaExclamationCircle,
 } from 'react-icons/fa';
 
 // Import refactored components
@@ -53,6 +38,7 @@ import EmptyVotesState from '../components/governance/EmptyVotesState';
 import GovernanceInfoSection from '../components/governance/GovernanceInfoSection';
 import CreateProposalModal from '../components/governance/CreateProposalModal';
 import MyVotesSection from '../components/governance/MyVotesSection';
+import VotingPieChart from '../components/governance/VotingPieChart';
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -87,6 +73,84 @@ const GovernancePage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activeSubTab, setActiveSubTab] = useState(0);
   const { isOpen: isCreateOpen, onOpen: onCreateOpen, onClose: onCreateClose } = useDisclosure();
+  
+  // State for proposals
+  const [userTokens, setUserTokens] = useState(1000); // Example initial token balance
+  const [proposals, setProposals] = useState({
+    emergency: {
+      highPriority: [
+        { 
+          id: 'high1', 
+          title: 'Johor Flood Emergency Relief', 
+          description: 'Immediate aid needed for flood victims in Johor. Funds will be used for evacuation, temporary shelter, food, and medical supplies.',
+          voteCount: 1350,
+          hasVoted: false
+        },
+        { 
+          id: 'high2', 
+          title: 'Putra Heights Gas Pipe Leakage Fire Relief', 
+          description: 'Emergency support needed for families affected by the gas pipe explosion. Funds for immediate medical care, temporary housing, and essential supplies.',
+          voteCount: 1850,
+          hasVoted: false
+        }
+      ],
+      mediumPriority: [
+        { 
+          id: 'med1', 
+          title: 'Kelantan Landslide Recovery', 
+          description: 'Support needed for communities affected by recent landslides in Kelantan. Funds for temporary shelter and basic necessities.',
+          voteCount: 950,
+          hasVoted: false
+        },
+        { 
+          id: 'med2', 
+          title: 'Penang Storm Damage Response', 
+          description: 'Assistance for families affected by severe storms in Penang. Funds for home repairs and emergency supplies.',
+          voteCount: 850,
+          hasVoted: false
+        }
+      ],
+      lowPriority: [
+        { 
+          id: 'low1', 
+          title: 'Sarawak Rural Bridge Repair', 
+          description: 'Emergency repairs needed for damaged bridges connecting rural communities in Sarawak.',
+          voteCount: 750,
+          hasVoted: false
+        },
+        { 
+          id: 'low2', 
+          title: 'Sabah Coastal Flooding Preparation', 
+          description: 'Preventive measures and emergency supplies for coastal communities at risk of flooding in Sabah.',
+          voteCount: 650,
+          hasVoted: false
+        }
+      ]
+    }
+  });
+
+  const handleVote = (projectId, tokenAmount, category) => {
+    setProposals(prev => {
+      // For emergency proposals, we need to check all priority levels
+      return {
+        ...prev,
+        emergency: {
+          highPriority: prev.emergency.highPriority.map(project => 
+            project.id === projectId ? { ...project, voteCount: project.voteCount + tokenAmount } : project
+          ),
+          mediumPriority: prev.emergency.mediumPriority.map(project => 
+            project.id === projectId ? { ...project, voteCount: project.voteCount + tokenAmount } : project
+          ),
+          lowPriority: prev.emergency.lowPriority.map(project => 
+            project.id === projectId ? { ...project, voteCount: project.voteCount + tokenAmount } : project
+          )
+        }
+      };
+    });
+
+    // Update user's token balance
+    setUserTokens(prevTokens => prevTokens - tokenAmount);
+  };
   
   // Mock data for governance stats
   const stats = {
@@ -195,51 +259,118 @@ const GovernancePage = () => {
   const pastProposals = [
     {
       id: "PROP-2023-37",
-      title: "School Building in Yemen",
-      category: "PROJECT FUNDING",
+      title: "Yemen Earthquake Relief",
+      category: "EMERGENCY",
+      priority: "HIGH",
       status: "Passed",
       date: "2023-03-15",
       votesFor: 2500,
-      votesAgainst: 500
+      votesAgainst: 500,
+      timeframe: "1 day",
+      description: "Emergency aid for earthquake victims in Yemen"
     },
     {
       id: "PROP-2023-36",
-      title: "Upgrade Smart Contract Security",
-      category: "PROTOCOL",
+      title: "Gaza Medical Emergency",
+      category: "EMERGENCY",
+      priority: "HIGH",
       status: "Passed",
       date: "2023-03-01",
       votesFor: 3000,
-      votesAgainst: 200
+      votesAgainst: 200,
+      timeframe: "1 day",
+      description: "Urgent medical supplies for hospitals in Gaza"
     },
     {
       id: "PROP-2023-35",
-      title: "Medical Aid for Gaza",
-      category: "EMERGENCY FUNDING",
+      title: "Indonesia Flood Response",
+      category: "EMERGENCY",
+      priority: "MEDIUM",
       status: "Passed",
       date: "2023-02-20",
       votesFor: 3500,
-      votesAgainst: 100
+      votesAgainst: 100,
+      timeframe: "2 days",
+      description: "Support for flood victims in Jakarta"
     },
     {
       id: "PROP-2023-34",
-      title: "Add New Shariah Advisors",
-      category: "GOVERNANCE",
-      status: "Failed",
+      title: "Syria Earthquake Aid",
+      category: "EMERGENCY",
+      priority: "HIGH",
+      status: "Passed",
       date: "2023-02-10",
-      votesFor: 1200,
-      votesAgainst: 1800
+      votesFor: 4200,
+      votesAgainst: 300,
+      timeframe: "1 day",
+      description: "Emergency response for earthquake victims"
     },
     {
       id: "PROP-2023-33",
-      title: "Implement Zakat Distribution Algorithm",
-      category: "PROTOCOL",
+      title: "Somalia Drought Relief",
+      category: "EMERGENCY",
+      priority: "LOW",
       status: "Passed",
       date: "2023-01-25",
       votesFor: 2800,
-      votesAgainst: 700
+      votesAgainst: 700,
+      timeframe: "3 days",
+      description: "Water and food aid for drought-affected regions"
     }
   ];
   
+  // Sample emergency proposals with different priority levels
+  const emergencyProposals = {
+    highPriority: [
+      {
+        id: 'high1',
+        title: 'Johor Flood Relief',
+        description: 'Immediate aid needed for flood victims in affected areas.',
+        voteCount: 1110,
+        hasVoted: false,
+      },
+      {
+        id: 'high2',
+        title: 'Putra Height Gas Pipe Leakage Affected Area',
+        description: 'Support for residents affected by dangerous gas pipe leakage.',
+        voteCount: 1350,
+        hasVoted: false,
+      }
+    ],
+    mediumPriority: [
+      {
+        id: 'med1',
+        title: 'Fire Damage Restoration',
+        description: 'Support for communities affected by recent fires.',
+        voteCount: 950,
+        hasVoted: false,
+      },
+      {
+        id: 'med2',
+        title: 'Emergency Food Supply',
+        description: 'Distribution of emergency food supplies to affected regions.',
+        voteCount: 850,
+        hasVoted: false,
+      }
+    ],
+    lowPriority: [
+      {
+        id: 'low1',
+        title: 'Infrastructure Repair',
+        description: 'Emergency repairs for damaged community infrastructure.',
+        voteCount: 750,
+        hasVoted: false,
+      },
+      {
+        id: 'low2',
+        title: 'Temporary Shelter Setup',
+        description: 'Establishment of temporary shelters for displaced families.',
+        voteCount: 650,
+        hasVoted: false,
+      }
+    ]
+  };
+
   return (
     <Box py={10} px={4} bg="#0A0F1E">
       <Container maxW="container.xl">
@@ -277,26 +408,24 @@ const GovernancePage = () => {
               </MotionText>
             </Box>
             
+            {/* User's Voting Power */}
             <MotionBox
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              whileHover={{ scale: 1.05 }}
             >
-              <Button 
-                leftIcon={<FaPlus />} 
-                onClick={onCreateOpen}
-                size="lg"
-                bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-                color="white"
-                _hover={{
-                  bgGradient: "linear(to-r, #00B5D8, #805AD5)",
-                }}
-                borderRadius="xl"
-                px={8}
-              >
-                Create Proposal
-              </Button>
+              <Tooltip label="Your voting power is proportional to your token balance">
+                <HStack 
+                  bg="rgba(0, 0, 0, 0.2)"
+                  p={4}
+                  borderRadius="xl"
+                  borderWidth="1px"
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                >
+                  <Icon as={FaCoins} color="#00E0FF" />
+                  <Text color="white">Your Voting Power: {userTokens} tokens</Text>
+                </HStack>
+              </Tooltip>
             </MotionBox>
           </Flex>
           
@@ -371,186 +500,86 @@ const GovernancePage = () => {
             
             <TabPanels>
               {/* Active Proposals Tab */}
-              <TabPanel p={0} pt={6}>
-                {/* Sub-tabs for Active Proposals */}
-                <Tabs 
-                  variant="soft-rounded" 
-                  colorScheme="cyan" 
-                  size="sm" 
-                  onChange={(index) => setActiveSubTab(index)}
-                  mb={6}
-                >
-                  <TabList 
-                    overflowX="auto" 
-                    py={2}
-                    css={{
-                      scrollbarWidth: 'none',
-                      '::-webkit-scrollbar': {
-                        display: 'none',
-                      },
-                    }}
-                  >
-                    <Tab 
-                      mr={2}
-                      bg="rgba(0, 0, 0, 0.2)"
-                      color="gray.300"
-                      _selected={{ 
-                        bg: "rgba(0, 224, 255, 0.2)", 
-                        color: "#00E0FF" 
-                      }}
-                    >
-                      <HStack>
-                        <Icon as={FaExclamationTriangle} />
-                        <Text>Emergency Funding</Text>
-                      </HStack>
-                    </Tab>
-                    <Tab 
-                      mr={2}
-                      bg="rgba(0, 0, 0, 0.2)"
-                      color="gray.300"
-                      _selected={{ 
-                        bg: "rgba(0, 224, 255, 0.2)", 
-                        color: "#00E0FF" 
-                      }}
-                    >
-                      <HStack>
-                        <Icon as={FaHandHoldingUsd} />
-                        <Text>Project Funding</Text>
-                      </HStack>
-                    </Tab>
-                    <Tab 
-                      mr={2}
-                      bg="rgba(0, 0, 0, 0.2)"
-                      color="gray.300"
-                      _selected={{ 
-                        bg: "rgba(0, 224, 255, 0.2)", 
-                        color: "#00E0FF" 
-                      }}
-                    >
-                      <HStack>
-                        <Icon as={FaTools} />
-                        <Text>Protocol Change</Text>
-                      </HStack>
-                    </Tab>
-                    <Tab 
-                      bg="rgba(0, 0, 0, 0.2)"
-                      color="gray.300"
-                      _selected={{ 
-                        bg: "rgba(0, 224, 255, 0.2)", 
-                        color: "#00E0FF" 
-                      }}
-                    >
-                      <HStack>
-                        <Icon as={FaFileContract} />
-                        <Text>Governance Change</Text>
-                      </HStack>
-                    </Tab>
-                  </TabList>
-                  
-                  <TabPanels>
-                    {/* Emergency Funding Proposals */}
-                    <TabPanel p={0}>
-                      <AnimatePresence>
-                        <VStack spacing={8} align="stretch">
-                          {emergencyFundingProposals.map((proposal, index) => (
-                            <MotionBox
-                              key={proposal.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 * index, duration: 0.5 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              className="stagger-item"
-                            >
-                              <ProposalCard proposal={proposal} />
-                            </MotionBox>
-                          ))}
-                        </VStack>
-                      </AnimatePresence>
-                    </TabPanel>
-                    
-                    {/* Project Funding Proposals */}
-                    <TabPanel p={0}>
-                      <AnimatePresence>
-                        <VStack spacing={8} align="stretch">
-                          {projectFundingProposals.map((proposal, index) => (
-                            <MotionBox
-                              key={proposal.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 * index, duration: 0.5 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              className="stagger-item"
-                            >
-                              <ProposalCard proposal={proposal} />
-                            </MotionBox>
-                          ))}
-                        </VStack>
-                      </AnimatePresence>
-                    </TabPanel>
-                    
-                    {/* Protocol Change Proposals */}
-                    <TabPanel p={0}>
-                      <AnimatePresence>
-                        <VStack spacing={8} align="stretch">
-                          {protocolChangeProposals.map((proposal, index) => (
-                            <MotionBox
-                              key={proposal.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 * index, duration: 0.5 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              className="stagger-item"
-                            >
-                              <ProposalCard proposal={proposal} />
-                            </MotionBox>
-                          ))}
-                        </VStack>
-                      </AnimatePresence>
-                    </TabPanel>
-                    
-                    {/* Governance Change Proposals */}
-                    <TabPanel p={0}>
-                      <AnimatePresence>
-                        <VStack spacing={8} align="stretch">
-                          {governanceChangeProposals.map((proposal, index) => (
-                            <MotionBox
-                              key={proposal.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 * index, duration: 0.5 }}
-                              exit={{ opacity: 0, y: -20 }}
-                              className="stagger-item"
-                            >
-                              <ProposalCard proposal={proposal} />
-                            </MotionBox>
-                          ))}
-                        </VStack>
-                      </AnimatePresence>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
+              <TabPanel p={0}>
+                <VStack spacing={8} align="stretch">
+                  <Box>
+                    <HStack mb={4}>
+                      <Icon as={FaExclamationCircle} color="red.500" boxSize={6} />
+                      <Heading color="white">Emergency Fund Allocation</Heading>
+                    </HStack>
+                    <Text color="gray.300">
+                      Vote on critical emergency funding proposals based on priority levels.
+                      Higher priority items require immediate attention and have shorter voting periods.
+                    </Text>
+                  </Box>
+
+                  <SimpleGrid columns={1} spacing={6}>
+                    {/* High Priority - 1 Day Left */}
+                    <VotingPieChart
+                      title="High Priority Emergency Proposals"
+                      data={proposals.emergency.highPriority}
+                      timeframe="1 day remaining"
+                      category="Emergency"
+                      userTokens={userTokens}
+                      onVote={(projectId, tokenAmount) => handleVote(projectId, tokenAmount, 'emergency')}
+                      colorScheme="red.500"
+                      width="100%"
+                    />
+
+                    {/* Medium Priority - 2 Days Left */}
+                    <VotingPieChart
+                      title="Medium Priority Emergency Proposals"
+                      data={proposals.emergency.mediumPriority}
+                      timeframe="2 days remaining"
+                      category="Emergency"
+                      userTokens={userTokens}
+                      onVote={(projectId, tokenAmount) => handleVote(projectId, tokenAmount, 'emergency')}
+                      colorScheme="orange.500"
+                      width="100%"
+                    />
+
+                    {/* Low Priority - 3 Days Left */}
+                    <VotingPieChart
+                      title="Low Priority Emergency Proposals"
+                      data={proposals.emergency.lowPriority}
+                      timeframe="3 days remaining"
+                      category="Emergency"
+                      userTokens={userTokens}
+                      onVote={(projectId, tokenAmount) => handleVote(projectId, tokenAmount, 'emergency')}
+                      colorScheme="yellow.500"
+                      width="100%"
+                    />
+                  </SimpleGrid>
+                </VStack>
               </TabPanel>
               
               {/* Past Proposals Tab */}
               <TabPanel p={0} pt={6}>
-                <MotionBox
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <PastProposalsTable proposals={pastProposals} />
-                </MotionBox>
+                <PastProposalsTable proposals={pastProposals} />
               </TabPanel>
               
               {/* My Votes Tab */}
-              <TabPanel p={0} pt={6}>
-                <MotionBox
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <MyVotesSection />
-                </MotionBox>
+              <TabPanel p={0}>
+                <MyVotesSection 
+                  userVotes={[
+                    {
+                      id: "PROP-2023-42",
+                      title: "Johor Flood Emergency Relief",
+                      votesUsed: 1250,
+                      participationRate: 87,
+                      date: "2023-03-15",
+                      status: "Active"
+                    },
+                    {
+                      id: "PROP-2023-41",
+                      title: "Gaza Medical Emergency",
+                      votesUsed: 850,
+                      participationRate: 92,
+                      date: "2023-03-01",
+                      status: "Passed"
+                    }
+                  ]} 
+                />
               </TabPanel>
             </TabPanels>
           </Tabs>
