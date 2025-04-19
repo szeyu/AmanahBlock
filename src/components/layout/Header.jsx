@@ -48,6 +48,7 @@ import {
   FaSearch,
   FaRocket
 } from 'react-icons/fa';
+import WalletConnect from '../wallet/WalletConnect';
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -274,89 +275,7 @@ const Header = () => {
           )}
           
           {/* Wallet Connection Button */}
-          {isWalletConnected ? (
-            <Menu>
-              <MenuButton
-                as={Button}
-                size="sm"
-                bg="#00E0FF"
-                color="gray.800"
-                _hover={{
-                  bg: "#00B5D8"
-                }}
-                _active={{
-                  bg: "#00B5D8"
-                }}
-                leftIcon={<FaWallet />}
-                rightIcon={<ChevronDownIcon />}
-              >
-                0x71C...93E4
-              </MenuButton>
-              <MenuList bg="gray.800" borderColor="gray.700">
-                <Box px={4} py={2}>
-                  <Flex justify="space-between" align="center" mb={2}>
-                    <Text color="gray.400" fontSize="sm">Balance</Text>
-                    <Badge colorScheme="green" variant="solid">2.14 ETH</Badge>
-                  </Flex>
-                  <Flex align="center" mb={2}>
-                    <Box as={FaEthereum} color="brand.500" mr={2} />
-                    <Text color="white" fontSize="sm" fontFamily="mono">0x71C7f4E9A4D0F9A93E4</Text>
-                  </Flex>
-                </Box>
-                <MenuDivider borderColor="gray.700" />
-                <MenuItem 
-                  icon={<FaUserCircle />} 
-                  as={Link} 
-                  to="/profile"
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  My Profile
-                </MenuItem>
-                <MenuItem 
-                  icon={<FaHistory />} 
-                  as={Link} 
-                  to="/donations"
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  My Donations
-                </MenuItem>
-                <MenuItem 
-                  icon={<FaGavel />} 
-                  as={Link} 
-                  to="/governance"
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  My Votes
-                </MenuItem>
-                <MenuDivider borderColor="gray.700" />
-                <MenuItem 
-                  icon={<FaSignOutAlt />} 
-                  onClick={handleDisconnectWallet}
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                  color="red.300"
-                >
-                  Disconnect Wallet
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          ) : (
-            <Button
-              size="sm"
-              bg="#00E0FF"
-              color="gray.800"
-              _hover={{
-                bg: "#00B5D8"
-              }}
-              leftIcon={<FaWallet />}
-              onClick={handleConnectWallet}
-            >
-              Connect Wallet
-            </Button>
-          )}
+          <WalletConnect />
           
           {/* Mobile menu button */}
           <IconButton

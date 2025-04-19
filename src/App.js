@@ -21,33 +21,36 @@ import ProjectFundingPage from './pages/ProjectFundingPage';
 import EmergencyFundPage from './pages/EmergencyFundPage';
 import BeneficiaryFeedbackPage from './pages/BeneficiaryFeedbackPage';
 import ScrollToTop from './ScrollToTop';
+import { Web3Provider } from './context/Web3Context';
 
 function App() {
   return (
     <ChakraProvider theme={theme} resetCSS>
-      <Router>
-        <ScrollToTop />
-        <Header />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/donate" element={<DonationPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/audit-trail" element={<AuditTrail />} />
-          <Route path="/learn" element={<LearnPage />} />
-          <Route path="/zakat-calculator" element={<ZakatCalculatorPage />} />
-          <Route path="/governance" element={<GovernancePage />} />
-          <Route path="/impact" element={<ImpactExplorerPage />} />
-          <Route path="/islamic-defi" element={<IslamicDefiPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/project-funding" element={<ProjectFundingPage />} />
-          <Route path="/emergency-fund" element={<EmergencyFundPage />} />
-          <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
-        </Routes>
-        <Footer />
-      </Router>
+      <Web3Provider>
+        <Router>
+          <ScrollToTop />
+          <Header />
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/donate" element={<DonationPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/audit-trail" element={<AuditTrail />} />
+            <Route path="/learn" element={<LearnPage />} />
+            <Route path="/zakat-calculator" element={<ZakatCalculatorPage />} />
+            <Route path="/governance" element={<GovernancePage />} />
+            <Route path="/impact" element={<ImpactExplorerPage />} />
+            <Route path="/islamic-defi" element={<IslamicDefiPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/project-funding" element={<ProjectFundingPage />} />
+            <Route path="/emergency-fund" element={<EmergencyFundPage />} />
+            <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
+          </Routes>
+          <Footer />
+        </Router>
+      </Web3Provider>
     </ChakraProvider>
   );
 }
