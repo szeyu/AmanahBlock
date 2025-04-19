@@ -927,7 +927,7 @@ const ImpactSection = () => {
             bgClip="text"
             fontWeight="bold"
             >
-              Global Impact Map
+              Malaysia Impact Map
             </Heading>
               <Text color="gray.400">Explore our projects and their impact around the world</Text>
             </Box>
