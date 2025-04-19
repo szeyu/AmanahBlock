@@ -154,7 +154,7 @@ AmanahBlock sustains itself ethically through:
 - Hew Jin Hong
 - John Ong Ming Hom
 - Lim Jack Sheng
-- Lee Ing Zheng
+- Lee Ing Zhen
 
 ---
 
