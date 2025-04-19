@@ -367,7 +367,7 @@ const DonationPage = () => {
       console.log('Uploading file...');
 
       // Call the new upload endpoint
-      const response = await fetch('http://localhost:8000/upload-pdf', {
+      const response = await fetch('http://localhost:8000/zakat/upload-pdf', {
         method: 'POST',
         body: formData,
         headers: {

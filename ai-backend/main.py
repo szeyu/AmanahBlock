@@ -3,13 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from OCRScanner import OCRScanner
 from ZakatMetricsExtractor import ZakatMetricsExtractor
+from ChatService import ChatService
 import os
 import shutil
 from pathlib import Path
+from typing import Optional
 
 app = FastAPI(
-    title="OCR Scanner API",
-    description="API for converting PDF documents to markdown using OCR",
+    title="AmanahBlock Backend API",
+    description="API for document processing and AI chat services",
     version="1.0.0"
 )
 
@@ -26,35 +28,100 @@ app.add_middleware(
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-@app.post("/upload-pdf")
+# Initialize services
+chat_service = ChatService()
+ocr_scanner = OCRScanner()
+
+# Models for request/response
+class ChatMessage(BaseModel):
+    message: str
+    documentId: Optional[str] = None
+
+class DocumentUploadResponse(BaseModel):
+    status: str
+    documentId: str
+    content: str
+
+# AI Chat Pipeline
+@app.post("/ai/upload-document")
+async def upload_document(file: UploadFile = File(...)):
+    try:
+        print(f"Receiving document upload: {file.filename}")
+        
+        if not file.filename.lower().endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+            
+        # Create unique document ID
+        document_id = f"doc_{os.urandom(8).hex()}"
+        file_path = UPLOAD_DIR / f"{document_id}_{file.filename}"
+        
+        # Save file
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        print(f"File saved at: {file_path}")
+        
+        # Process PDF with OCR
+        content = ocr_scanner.convert_pdf_to_markdown(str(file_path))
+        
+        # Set context in chat service
+        chat_service.set_context_from_pdf(str(file_path))
+        
+        # Clean up file
+        os.remove(file_path)
+        
+        return DocumentUploadResponse(
+            status="success",
+            documentId=document_id,
+            content=content
+        )
+        
+    except Exception as e:
+        print(f"Error processing document: {str(e)}")
+        if 'file_path' in locals() and file_path.exists():
+            os.remove(file_path)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ai/chat")
+async def chat(request: ChatMessage):
+    try:
+        if not request.message:
+            raise HTTPException(status_code=400, detail="Message cannot be empty")
+        
+        response = chat_service.get_chat_response(request.message)
+        return {
+            "status": "success",
+            "response": response
+        }
+    except Exception as e:
+        print(f"Error in chat: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Original Zakat Pipeline
+@app.post("/zakat/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
     try:
         print(f"Receiving file upload: {file.filename}")
         
-        # Validate file type
         if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
             
-        # Save file to uploads directory
         file_path = UPLOAD_DIR / file.filename
         with file_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
         print(f"File saved successfully at: {file_path}")
         
-        # Process the PDF
         scanner = OCRScanner()
         print(f"Starting OCR conversion for file: {file_path}")
         markdown_text = scanner.convert_pdf_to_markdown(str(file_path))
         print("OCR conversion completed successfully")
         
-        # Extract Zakat metrics from the OCR text
         extractor = ZakatMetricsExtractor()
         print("Extracting Zakat metrics from text")
         metrics = extractor.extract_metrics(markdown_text)
         print(f"Extracted metrics: {metrics}")
         
-        # Clean up the uploaded file
         os.remove(file_path)
         print(f"Cleaned up temporary file: {file_path}")
         
@@ -66,16 +133,14 @@ async def upload_pdf(file: UploadFile = File(...)):
         
     except Exception as e:
         print(f"Error processing upload: {str(e)}")
-        # Clean up file if it exists
         if 'file_path' in locals() and file_path.exists():
             os.remove(file_path)
         raise HTTPException(status_code=500, detail=str(e))
 
-# Add endpoint to process existing OCR text
 class TextAnalysisRequest(BaseModel):
     text: str
 
-@app.post("/extract-zakat-metrics")
+@app.post("/zakat/extract-metrics")
 async def extract_zakat_metrics(request: TextAnalysisRequest):
     try:
         extractor = ZakatMetricsExtractor()

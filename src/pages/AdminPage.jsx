@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Container,
@@ -9,23 +9,14 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  Button,
-  Flex,
-  Badge,
-  HStack,
   Icon,
-  useToast,
-  VStack,
-  Divider,
+  Flex,
 } from "@chakra-ui/react";
 import {
-  FaWallet,
-  FaEthereum,
   FaShieldAlt,
   FaRegCheckCircle,
-  FaRegTimesCircle,
 } from "react-icons/fa";
-import { mockWallet, mockProposals, mockProofs } from "../data/adminMockData";
+import { mockProposals, mockProofs } from "../data/adminMockData";
 import ProposalReviewSection from "../components/admin/ProposalReviewSection";
 import MilestoneTrackingSection from "../components/admin/MilestoneTrackingSection";
 
@@ -33,43 +24,10 @@ import MilestoneTrackingSection from "../components/admin/MilestoneTrackingSecti
  * AdminPage component - Main administrative interface for AmanahBlock
  *
  * Provides functionality for:
- * 1. Wallet connection for transparency
- * 2. Proposal review with AI flagging
- * 3. Milestone tracking and fund release approval
+ * 1. Proposal review with AI flagging
+ * 2. Milestone tracking and fund release approval
  */
 const AdminPage = () => {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [wallet, setWallet] = useState(null);
-  const toast = useToast();
-
-  // Handle wallet connection
-  const connectWallet = () => {
-    // Mock wallet connection
-    setWallet(mockWallet);
-    setIsWalletConnected(true);
-
-    toast({
-      title: "Wallet Connected",
-      description: `Connected to address ${mockWallet.address}`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
-  // Handle wallet disconnection
-  const disconnectWallet = () => {
-    setWallet(null);
-    setIsWalletConnected(false);
-
-    toast({
-      title: "Wallet Disconnected",
-      status: "info",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
   return (
     <Box
       p={5}
@@ -91,100 +49,20 @@ const AdminPage = () => {
       }}
     >
       {/* Header Area */}
-      <Flex
-        justify="space-between"
-        align="center"
-        mb={8}
-        direction={{ base: "column", md: "row" }}
-        gap={4}
-      >
-        <Box>
-          <Heading
-            as="h1"
-            size="xl"
-            mb={2}
-            bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-            bgClip="text"
-          >
-            Admin Dashboard
-          </Heading>
-          <Text color="gray.300">
-            Manage charity proposals and milestone verification
-          </Text>
-        </Box>
-
-        {/* Wallet Connection */}
-        {isWalletConnected ? (
-          <Box
-            p={4}
-            bg="rgba(26, 32, 44, 0.7)"
-            backdropFilter="blur(10px)"
-            borderRadius="lg"
-            borderWidth="1px"
-            borderColor="rgba(0, 224, 255, 0.3)"
-            minW={{ base: "full", md: "320px" }}
-          >
-            <Flex justify="space-between" align="center" mb={2}>
-              <HStack>
-                <Icon as={FaEthereum} color="brand.500" />
-                <Text color="white" fontWeight="medium">
-                  Wallet Connected
-                </Text>
-              </HStack>
-              <Badge colorScheme="green" variant="subtle" px={2} py={1}>
-                Active
-              </Badge>
-            </Flex>
-
-            <Divider my={2} borderColor="gray.700" />
-
-            <Flex justify="space-between" align="center" mb={2}>
-              <Text color="gray.400" fontSize="sm">
-                Address:
-              </Text>
-              <Text color="white" fontSize="sm">
-                {wallet?.address}
-              </Text>
-            </Flex>
-
-            <Flex justify="space-between" align="center" mb={3}>
-              <Text color="gray.400" fontSize="sm">
-                Balance:
-              </Text>
-              <Text color="white" fontSize="sm" fontWeight="bold">
-                {wallet?.balance} {wallet?.currency}
-              </Text>
-            </Flex>
-
-            <Button
-              variant="outline"
-              colorScheme="red"
-              size="sm"
-              onClick={disconnectWallet}
-              width="full"
-            >
-              Disconnect Wallet
-            </Button>
-          </Box>
-        ) : (
-          <Button
-            leftIcon={<FaWallet />}
-            bg="rgba(0, 224, 255, 0.1)"
-            color="#00E0FF"
-            borderWidth="1px"
-            borderColor="rgba(0, 224, 255, 0.3)"
-            _hover={{
-              bg: "rgba(0, 224, 255, 0.2)",
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)",
-            }}
-            onClick={connectWallet}
-            minW={{ base: "full", md: "200px" }}
-          >
-            Connect Wallet
-          </Button>
-        )}
-      </Flex>
+      <Box mb={8}>
+        <Heading
+          as="h1"
+          size="xl"
+          mb={2}
+          bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+          bgClip="text"
+        >
+          Admin Dashboard
+        </Heading>
+        <Text color="gray.300">
+          Manage charity proposals and milestone verification
+        </Text>
+      </Box>
 
       {/* Admin Tabs */}
       <Box
