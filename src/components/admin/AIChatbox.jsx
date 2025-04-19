@@ -1,354 +1,459 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
- import {
-   Box,
-   VStack,
-   Text,
-   Flex,
-   Input,
-   IconButton,
-   Badge,
-   Icon,
-   HStack,
-   Avatar,
-   Spinner,
-   FormControl,
-   useColorModeValue,
-   Divider,
- } from "@chakra-ui/react";
- import { FaPaperPlane, FaExclamationTriangle, FaRobot, FaUser } from "react-icons/fa";
- import { motion } from "framer-motion";
- 
- const MotionBox = motion(Box);
- 
- /**
-  * ChatInputComponent - Separated input component for AI chat
-  * 
-  * @param {string} inputValue - Current input text value
-  * @param {Function} onChange - Handler for input changes
-  * @param {Function} onSend - Handler for send button click
-  * @param {boolean} isLoading - Loading state for send button
-  */
- const ChatInputComponent = ({ inputValue, onChange, onSend, isLoading }) => {
-   return (
-     <Box 
-       p={4} 
-       bg="rgba(26, 32, 44, 0.9)"
-       borderRadius="lg"
-       borderWidth="1px"
-       borderColor="gray.700"
-       width="100%"
-       mt={4}
-     >
-       <FormControl>
-         <Flex>
-           <Input
-             placeholder="Message AI assistant..."
-             value={inputValue}
-             onChange={onChange}
-             bg="whiteAlpha.100"
-             _hover={{ bg: "whiteAlpha.200" }}
-             _focus={{ 
-               bg: "whiteAlpha.200", 
-               borderColor: "brand.500" 
-             }}
-             borderRadius="md"
-             mr={2}
-             size="md"
-           />
-           <IconButton
-             colorScheme="brand"
-             aria-label="Send message"
-             icon={isLoading ? <Spinner size="sm" /> : <FaPaperPlane />}
-             onClick={onSend}
-             isLoading={isLoading}
-             variant="solid"
-             size="md"
-           />
-         </Flex>
-       </FormControl>
-     </Box>
-   );
- };
- 
- /**
-  * AIChatbox - AI assistant chat component for proposal review
-  * 
-  * Features:
-  * - AI-assisted proposal analysis
-  * - Interactive chat interface
-  * - Flagging and risk assessment
-  * 
-  * @param {string} title - Chat component title
-  * @param {boolean} isFlagged - Whether the proposal is flagged
-  * @param {string} flagReason - Reason for flagging
-  * @param {array} chatHistory - Previous chat messages
-  * @param {string} pdfContent - Content of the PDF proposal
-  * @param {string} height - Height of the component
-  */
- const AIChatbox = forwardRef((props, ref) => {
-   const { 
-     title = "AI Analysis", 
-     isFlagged = false, 
-     flagReason = "", 
-     chatHistory = [], 
-     pdfContent = "",
-     height = "100%" 
-   } = props;
- 
-   const [messages, setMessages] = useState([]);
-   const [inputValue, setInputValue] = useState("");
-   const [isLoading, setIsLoading] = useState(false);
-   const [isInitializing, setIsInitializing] = useState(true);
-   const messageBg = useColorModeValue("whiteAlpha.200", "whiteAlpha.200");
-   const messageSelfBg = useColorModeValue("blue.500", "brand.500");
-   const messagesEndRef = React.useRef(null);
- 
-   // Expose methods to parent component
-   useImperativeHandle(ref, () => ({
-     addMessage: (newMessage) => {
-       setMessages(prev => [...prev, newMessage]);
-     }
-   }));
- 
-   // Scroll to the bottom when messages change
-   const scrollToBottom = () => {
-     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-   };
- 
-   useEffect(() => {
-     scrollToBottom();
-   }, [messages]);
- 
-   // Initialize chat with initial analysis
-   useEffect(() => {
-     // Simulate loading the AI analysis
-     const timer = setTimeout(() => {
-       let initialMessages = [];
-       
-       if (chatHistory && chatHistory.length > 0) {
-         initialMessages = [...chatHistory];
-       } else {
-         // Default initial message if no history provided
-         initialMessages = [
-           {
-             role: "ai",
-             message: "I've reviewed the proposal document. Here's my initial analysis:",
-           },
-           {
-             role: "ai",
-             message: isFlagged
-               ? `⚠️ **FLAGGED**: ${flagReason}\n\nThis proposal has been flagged for potential compliance issues. Please review carefully.`
-               : "The proposal appears to be well-structured and compliant with our guidelines. The project goals align with our mission for sustainable impact."
-           },
-           {
-             role: "ai",
-             message: "Would you like me to analyze any specific aspects of the proposal in detail?"
-           }
-         ];
-       }
-       
-       setMessages(initialMessages);
-       setIsInitializing(false);
-     }, 1500);
-     
-     return () => clearTimeout(timer);
-   }, [chatHistory, isFlagged, flagReason]);
- 
-   // Handle input change
-   const handleInputChange = (e) => {
-     setInputValue(e.target.value);
-   };
- 
-   // Handle sending message
-   const handleSendMessage = () => {
-     if (inputValue.trim() === "") return;
-     
-     // Add user message
-     const userMessage = {
-       role: "admin",
-       message: inputValue.trim()
-     };
-     
-     setMessages(prev => [...prev, userMessage]);
-     setInputValue("");
-     setIsLoading(true);
-     
-     // Simulate AI response
-     setTimeout(() => {
-       const aiResponse = {
-         role: "ai",
-         message: generateAIResponse(inputValue, isFlagged, pdfContent)
-       };
-       
-       setMessages(prev => [...prev, aiResponse]);
-       setIsLoading(false);
-     }, 1500);
-   };
- 
-   // Handle pressing Enter to send message
-   const handleKeyPress = (e) => {
-     if (e.key === "Enter" && !isLoading) {
-       handleSendMessage();
-     }
-   };
- 
-   // Generate AI response based on user input and proposal context
-   const generateAIResponse = (userInput, isFlagged, pdfContent) => {
-     // Simple response generation logic - in a real app, this would connect to an actual AI service
-     const userInputLower = userInput.toLowerCase();
-     
-     if (userInputLower.includes("risk") || userInputLower.includes("concern")) {
-       return isFlagged 
-         ? "The main risks I've identified are related to budget allocation and timeline feasibility. The proposed completion dates seem optimistic given the scope."
-         : "I don't see any major risks in this proposal. The budget appears reasonable and the timeline is feasible.";
-     }
-     
-     if (userInputLower.includes("budget") || userInputLower.includes("cost")) {
-       return "The budget allocation appears to be within standard parameters. Administrative costs are at 12%, which is below our 15% threshold.";
-     }
-     
-     if (userInputLower.includes("impact") || userInputLower.includes("benefit")) {
-       return "The projected impact includes reaching 2,500 beneficiaries in the first year with potential for scaling to 10,000 by year three.";
-     }
-     
-     if (userInputLower.includes("timeline") || userInputLower.includes("schedule")) {
-       return "The proposed timeline spans 18 months with major milestones at 3, 9, and 15 months. The critical path appears reasonable.";
-     }
-     
-     if (userInputLower.includes("compliance") || userInputLower.includes("shariah")) {
-       return isFlagged
-         ? "There are some Shariah compliance concerns regarding the financing structure. The proposed profit-sharing mechanism may need adjustment."
-         : "The proposal appears to be Shariah-compliant. The financing structure uses approved mechanisms and avoids interest-based instruments.";
-     }
-     
-     // Default response
-     return "I've analyzed this aspect of the proposal and it appears to meet our standards. Would you like me to elaborate on any specific points?";
-   };
- 
-   return (
-     <Box
-       height={height}
-       bg="rgba(26, 32, 44, 0.7)"
-       backdropFilter="blur(10px)"
-       borderRadius="lg"
-       borderWidth="1px"
-       borderColor={isFlagged ? "rgba(245, 101, 101, 0.3)" : "rgba(255, 255, 255, 0.1)"}
-       display="flex"
-       flexDirection="column"
-       overflow="hidden"
-     >
-       {/* Header */}
-       <Flex 
-         p={4} 
-         borderBottomWidth="1px" 
-         borderColor="gray.700"
-         justify="space-between"
-         align="center"
-       >
-         <Text fontWeight="bold" color="white">
-           {title}
-         </Text>
-         
-         {isFlagged && (
-           <Badge 
-             colorScheme="red" 
-             display="flex" 
-             alignItems="center"
-             px={2}
-             py={1}
-             borderRadius="md"
-           >
-             <Icon as={FaExclamationTriangle} mr={1} />
-             <Text fontSize="xs">Flagged</Text>
-           </Badge>
-         )}
-       </Flex>
-       
-       {/* Chat Messages - Scrollable Area */}
-       <VStack 
-         flex="1" 
-         overflowY="auto" 
-         spacing={4} 
-         p={4}
-         align="stretch"
-         css={{
-           '&::-webkit-scrollbar': {
-             width: '6px',
-           },
-           '&::-webkit-scrollbar-track': {
-             background: 'rgba(0, 0, 0, 0.1)',
-           },
-           '&::-webkit-scrollbar-thumb': {
-             background: 'rgba(255, 255, 255, 0.2)',
-             borderRadius: '3px',
-           },
-         }}
-       >
-         {isInitializing ? (
-           <Flex justify="center" align="center" height="100%">
-             <Spinner size="xl" color="brand.500" thickness="4px" />
-           </Flex>
-         ) : (
-           messages.map((msg, index) => (
-             <MotionBox
-               key={index}
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.3, delay: index * 0.1 }}
-               alignSelf={msg.role === "admin" ? "flex-end" : "flex-start"}
-               maxWidth="80%"
-             >
-               <HStack 
-                 align="flex-start" 
-                 spacing={2}
-                 mb={1}
-               >
-                 {msg.role === "ai" ? (
-                   <Avatar 
-                     size="xs" 
-                     icon={<FaRobot />} 
-                     bg="brand.500" 
-                     color="white" 
-                   />
-                 ) : (
-                   <Avatar 
-                     size="xs" 
-                     icon={<FaUser />} 
-                     bg="blue.500" 
-                     color="white" 
-                   />
-                 )}
-                 <Text fontSize="xs" color="gray.400">
-                   {msg.role === "ai" ? "AI Assistant" : "You"}
-                 </Text>
-               </HStack>
-               
-               <Box
-                 bg={msg.role === "admin" ? messageSelfBg : messageBg}
-                 px={4}
-                 py={3}
-                 borderRadius="lg"
-                 borderTopLeftRadius={msg.role === "admin" ? "lg" : "sm"}
-                 borderTopRightRadius={msg.role === "admin" ? "sm" : "lg"}
-                 boxShadow="md"
-               >
-                 <Text color="white">{msg.message}</Text>
-               </Box>
-             </MotionBox>
-           ))
-         )}
-         <div ref={messagesEndRef} />
-       </VStack>
-       
-       {/* Separated Chat Input Component */}
-       <ChatInputComponent 
-         inputValue={inputValue}
-         onChange={handleInputChange}
-         onSend={handleSendMessage}
-         isLoading={isLoading}
-       />
-     </Box>
-   );
- });
- 
- export default AIChatbox;
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
+import {
+  Box,
+  VStack,
+  Text,
+  Flex,
+  Input,
+  IconButton,
+  Badge,
+  Icon,
+  HStack,
+  Avatar,
+  Spinner,
+  FormControl,
+  useColorModeValue,
+  Divider,
+  useToast,
+} from "@chakra-ui/react";
+import { FaPaperPlane, FaExclamationTriangle, FaRobot, FaUser } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+
+const MotionBox = motion(Box);
+
+const API_BASE_URL = 'http://localhost:8000';
+
+// Hardcoded proposal context
+const PROPOSAL_CONTEXT = `# Charity Proposal: EmpowerEd Community Learning Centre
+
+Organization: Persatuan Pendidikan Masyarakat Selangor (PPMS)
+Location: Bandar Baru Bangi, Selangor, Malaysia
+Submission Date: 16 April 2025
+Funding Request: RM 150,000
+Contact: Ahmad Zaki, Director, ahmad@ppms.org.my
+
+Project Overview:
+Persatuan Pendidikan Masyarakat Selangor (PPMS) proposes to establish the EmpowerEd Community Learning Centre in Bandar Baru Bangi to provide free education and vocational training for underprivileged youth aged 13–18. The centre will offer classes in mathematics, English, coding, and sewing, alongside community events to foster engagement. The project aims to empower 200 students annually, aligning with Malaysia's Shared Prosperity Vision 2030.
+
+Objectives:
+1. Provide free education to 200 underprivileged youth in Bandar Baru Bangi.
+2. Equip students with skills for employment through vocational training.
+3. Host community bonding events to promote social cohesion.
+
+Budget Breakdown:
+- Classroom Renovation: RM 50,000 (Refurbish 4 classrooms with furniture)
+- Educational Materials: RM 30,000 (Textbooks, computers, sewing machines)
+- Staff Salaries: RM 40,000 (5 teachers for 6 months)
+- Community Events: RM 20,000 (4 events with food and activities)
+- Miscellaneous Supplies: RM 10,000 (Stationery, utilities, promotional items)
+Total: RM 150,000
+
+Implementation Plan:
+• Month 1: Renovate classrooms and procure materials.
+• Month 2: Hire teachers and finalize curriculum.
+• Month 3-6: Conduct classes and host one community event monthly.
+
+Community Events:
+1. Cultural Day: Showcase traditional Malaysian arts with food stalls (budget: RM 5,000)
+2. Career Fair: Connect students with local businesses (budget: RM 4,000)
+3. Charity Gala: Fundraising dinner with entertainment (budget: RM 6,000)
+4. Youth Festival: Sports and music activities (budget: RM 5,000)
+
+Expected Impact:
+• 200 students gain access to education and skills training
+• 80% of graduates secure jobs or pursue further studies
+• Strengthened community ties through inclusive events
+
+Compliance:
+PPMS is registered with the Registrar of Societies Malaysia (ROS: PPM-008-10-123456). We commit to transparent fund usage, with all proofs uploaded to CharityChain's public storage. The project adheres to Malaysian laws and Islamic principles, ensuring no prohibited activities.`;
+
+/**
+ * ChatInputComponent - Separated input component for AI chat
+ * 
+ * @param {string} inputValue - Current input text value
+ * @param {Function} onChange - Handler for input changes
+ * @param {Function} onSend - Handler for send button click
+ * @param {boolean} isLoading - Loading state for send button
+ */
+const ChatInputComponent = ({ inputValue, onChange, onSend, isLoading }) => {
+  return (
+    <FormControl>
+      <Flex>
+        <Input
+          placeholder="Message AI assistant..."
+          value={inputValue}
+          onChange={onChange}
+          bg="whiteAlpha.100"
+          _hover={{ bg: "whiteAlpha.200" }}
+          _focus={{ 
+            bg: "whiteAlpha.200", 
+            borderColor: "brand.500" 
+          }}
+          borderRadius="md"
+          mr={2}
+          size="md"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !isLoading) {
+              onSend();
+            }
+          }}
+        />
+        <IconButton
+          colorScheme="brand"
+          aria-label="Send message"
+          icon={isLoading ? <Spinner size="sm" /> : <FaPaperPlane />}
+          onClick={onSend}
+          isLoading={isLoading}
+          variant="solid"
+          size="md"
+          flexShrink={0}
+        />
+      </Flex>
+    </FormControl>
+  );
+};
+
+const TypingIndicator = () => (
+  <HStack spacing={1} px={2} py={1}>
+    <motion.div
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+    >
+      <Box w="2px" h="2px" bg="white" borderRadius="full" />
+    </motion.div>
+    <motion.div
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse", delay: 0.2 }}
+    >
+      <Box w="2px" h="2px" bg="white" borderRadius="full" />
+    </motion.div>
+    <motion.div
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse", delay: 0.4 }}
+    >
+      <Box w="2px" h="2px" bg="white" borderRadius="full" />
+    </motion.div>
+  </HStack>
+);
+
+const StreamingText = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const CHUNK_SIZE = 4; // Show 4 characters at once
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timer = setTimeout(() => {
+        const nextChunk = text.slice(
+          currentIndex,
+          Math.min(currentIndex + CHUNK_SIZE, text.length)
+        );
+        setDisplayedText(prev => prev + nextChunk);
+        setCurrentIndex(prev => prev + CHUNK_SIZE);
+      }, 10); // Slightly faster timing
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, text]);
+
+  return <Text color="white" whiteSpace="pre-wrap">{displayedText}</Text>;
+};
+
+const ChatMessage = ({ message, role, animate = true }) => {
+  const messageBg = useColorModeValue(
+    role === "admin" ? "blue.500" : "whiteAlpha.200",
+    role === "admin" ? "brand.500" : "whiteAlpha.200"
+  );
+
+  return (
+    <Box
+      alignSelf={role === "admin" ? "flex-end" : "flex-start"}
+      maxWidth="80%"
+      width="fit-content"
+      mb={2}
+    >
+      <Flex align="center" mb={1}>
+        {role === "ai" ? (
+          <Avatar 
+            size="xs" 
+            icon={<FaRobot />} 
+            bg="brand.500" 
+            color="white" 
+            mr={1}
+          />
+        ) : (
+          <Avatar 
+            size="xs" 
+            icon={<FaUser />} 
+            bg="blue.500" 
+            color="white" 
+            mr={1}
+          />
+        )}
+        <Text fontSize="xs" color="gray.400">
+          {role === "ai" ? "AI Assistant" : "You"}
+        </Text>
+      </Flex>
+      
+      <Box
+        bg={messageBg}
+        px={4}
+        py={3}
+        borderRadius="lg"
+        borderTopLeftRadius={role === "admin" ? "lg" : "sm"}
+        borderTopRightRadius={role === "admin" ? "sm" : "lg"}
+        boxShadow="md"
+      >
+        {role === "ai" && animate ? (
+          <StreamingText text={message} />
+        ) : (
+          <Text color="white" whiteSpace="pre-wrap">{message}</Text>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+/**
+ * AIChatbox - AI assistant chat component for proposal review
+ * 
+ * Features:
+ * - AI-assisted proposal analysis
+ * - Interactive chat interface
+ * - Flagging and risk assessment
+ * 
+ * @param {string} title - Chat component title
+ * @param {boolean} isFlagged - Whether the proposal is flagged
+ * @param {string} flagReason - Reason for flagging
+ * @param {array} chatHistory - Previous chat messages
+ * @param {string} height - Height of the component
+ */
+const AIChatbox = forwardRef((props, ref) => {
+  const { 
+    title = "AI Analysis", 
+    isFlagged = false, 
+    flagReason = "", 
+    chatHistory = [], 
+    height = "100%" 
+  } = props;
+
+  const [messages, setMessages] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const toast = useToast();
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    addMessage: (newMessage) => {
+      setMessages(prev => [...prev, newMessage]);
+    }
+  }));
+
+  // Enhanced scroll handling
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  };
+
+  // Scroll when messages change or streaming completes
+  useEffect(() => {
+    const scrollTimeout = setTimeout(() => {
+      scrollToBottom();
+    }, 100); // Small delay to ensure content is rendered
+    return () => clearTimeout(scrollTimeout);
+  }, [messages, isLoading]);
+
+  // Add scroll to parent container function
+  const scrollParentToBottom = () => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTop = container.scrollHeight;
+    }
+  };
+
+  // Call both scroll functions when needed
+  const handleScroll = () => {
+    scrollToBottom();
+    scrollParentToBottom();
+  };
+
+  // Initialize chat faster - simplified for loading speed
+  useEffect(() => {
+    const initializeChat = async () => {
+      try {
+        // Skip actual API call and load initial messages immediately for faster loading
+        const initialMessages = [
+          {
+            role: "ai",
+            message: "I've analyzed the proposal document. Here's my initial assessment:",
+          },
+          {
+            role: "ai",
+            message: isFlagged
+              ? `⚠️ **FLAGGED**: ${flagReason}\n\nThis proposal requires additional scrutiny due to potential compliance issues.`
+              : "The proposal appears to be well-structured and compliant with our guidelines. I'm ready to assist with your review."
+          }
+        ];
+
+        setMessages(initialMessages);
+        setIsInitializing(false);
+      } catch (error) {
+        console.error('Error initializing chat:', error);
+        setIsInitializing(false);
+      }
+    };
+
+    initializeChat();
+  }, [isFlagged, flagReason, toast]);
+
+  // Handle sending message
+  const handleSendMessage = async () => {
+    if (inputValue.trim() === "") return;
+    
+    const userMessage = {
+      role: "admin",
+      message: inputValue.trim()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue("");
+    setIsLoading(true);
+    setIsTyping(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: userMessage.message,
+          isInitialization: false
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+      
+      const aiResponse = {
+        role: "ai",
+        message: data.response
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+      setIsTyping(false);
+    }
+  };
+
+  return (
+    <Box height={height} width="100%" display="flex" flexDirection="column">
+      {/* Header with Flag Status */}
+      <Flex 
+        p={3}
+        justifyContent="space-between" 
+        alignItems="center"
+        bg="rgba(26, 32, 44, 0.9)" 
+        borderTopLeftRadius="lg"
+        borderTopRightRadius="lg"
+        borderBottom="1px solid"
+        borderColor="gray.700"
+        mb={2}
+      >
+        <Text fontWeight="bold" color="white">{title}</Text>
+        {isFlagged && (
+          <Badge colorScheme="red" display="flex" alignItems="center" px={2} py={1}>
+            <Icon as={FaExclamationTriangle} mr={1} />
+            <Text fontSize="xs">Flagged</Text>
+          </Badge>
+        )}
+      </Flex>
+
+      {/* Chat Messages Area */}
+      <Box 
+        flex="1" 
+        overflowY="auto" 
+        px={4}
+        py={2}
+        bg="rgba(26, 32, 44, 0.7)" 
+        mb={3}
+        ref={messagesContainerRef}
+      >
+        {isInitializing ? (
+          <Flex justify="center" align="center" py={10}>
+            <Spinner size="lg" color="brand.500" thickness="3px" />
+          </Flex>
+        ) : (
+          <VStack spacing={4} align="stretch" width="100%">
+            {messages.map((msg, index) => (
+              <ChatMessage
+                key={index}
+                message={msg.message}
+                role={msg.role}
+                animate={msg.role === "ai" && index === messages.length - 1}
+              />
+            ))}
+            {isTyping && (
+              <Box alignSelf="flex-start">
+                <TypingIndicator />
+              </Box>
+            )}
+            <div ref={messagesEndRef} style={{ height: 1 }} />
+          </VStack>
+        )}
+      </Box>
+      
+      {/* Simple Input Area */}
+      <Flex mb={2}>
+        <Input 
+          placeholder="Message AI assistant..." 
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          bg="rgba(26, 32, 44, 0.7)"
+          color="white"
+          borderRadius="md"
+          mr={2}
+          size="md"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !isLoading) {
+              handleSendMessage();
+            }
+          }}
+        />
+        <IconButton
+          aria-label="Send message"
+          icon={isLoading ? <Spinner size="sm" /> : <FaPaperPlane />}
+          colorScheme="blue"
+          onClick={handleSendMessage}
+          isLoading={isLoading}
+          size="md"
+        />
+      </Flex>
+    </Box>
+  );
+});
+
+export default AIChatbox;

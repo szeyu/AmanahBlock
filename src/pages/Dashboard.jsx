@@ -233,18 +233,18 @@ const Dashboard = () => {
         </Box>
 
         {/* NFT Collection */}
-        <ImpactNFTs 
+        {/* <ImpactNFTs 
           nftCollection={nftCollection} 
           handleNftClick={handleNftClick} 
           onOpenReceiptModal={onOpenReceiptModal} 
-        />
+        /> */}
         
         {/* NFT Modal */}
-        <NFTModal 
+        {/* <NFTModal 
           isOpen={isOpen} 
           onClose={onClose} 
           selectedNft={selectedNft} 
-        />
+        /> */}
         
         {/* Recent Transactions and Fund Allocation in a grid */}
         <Flex 

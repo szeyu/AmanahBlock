@@ -1,5 +1,27 @@
 export const projectsExploreData = [
     {
+      id: 0,
+      title: "Support AmanahBlock Phase 3",
+      category: "General Support",
+      donationType: "donation",
+      location: "Malaysia",
+      image: "Amanah Block Logo.png",
+      description: "Support our mission to connect donors with meaningful causes. Your contribution helps us maintain the platform, expand our reach, and continue facilitating transparent charitable giving.",
+      raised: 15000,
+      goal: 50000,
+      progress: 30,
+      deadline: "Ongoing",
+      donors: 124,
+      verified: true,
+      shariah: "Fully Compliant",
+      tags: ["Platform Support", "Sustainability", "Transparency"],
+      impact: "Will help us connect more donors with charitable causes and improve platform features",
+      team: [
+        { name: "Ahmed Salam", role: "Founder", image: "https://randomuser.me/api/portraits/men/1.jpg" },
+        { name: "Fatima Hassan", role: "Operations Director", image: "https://randomuser.me/api/portraits/women/2.jpg" }
+      ]
+    },
+    {
       id: 1,
       title: "Food Bank Initiative",
       category: "Food",

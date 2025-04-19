@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Heading,
@@ -18,10 +18,38 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem
+  MenuItem,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  Progress,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useColorModeValue,
+  Tooltip,
+  Circle,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Select,
+  Textarea,
+  useToast
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup } from 'react-icons/fa';
+import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup, FaInfoCircle, FaArrowUp, FaArrowDown, FaPlus, FaFileUpload, FaUser, FaEnvelope, FaPhone, FaFileAlt } from 'react-icons/fa';
 
 // Project components
 import ProjectCardExplore from '../components/projects/ProjectCard';
@@ -66,6 +94,36 @@ const MergedProjectsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [donationTypeFilter, setDonationTypeFilter] = useState('');
+  
+  // New state for stats interactivity
+  const [selectedStat, setSelectedStat] = useState(null);
+  const { isOpen: isStatsModalOpen, onOpen: onStatsModalOpen, onClose: onStatsModalClose } = useDisclosure();
+  const [statsTrend, setStatsTrend] = useState({
+    totalProjects: { value: 5, label: 'New projects this month' },
+    totalFundsRaised: { value: 12.5, label: 'Increase since last month' },
+    successRate: { value: 7.2, label: 'Improvement since last quarter' }
+  });
+  const [statsHistory, setStatsHistory] = useState({
+    totalProjects: [28, 32, 36, 42, 48, 52, 58, 65, 72, 80, 88, 95],
+    totalFundsRaised: [15000, 35000, 65000, 95000, 120000, 150000, 185000, 220000, 260000, 290000, 320000, 350000],
+    successRate: [40, 42, 45, 48, 51, 55, 62, 68, 71, 78, 82, 85],
+  });
+  
+  // State for proposal form
+  const { isOpen: isProposalModalOpen, onOpen: onProposalModalOpen, onClose: onProposalModalClose } = useDisclosure();
+  const [proposalForm, setProposalForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    projectType: '',
+    description: '',
+    category: '',
+    location: '',
+    file: null
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const fileInputRef = useRef(null);
+  const toast = useToast();
   
   // Adding/removing filters for explore projects
   const addFilter = (filter) => {
@@ -130,24 +188,95 @@ const MergedProjectsPage = () => {
 
   const { totalProjects, totalFundsRaised, successRate } = calculateStats();
 
+  // Handle stat card click
+  const handleStatClick = (statType) => {
+    setSelectedStat(statType);
+    onStatsModalOpen();
+  };
+
+  const getModalContent = () => {
+    if (!selectedStat) return null;
+
+    // Content based on selected stat
+    switch (selectedStat) {
+      case 'totalProjects':
+        return {
+          title: 'Projects Overview',
+          data: {
+            current: totalProjects,
+            trend: statsTrend.totalProjects.value,
+            trendLabel: statsTrend.totalProjects.label,
+            breakdown: [
+              { label: 'Education', value: projectsData.filter(p => p.category === 'Education').length + projectsExploreData.filter(p => p.category === 'Education').length, color: '#48BB78' },
+              { label: 'Healthcare', value: projectsData.filter(p => p.category === 'Healthcare').length + projectsExploreData.filter(p => p.category === 'Healthcare').length, color: '#3182CE' },
+              { label: 'Food', value: projectsData.filter(p => p.category === 'Food').length + projectsExploreData.filter(p => p.category === 'Food').length, color: '#DD6B20' },
+              { label: 'Water', value: projectsData.filter(p => p.category === 'Water').length + projectsExploreData.filter(p => p.category === 'Water').length, color: '#00E0FF' },
+              { label: 'Other', value: projectsData.filter(p => !['Education', 'Healthcare', 'Food', 'Water'].includes(p.category)).length + projectsExploreData.filter(p => !['Education', 'Healthcare', 'Food', 'Water'].includes(p.category)).length, color: '#8A7CFB' },
+            ],
+            history: statsHistory.totalProjects
+          }
+        };
+      case 'totalFundsRaised':
+        return {
+          title: 'Funds Raised Overview',
+          data: {
+            current: totalFundsRaised,
+            trend: statsTrend.totalFundsRaised.value,
+            trendLabel: statsTrend.totalFundsRaised.label,
+            breakdown: [
+              { label: 'Sadaqah', value: Math.round(totalFundsRaised * 0.65), color: '#48BB78' },
+              { label: 'Waqf', value: Math.round(totalFundsRaised * 0.25), color: '#3182CE' },
+              { label: 'Zakat', value: Math.round(totalFundsRaised * 0.10), color: '#DD6B20' },
+            ],
+            history: statsHistory.totalFundsRaised
+          }
+        };
+      case 'successRate':
+        return {
+          title: 'Success Rate Overview',
+          data: {
+            current: successRate,
+            trend: statsTrend.successRate.value,
+            trendLabel: statsTrend.successRate.label,
+            breakdown: [
+              { label: 'Completed', value: Math.round(successRate * 0.75), color: '#48BB78' }, 
+              { label: 'On track', value: Math.round(successRate * 0.15), color: '#3182CE' },
+              { label: 'Delayed', value: Math.round(successRate * 0.10), color: '#DD6B20' },
+            ],
+            history: statsHistory.successRate
+          }
+        };
+      default:
+        return null;
+    }
+  };
+
+  const modalContent = getModalContent();
+
   const stats = [
     { 
       label: "Total Projects", 
       value: totalProjects,
       icon: FaProjectDiagram,
-      color: "#00E0FF"
+      color: "#00E0FF",
+      key: "totalProjects",
+      description: "Click for detailed breakdown of all projects",
     },
     { 
       label: "Funds Raised", 
       value: `$${totalFundsRaised.toLocaleString()}`,
       icon: FaChartLine,
-      color: "#8A7CFB"
+      color: "#8A7CFB",
+      key: "totalFundsRaised",
+      description: "Click to see funding breakdown and trends",
     },
     { 
       label: "Success Rate", 
       value: `${successRate}%`,
       icon: FaRegLightbulb,
-      color: "#48BB78"
+      color: "#48BB78",
+      key: "successRate",
+      description: "Click to view success metrics and analysis",
     }
   ];
   
@@ -243,6 +372,87 @@ const MergedProjectsPage = () => {
     }, 500);
   }, [searchQuery, categoryFilter, locationFilter, donationTypeFilter, exploreFilters, fundingFilters]);
   
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProposalForm({
+        ...proposalForm,
+        file: file
+      });
+    }
+  };
+  
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProposalForm({
+      ...proposalForm,
+      [name]: value
+    });
+  };
+  
+  // Validate form
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!proposalForm.name.trim()) errors.name = "Name is required";
+    if (!proposalForm.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(proposalForm.email)) {
+      errors.email = "Email is invalid";
+    }
+    
+    if (!proposalForm.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!/^(\+?6?01)[0-46-9]-*[0-9]{7,8}$/.test(proposalForm.phone)) {
+      errors.phone = "Phone number is invalid (Malaysian format)";
+    }
+    
+    if (!proposalForm.projectType) errors.projectType = "Project type is required";
+    if (!proposalForm.description.trim()) errors.description = "Description is required";
+    if (!proposalForm.category) errors.category = "Category is required";
+    if (!proposalForm.location) errors.location = "Location is required";
+    if (!proposalForm.file) errors.file = "Proposal document is required";
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  
+  // Handle form submission
+  const handleSubmitProposal = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      // Here we would typically send the form data to an API
+      console.log("Form submission:", proposalForm);
+      
+      // Show success toast
+      toast({
+        title: "Proposal submitted",
+        description: "Your project proposal has been submitted successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right"
+      });
+      
+      // Reset form and close modal
+      setProposalForm({
+        name: '',
+        email: '',
+        phone: '',
+        projectType: '',
+        description: '',
+        category: '',
+        location: '',
+        file: null
+      });
+      
+      onProposalModalClose();
+    }
+  };
+  
   return (
     <Box 
       minH="100vh" 
@@ -255,32 +465,311 @@ const MergedProjectsPage = () => {
       pb={20}
     >
       {/* Page Header */}
-      <Container maxW="container.xl" mb={10} textAlign="center">
-        <Icon 
-          as={FaProjectDiagram}
-          color="#00E0FF"
-          boxSize="50px"
+      <Container maxW="container.xl" mb={10}>
+        <Flex justifyContent="space-between" alignItems="center" mb={6}>
+          <Box textAlign={{base: "center", md: "left"}}>
+            <Icon 
+              as={FaProjectDiagram}
+              color="#00E0FF"
+              boxSize="50px"
+              mb={6}
+            />
+            <Heading
+              fontSize={{ base: "4xl", md: "5xl" }}
+              mb={4}
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+              bgClip="text"
+              fontWeight="bold"
+            >
+              Project Funding
+            </Heading>
+            <Text
+              fontSize={{ base: "lg", md: "xl" }}
+              color="gray.400"
+              maxW="container.md"
+              mb={10}
+            >
+              Track the progress of funded projects with milestone-based verification on the blockchain
+            </Text>
+          </Box>
+          
+          {/* Create Project Proposal Button */}
+          <Button
+            leftIcon={<FaPlus />}
+            onClick={onProposalModalOpen}
+            size="lg"
+            bg="rgba(138, 124, 251, 0.2)"
+            color="white"
+            _hover={{
+              bg: "rgba(138, 124, 251, 0.3)",
+            }}
+            borderRadius="lg"
+            px={6}
+            height="60px"
+            display={{base: "none", md: "flex"}}
+            alignItems="center"
+            justifyContent="center"
+            borderWidth="1px"
+            borderColor="rgba(138, 124, 251, 0.3)"
+            boxShadow="0px 4px 20px rgba(0, 0, 0, 0.15)"
+            transition="all 0.3s"
+            _active={{
+              transform: "scale(0.98)"
+            }}
+          >
+            Create Project Proposal
+          </Button>
+        </Flex>
+        
+        {/* Mobile Create Button */}
+        <Button
+          leftIcon={<FaPlus />}
+          onClick={onProposalModalOpen}
+          width="full"
+          bg="rgba(138, 124, 251, 0.2)"
+          color="white"
+          _hover={{
+            bg: "rgba(138, 124, 251, 0.3)",
+          }}
+          borderRadius="lg"
+          height="50px"
+          display={{base: "flex", md: "none"}}
+          alignItems="center"
+          justifyContent="center"
           mb={6}
-        />
-        <Heading
-          fontSize={{ base: "4xl", md: "5xl" }}
-          mb={4}
-          bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-          bgClip="text"
-          fontWeight="bold"
+          borderWidth="1px"
+          borderColor="rgba(138, 124, 251, 0.3)"
         >
-          Project Funding
-        </Heading>
-        <Text
-          fontSize={{ base: "lg", md: "xl" }}
-          color="gray.400"
-          maxW="container.md"
-          mx="auto"
-          mb={10}
-        >
-          Track the progress of funded projects with milestone-based verification on the blockchain
-        </Text>
+          Create Project Proposal
+        </Button>
       </Container>
+
+      {/* Project Proposal Modal */}
+      <Modal isOpen={isProposalModalOpen} onClose={onProposalModalClose} size="xl">
+        <ModalOverlay backdropFilter="blur(10px)" />
+        <ModalContent bg="rgba(13, 16, 31, 0.95)" borderColor="rgba(255, 255, 255, 0.05)" borderWidth="1px">
+          <ModalHeader color="white">Create Project Proposal</ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody pb={6}>
+            <form onSubmit={handleSubmitProposal}>
+              <VStack spacing={5} align="stretch">
+                <Heading size="sm" color="gray.300" mb={2}>Person in Charge Details</Heading>
+                
+                <FormControl isInvalid={formErrors.name}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaUser} />
+                      <Text>Name</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="name"
+                    value={proposalForm.name}
+                    onChange={handleInputChange}
+                    placeholder="Enter your full name"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.name && <FormErrorMessage>{formErrors.name}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.email}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaEnvelope} />
+                      <Text>Email</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="email"
+                    value={proposalForm.email}
+                    onChange={handleInputChange}
+                    placeholder="Enter your email address"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.email && <FormErrorMessage>{formErrors.email}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.phone}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaPhone} />
+                      <Text>Phone Number</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Input
+                    name="phone"
+                    value={proposalForm.phone}
+                    onChange={handleInputChange}
+                    placeholder="Enter your phone number (Malaysian format)"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  />
+                  {formErrors.phone && <FormErrorMessage>{formErrors.phone}</FormErrorMessage>}
+                </FormControl>
+                
+                <Box h="1px" bg="rgba(255, 255, 255, 0.1)" my={2}></Box>
+                
+                <Heading size="sm" color="gray.300" mb={2}>Project Details</Heading>
+                
+                <FormControl isInvalid={formErrors.projectType}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaCoins} />
+                      <Text>Project Type</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Select
+                    name="projectType"
+                    value={proposalForm.projectType}
+                    onChange={handleInputChange}
+                    placeholder="Select project type"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Waqf">Waqf</option>
+                    <option value="Zakat">Zakat</option>
+                    <option value="Sadaqah">Sadaqah</option>
+                  </Select>
+                  {formErrors.projectType && <FormErrorMessage>{formErrors.projectType}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.category}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaLayerGroup} />
+                      <Text>Category</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Select
+                    name="category"
+                    value={proposalForm.category}
+                    onChange={handleInputChange}
+                    placeholder="Select category"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Food">Food</option>
+                    <option value="Water">Water</option>
+                    <option value="Education">Education</option>
+                    <option value="Healthcare">Healthcare</option>
+                  </Select>
+                  {formErrors.category && <FormErrorMessage>{formErrors.category}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.location}>
+                  <FormLabel color="gray.300">Location</FormLabel>
+                  <Select
+                    name="location"
+                    value={proposalForm.location}
+                    onChange={handleInputChange}
+                    placeholder="Select location"
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                  >
+                    <option value="Johor">Johor</option>
+                    <option value="Kedah">Kedah</option>
+                    <option value="Kelantan">Kelantan</option>
+                    <option value="Kuala Lumpur">Kuala Lumpur</option>
+                    <option value="Labuan">Labuan</option>
+                    <option value="Melaka">Melaka</option>
+                    <option value="Negeri Sembilan">Negeri Sembilan</option>
+                    <option value="Pahang">Pahang</option>
+                    <option value="Penang">Penang</option>
+                    <option value="Perak">Perak</option>
+                    <option value="Perlis">Perlis</option>
+                    <option value="Putrajaya">Putrajaya</option>
+                    <option value="Sabah">Sabah</option>
+                    <option value="Sarawak">Sarawak</option>
+                    <option value="Selangor">Selangor</option>
+                    <option value="Terengganu">Terengganu</option>
+                  </Select>
+                  {formErrors.location && <FormErrorMessage>{formErrors.location}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.description}>
+                  <FormLabel color="gray.300">Project Description</FormLabel>
+                  <Textarea
+                    name="description"
+                    value={proposalForm.description}
+                    onChange={handleInputChange}
+                    placeholder="Describe your project in detail..."
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                    _focus={{ borderColor: "#8A7CFB", boxShadow: "0 0 0 1px #8A7CFB" }}
+                    minH="120px"
+                  />
+                  {formErrors.description && <FormErrorMessage>{formErrors.description}</FormErrorMessage>}
+                </FormControl>
+                
+                <FormControl isInvalid={formErrors.file}>
+                  <FormLabel color="gray.300">
+                    <HStack>
+                      <Icon as={FaFileAlt} />
+                      <Text>Proposal Document (PDF)</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Button
+                    leftIcon={<FaFileUpload />}
+                    w="full"
+                    onClick={() => fileInputRef.current?.click()}
+                    bg="rgba(13, 16, 31, 0.7)"
+                    borderColor="rgba(255, 255, 255, 0.1)"
+                    borderWidth="1px"
+                    borderStyle="dashed"
+                    borderRadius="md"
+                    p={6}
+                    _hover={{ bg: "rgba(13, 16, 31, 0.9)" }}
+                    color={proposalForm.file ? "white" : "gray.400"}
+                  >
+                    {proposalForm.file ? proposalForm.file.name : "Click to upload proposal document"}
+                  </Button>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    display="none"
+                  />
+                  {formErrors.file && <FormErrorMessage>{formErrors.file}</FormErrorMessage>}
+                </FormControl>
+              </VStack>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onProposalModalClose} mr={3} variant="outline" colorScheme="gray">
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmitProposal}
+              colorScheme="blue" 
+              bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+              _hover={{
+                bgGradient: "linear(to-r, #00C5FF, #7A6CFB)",
+              }}
+              _active={{
+                bgGradient: "linear(to-r, #00B5FF, #6A5CFB)",
+              }}
+            >
+              Submit Proposal
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Stats Cards */}
       <Container maxW="container.xl" mb={10}>
@@ -288,33 +777,26 @@ const MergedProjectsPage = () => {
           {stats.map((stat, index) => (
             <Box
               key={index}
+              as={motion.div}
+              whileHover={{ 
+                y: -5,
+                boxShadow: "0 8px 30px rgba(0, 0, 0, 0.3)"
+              }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleStatClick(stat.key)}
               bg="rgba(13, 16, 31, 0.7)"
               backdropFilter="blur(10px)"
               borderRadius="xl"
               borderWidth="1px"
-              borderColor="rgba(255, 255, 255, 0.05)"
+              borderColor={selectedStat === stat.key ? stat.color : "rgba(255, 255, 255, 0.05)"}
               p={6}
               textAlign="center"
               position="relative"
               overflow="hidden"
-              transition="all 0.3s ease-in-out"
+              cursor="pointer"
+              transition="all 0.3s"
               _hover={{
-                transform: "translateY(-8px)",
-                boxShadow: `0 20px 30px -10px ${stat.color}30`,
-                borderColor: `${stat.color}50`,
-                "& > .stat-icon": {
-                  opacity: "0.2",
-                  transform: "scale(1.2) rotate(10deg)",
-                },
-                "& > .content > .visible-icon": {
-                  transform: "rotateY(360deg)",
-                  color: stat.color,
-                },
-                "& > .content > .stat-value": {
-                  transform: "scale(1.05)",
-                  color: "white",
-                },
-                cursor: "pointer"
+                borderColor: stat.color,
               }}
             >
               {/* Background icon */}
@@ -325,66 +807,157 @@ const MergedProjectsPage = () => {
                 top="-15px" 
                 right="-15px" 
                 opacity="0.1" 
-                boxSize="80px"
-                className="stat-icon"
-                transition="all 0.5s ease"
+                boxSize="80px" 
               />
               
-              {/* Decorative elements that appear on hover */}
-              <Box
-                position="absolute"
-                bottom="-50px"
-                left="-50px"
-                width="100px"
-                height="100px"
-                borderRadius="full"
-                bg={stat.color}
-                opacity="0"
-                filter="blur(30px)"
-                transition="opacity 0.5s ease"
-                _groupHover={{ opacity: "0.1" }}
-              />
-              
-              {/* Visible icon and content */}
-              <Flex 
-                direction="column" 
-                align="center" 
-                justify="center" 
-                position="relative" 
-                zIndex={1}
-                className="content"
-              >
-                <Icon 
-                  as={stat.icon} 
-                  color={stat.color} 
-                  boxSize={8} 
-                  mb={3}
-                  className="visible-icon"
-                  transition="all 0.6s ease"
-                />
+              {/* Visible icon */}
+              <Flex direction="column" align="center" justify="center" position="relative" zIndex={1}>
+                <Icon as={stat.icon} color={stat.color} boxSize={8} mb={3} />
                 <Text 
                   color="white" 
                   fontSize={{ base: "2xl", md: "3xl" }} 
                   fontWeight="bold"
                   mb={2}
-                  className="stat-value"
-                  transition="all 0.3s ease"
                 >
                   {stat.value}
                 </Text>
-                <Text 
-                  color="gray.400" 
-                  fontSize="sm"
-                  transition="color 0.3s ease"
-                  _groupHover={{ color: "gray.300" }}
-                >
-                  {stat.label}
-                </Text>
+                <Text color="gray.400" fontSize="sm" mb={2}>{stat.label}</Text>
+                
+                {/* Add trend indicators */}
+                {statsTrend[stat.key] && (
+                  <HStack fontSize="xs" color={statsTrend[stat.key].value > 0 ? "green.400" : "red.400"} spacing={1}>
+                    <Icon as={statsTrend[stat.key].value > 0 ? FaArrowUp : FaArrowDown} boxSize={3} />
+                    <Text>{Math.abs(statsTrend[stat.key].value)}%</Text>
+                  </HStack>
+                )}
+                
+                {/* Info text */}
+                <HStack color="gray.500" fontSize="xs" mt={3} spacing={1}>
+                  <Icon as={FaInfoCircle} boxSize={3} />
+                  <Text>Click for details</Text>
+                </HStack>
               </Flex>
             </Box>
           ))}
         </Grid>
       </Container>
+      
+      {/* Stats Modal */}
+      <Modal isOpen={isStatsModalOpen} onClose={onStatsModalClose} size="lg">
+        <ModalOverlay backdropFilter="blur(10px)" />
+        <ModalContent bg="rgba(13, 16, 31, 0.95)" borderColor="rgba(255, 255, 255, 0.05)" borderWidth="1px">
+          <ModalHeader color="white">{modalContent?.title}</ModalHeader>
+          <ModalCloseButton color="white" />
+          <ModalBody pb={6}>
+            {modalContent && (
+              <VStack spacing={6} align="stretch">
+                {/* Current value with trend */}
+                <Stat>
+                  <StatLabel color="gray.400">Current Value</StatLabel>
+                  <StatNumber color="white" fontSize="3xl">
+                    {selectedStat === 'totalFundsRaised' 
+                      ? `$${modalContent.data.current.toLocaleString()}` 
+                      : selectedStat === 'successRate' 
+                        ? `${modalContent.data.current}%` 
+                        : modalContent.data.current}
+                  </StatNumber>
+                  <StatHelpText>
+                    <StatArrow type={modalContent.data.trend > 0 ? 'increase' : 'decrease'} />
+                    {Math.abs(modalContent.data.trend)}% {modalContent.data.trendLabel}
+                  </StatHelpText>
+                </Stat>
+                
+                {/* Breakdown by category */}
+                <Box>
+                  <Text color="white" fontWeight="medium" mb={3}>Breakdown</Text>
+                  <VStack align="stretch" spacing={3}>
+                    {modalContent.data.breakdown.map((item, idx) => (
+                      <Box key={idx}>
+                        <Flex justify="space-between" mb={1}>
+                          <HStack>
+                            <Circle size="12px" bg={item.color} />
+                            <Text color="gray.300" fontSize="sm">{item.label}</Text>
+                          </HStack>
+                          <Text color="white" fontWeight="medium">
+                            {selectedStat === 'totalFundsRaised' 
+                              ? `$${item.value.toLocaleString()}` 
+                              : selectedStat === 'successRate' 
+                                ? `${item.value}%` 
+                                : item.value}
+                          </Text>
+                        </Flex>
+                        <Progress 
+                          value={item.value} 
+                          max={selectedStat === 'totalFundsRaised' 
+                            ? modalContent.data.current 
+                            : selectedStat === 'successRate' 
+                              ? 100 
+                              : modalContent.data.current}
+                          size="sm"
+                          colorScheme={item.color.includes('#48BB78') ? 'green' : 
+                                        item.color.includes('#3182CE') ? 'blue' : 
+                                        item.color.includes('#DD6B20') ? 'orange' : 
+                                        item.color.includes('#00E0FF') ? 'cyan' : 
+                                        'purple'}
+                          borderRadius="full"
+                        />
+                      </Box>
+                    ))}
+                  </VStack>
+                </Box>
+                
+                {/* Historical data */}
+                <Box>
+                  <Text color="white" fontWeight="medium" mb={3}>12-Month History</Text>
+                  <Box h="150px" position="relative" mt={4}>
+                    {/* Simple chart visualization */}
+                    <Flex h="100%" position="relative" align="flex-end">
+                      {modalContent.data.history.map((value, idx) => {
+                        const maxValue = Math.max(...modalContent.data.history);
+                        const height = (value / maxValue) * 100;
+                        const color = selectedStat === 'totalProjects' ? '#00E0FF' : 
+                                      selectedStat === 'totalFundsRaised' ? '#8A7CFB' : '#48BB78';
+                        
+                        return (
+                          <Tooltip 
+                            key={idx} 
+                            label={selectedStat === 'totalFundsRaised' 
+                              ? `$${value.toLocaleString()}` 
+                              : selectedStat === 'successRate' 
+                                ? `${value}%` 
+                                : value}
+                            placement="top"
+                          >
+                            <Box
+                              w="8.33%"
+                              h={`${height}%`}
+                              bg={color}
+                              opacity={0.7}
+                              _hover={{ opacity: 1 }}
+                              borderTopRadius="md"
+                              mx="1px"
+                              transition="all 0.2s"
+                            />
+                          </Tooltip>
+                        );
+                      })}
+                    </Flex>
+                  </Box>
+                  <Flex justify="space-between" mt={2}>
+                    <Text color="gray.500" fontSize="xs">12 Months Ago</Text>
+                    <Text color="gray.500" fontSize="xs">Current</Text>
+                  </Flex>
+                </Box>
+              </VStack>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onStatsModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       
       <Container maxW="container.xl">
         {/* Toggle Buttons for Pending/Ongoing */}
