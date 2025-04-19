@@ -109,89 +109,81 @@ const CustomNode = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
   
   return (
-    <Tooltip 
-      label={
-        <Box p={2}>
-          <Text fontWeight="bold">{data.label}</Text>
-          <Text fontSize="sm">Address: {data.address || '0x...'}</Text>
-          <Text fontSize="sm">Created: {data.created || 'N/A'}</Text>
-          <Text fontSize="sm">{data.description || ''}</Text>
-          {data.blocks && (
-            <Box mt={2}>
-              <Text fontWeight="bold" mb={2}>Recent Blocks:</Text>
-              <BlockList blocks={data.blocks || []} />
-            </Box>
-          )}
-        </Box>
-      }
-      isOpen={isHovered}
-      placement="top"
-      hasArrow
+    <Box
+      p={4}
+      borderRadius="xl"
+      transform={isHovered ? 'translateY(-2px)' : 'none'}
+      transition="all 0.2s"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      bg={data.style?.background || '#E6FFFA'}
+      color={data.style?.color || '#2C7A7B'}
+      border={data.style?.border || '2px solid #319795'}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 16px rgba(0,0,0,0.3)' 
+          : '0 4px 12px rgba(0,0,0,0.2)',
+        width: '300px',
+        borderRadius: '12px',
+      }}
     >
-      <Box
-        p={4}
-        borderRadius="xl"
-        transform={isHovered ? 'translateY(-2px)' : 'none'}
-        transition="all 0.2s"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        bg={data.style?.background || '#E6FFFA'}
-        color={data.style?.color || '#2C7A7B'}
-        border={data.style?.border || '2px solid #319795'}
-        style={{
-          boxShadow: isHovered 
-            ? '0 8px 16px rgba(0,0,0,0.3)' 
-            : '0 4px 12px rgba(0,0,0,0.2)',
-          width: '300px',
-          borderRadius: '12px',
-        }}
-      >
-        <Handle type="target" position={Position.Left} />
-        <VStack spacing={3} align="stretch">
-          <HStack spacing={3}>
-            <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
-              {data.icon}
-            </Box>
-            <Text fontWeight="bold" fontSize="md">{data.label}</Text>
-          </HStack>
-          
-          {data.metrics && (
-            <Stat>
-              <StatLabel color={data.style?.color || '#2C7A7B'}>{data.metrics.label}</StatLabel>
-              <StatNumber fontSize="2xl">{data.metrics.value}</StatNumber>
-              {data.metrics.change && (
-                <StatHelpText>
-                  <StatArrow 
-                    type={data.metrics.change > 0 ? 'increase' : 'decrease'} 
-                  />
-                  {Math.abs(data.metrics.change)}%
-                </StatHelpText>
-              )}
-            </Stat>
-          )}
+      <Handle type="target" position={Position.Left} />
+      <VStack spacing={3} align="stretch">
+        <HStack spacing={3}>
+          <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
+            {data.icon}
+          </Box>
+          <Text fontWeight="bold" fontSize="md">{data.label}</Text>
+        </HStack>
+        
+        {data.metrics && (
+          <Stat>
+            <StatLabel color={data.style?.color || '#2C7A7B'}>{data.metrics.label}</StatLabel>
+            <StatNumber fontSize="2xl">{data.metrics.value}</StatNumber>
+            {data.metrics.change && (
+              <StatHelpText>
+                <StatArrow 
+                  type={data.metrics.change > 0 ? 'increase' : 'decrease'} 
+                />
+                {Math.abs(data.metrics.change)}%
+              </StatHelpText>
+            )}
+          </Stat>
+        )}
 
-          {data.progress && (
-            <Box>
-              <Text fontSize="sm" mb={1}>{data.progress.label}</Text>
-              <Progress 
-                value={data.progress.value} 
-                size="sm" 
-                colorScheme={data.progress.colorScheme || 'teal'}
-                borderRadius="full"
-              />
-            </Box>
-          )}
+        {data.progress && (
+          <Box>
+            <Text fontSize="sm" mb={1} color={data.progress.colorScheme === 'blue' ? '#3182CE' : data.style?.color || '#2C7A7B'}>
+              {data.progress.label}: {data.progress.value}%
+            </Text>
+            <Progress 
+              value={data.progress.value} 
+              size="sm" 
+              colorScheme={data.progress.colorScheme || 'teal'}
+              borderRadius="full"
+              hasStripe={true}
+              isAnimated={true}
+            />
+          </Box>
+        )}
 
-          {data.blocks && data.blocks.length > 0 && (
-            <Box>
-              <Text fontSize="sm" mb={1}>Latest Block:</Text>
-              <BlockchainBlock data={data.blocks[data.blocks.length - 1]} />
-            </Box>
-          )}
-        </VStack>
-        <Handle type="source" position={Position.Right} />
-      </Box>
-    </Tooltip>
+        {data.blocks && data.blocks.length > 0 && (
+          <Box>
+            <Text fontSize="sm" mb={1}>Latest Block:</Text>
+            <BlockchainBlock data={data.blocks[data.blocks.length - 1]} />
+          </Box>
+        )}
+        
+        {data.address && (
+          <Text fontSize="xs" color="gray.500">Address: {data.address}</Text>
+        )}
+        
+        {data.description && (
+          <Text fontSize="xs" color="gray.500" noOfLines={2}>{data.description}</Text>
+        )}
+      </VStack>
+      <Handle type="source" position={Position.Right} />
+    </Box>
   );
 };
 
@@ -270,12 +262,230 @@ const CustomEdge = ({
   );
 };
 
-const nodeTypes = {
-  custom: CustomNode,
+// Transaction Node Component for Project-Specific Flows
+const TransactionNode = ({ data }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <Box
+      p={4}
+      borderRadius="xl"
+      transform={isHovered ? 'translateY(-2px)' : 'none'}
+      transition="all 0.2s"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      bg={data.style?.background || '#E6FFFA'}
+      color={data.style?.color || '#2C7A7B'}
+      border={data.style?.border || '2px solid #319795'}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 16px rgba(0,0,0,0.3)' 
+          : '0 4px 12px rgba(0,0,0,0.2)',
+        width: '250px',
+        borderRadius: '12px',
+      }}
+    >
+      <Handle type="target" position={Position.Left} />
+      <VStack spacing={3} align="stretch">
+        <HStack spacing={3}>
+          <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
+            {data.icon}
+          </Box>
+          <Text fontWeight="bold" fontSize="md">{data.label}</Text>
+        </HStack>
+        
+        {data.amount && (
+          <Stat>
+            <StatLabel color={data.style?.color || '#2C7A7B'}>Amount</StatLabel>
+            <StatNumber fontSize="md" color={data.style?.color || '#2C7A7B'}>
+              {data.amount}
+            </StatNumber>
+          </Stat>
+        )}
+      </VStack>
+      <Handle type="source" position={Position.Right} />
+    </Box>
+  );
 };
 
+// Milestone Node Component for Project-Specific Flows
+const MilestoneNode = ({ data }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Get status-specific colors
+  const getBgColor = (status) => {
+    if (status === "Completed") return "#E6FFFA";
+    if (status === "In Progress") return "#EBF8FF";
+    return "#F7FAFC";
+  };
+  
+  const getBorderColor = (status) => {
+    if (status === "Completed") return "#319795";
+    if (status === "In Progress") return "#3182CE";
+    return "#A0AEC0";
+  };
+
+  // Set opacity based on status
+  const getOpacity = (status) => {
+    if (status === "Pending") return 0.6;
+    return 1;
+  };
+  
+  // Get progress value for In Progress milestones (random for demonstration)
+  const getProgress = () => {
+    // For real implementation, this would come from the milestone data
+    return data.milestone.progress || Math.floor(Math.random() * 50) + 30; // Returns a value between 30-80%
+  };
+  
+  return (
+    <Box
+      p={4}
+      borderRadius="xl"
+      transform={isHovered ? 'translateY(-2px)' : 'none'}
+      transition="all 0.2s"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      bg={getBgColor(data.milestone.status)}
+      borderWidth="2px"
+      borderColor={getBorderColor(data.milestone.status)}
+      opacity={getOpacity(data.milestone.status)}
+      style={{
+        boxShadow: isHovered 
+          ? '0 8px 16px rgba(0,0,0,0.3)' 
+          : '0 4px 12px rgba(0,0,0,0.2)',
+        width: '250px',
+        borderRadius: '12px',
+      }}
+    >
+      <Handle type="target" position={Position.Left} />
+      <VStack spacing={3} align="stretch">
+        <HStack spacing={3} justify="space-between">
+          <Text fontSize="md" fontWeight="bold" color="#2C7A7B">
+            {data.milestone.title}
+          </Text>
+          <Badge 
+            colorScheme={
+              data.milestone.status === "Completed" ? "green" : 
+              data.milestone.status === "In Progress" ? "blue" : 
+              "gray"
+            }
+            fontSize="xs"
+            px={2}
+            py={0.5}
+            borderRadius="full"
+          >
+            {data.milestone.status}
+          </Badge>
+        </HStack>
+        
+        {/* Add progress bar for In Progress milestones */}
+        {data.milestone.status === "In Progress" && (
+          <Box mt={1}>
+            <Text fontSize="xs" mb={1} color="#3182CE">Completion: {getProgress()}%</Text>
+            <Progress 
+              value={getProgress()} 
+              size="sm" 
+              colorScheme="blue"
+              borderRadius="full"
+              hasStripe={true}
+              isAnimated={true}
+            />
+          </Box>
+        )}
+        
+        {data.milestone.amount && (
+          <Stat>
+            <StatLabel color="#2C7A7B">Amount</StatLabel>
+            <StatNumber fontSize="md" color="#2C7A7B">
+              {data.milestone.amount}
+            </StatNumber>
+          </Stat>
+        )}
+      </VStack>
+      <Handle type="source" position={Position.Right} />
+    </Box>
+  );
+};
+
+// Transaction Edge Component for Project-Specific Flows
+const TransactionEdge = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  data,
+  markerEnd,
+}) => {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    curvature: 0.2 // Add slight curvature to all edges
+  });
+
+  return (
+    <>
+      <path
+        id={id}
+        style={style}
+        className="react-flow__edge-path"
+        d={edgePath}
+        markerEnd={markerEnd}
+      />
+      {data?.label && (
+        <>
+          <rect
+            x={labelX - 65}
+            y={labelY - 18}
+            width={130}
+            height={36}
+            fill="white"
+            rx={10}
+            style={{
+              filter: 'drop-shadow(0px 3px 6px rgba(0,0,0,0.3))',
+              stroke: '#0BC5EA',
+              strokeWidth: 1.5,
+            }}
+          />
+          <text
+            x={labelX}
+            y={labelY}
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            style={{
+              fill: '#0BC5EA',
+              fontSize: '16px',
+              fontWeight: 700,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          >
+            {data.label}
+          </text>
+        </>
+      )}
+    </>
+  );
+};
+
+// Define node types
+const nodeTypes = {
+  custom: CustomNode,
+  transaction: TransactionNode,
+  milestone: MilestoneNode,
+};
+
+// Define edge types
 const edgeTypes = {
   custom: CustomEdge,
+  transaction: TransactionEdge,
 };
 
 const Flow = () => {
@@ -295,7 +505,7 @@ const Flow = () => {
     { id: 'foodBank', name: 'Food Bank Program', type: 'Humanitarian' },
   ];
 
-  // Initialize edges
+  // Initialize edges for general view
   const initialEdges = [
     { 
       id: 'e1-2', 
@@ -402,7 +612,7 @@ const Flow = () => {
     }));
   };
 
-  // Initialize nodes with blockchain data
+  // Initialize nodes for general view with blockchain data
   const getInitialNodes = () => {
     const baseNodes = [
       {
@@ -566,7 +776,7 @@ const Flow = () => {
             colorScheme: 'red'
           }
         },
-        position: { x: 1850, y: 450 },
+        position: { x: 1850, y: 500 },
         style: { 
           background: '#FFF5F5', 
           color: '#742A2A', 
@@ -650,7 +860,7 @@ const Flow = () => {
             colorScheme: 'blue'
           }
         },
-        position: { x: 2750, y: 300 },
+        position: { x: 2750, y: 320 },
         style: { 
           background: '#FFF5F5', 
           color: '#742A2A', 
@@ -678,7 +888,7 @@ const Flow = () => {
             colorScheme: 'orange'
           }
         },
-        position: { x: 2750, y: 550 },
+        position: { x: 2750, y: 590 },
         style: { 
           background: '#FFF5F5', 
           color: '#742A2A', 
@@ -706,7 +916,7 @@ const Flow = () => {
             colorScheme: 'purple'
           }
         },
-        position: { x: 2750, y: 800 },
+        position: { x: 2750, y: 860 },
         style: { 
           background: '#FFF5F5', 
           color: '#742A2A', 
@@ -719,46 +929,570 @@ const Flow = () => {
     return baseNodes;
   };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(getInitialNodes());
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  // Function to generate project-specific transaction flow
+  const generateProjectFlow = (project) => {
+    const nodes = [];
+    const edges = [];
+    
+    // Set default transaction amount
+    const amount = 500;
+    const investmentAmount = (amount * 0.9).toFixed(2); // 90% to investment
+    const emergencyAmount = (amount * 0.1).toFixed(2); // 10% to emergency fund
+    const profitAmount = (amount * 0.9 * 0.05).toFixed(2); // 5% profit from investment
+
+    // Sample milestones data based on project types
+    const getMilestones = (projectType) => {
+      if (projectType === 'schoolBuilding') {
+        return [
+          { 
+            title: 'Land Acquisition', 
+            status: 'Completed', 
+            amount: 'USDT 500' 
+          },
+          { 
+            title: 'Foundation Work', 
+            status: 'In Progress', 
+            amount: 'USDT 350',
+            progress: 65 // 65% complete
+          },
+          { 
+            title: 'Building Construction', 
+            status: 'Pending', 
+            amount: 'USDT 600'
+          }
+        ];
+      } else if (projectType === 'waterProject') {
+        return [
+          { 
+            title: 'Site Survey', 
+            status: 'Completed', 
+            amount: 'USDT 200' 
+          },
+          { 
+            title: 'Well Drilling', 
+            status: 'In Progress', 
+            amount: 'USDT 450',
+            progress: 40 // 40% complete
+          },
+          { 
+            title: 'Pump Installation', 
+            status: 'Pending', 
+            amount: 'USDT 300'
+          }
+        ];
+      } else if (projectType === 'foodBank') {
+        return [
+          { 
+            title: 'Initial Supplies', 
+            status: 'Completed', 
+            amount: 'USDT 300' 
+          },
+          { 
+            title: 'Storage Facility', 
+            status: 'In Progress', 
+            amount: 'USDT 250',
+            progress: 75 // 75% complete
+          },
+          { 
+            title: 'Distribution Network', 
+            status: 'Pending', 
+            amount: 'USDT 200'
+          }
+        ];
+      }
+      return [];
+    };
+    
+    // Common nodes with improved positioning - increased spacing between nodes (x values)
+    nodes.push({
+      id: 'donor',
+      type: 'transaction',
+      data: { 
+        label: 'Donor',
+        icon: <FaMoneyBillWave />,
+        amount: `USDT ${amount}`,
+      },
+      position: { x: 50, y: 150 },
+      style: { 
+        background: '#E6FFFA', 
+        color: '#2C7A7B', 
+        border: '2px solid #319795',
+      },
+    });
+    
+    nodes.push({
+      id: 'userWallet',
+      type: 'transaction',
+      data: { 
+        label: 'User Wallet',
+        icon: <FaHandHoldingUsd />,
+        amount: `USDT ${amount}`,
+      },
+      position: { x: 350, y: 150 },
+      style: { 
+        background: '#E6FFFA', 
+        color: '#2C7A7B', 
+        border: '2px solid #319795',
+      },
+    });
+    
+    nodes.push({
+      id: 'amanah',
+      type: 'transaction',
+      data: { 
+        label: 'Amanah',
+        icon: <FaUserShield />,
+        amount: `USDT ${amount}`,
+      },
+      position: { x: 650, y: 150 },
+      style: { 
+        background: '#E6FFFA', 
+        color: '#2C7A7B', 
+        border: '2px solid #319795',
+      },
+    });
+    
+    nodes.push({
+      id: 'projectPools',
+      type: 'transaction',
+      data: { 
+        label: 'Project Pools',
+        icon: <FaPiggyBank />,
+        amount: `USDT ${amount}`,
+      },
+      position: { x: 950, y: 150 },
+      style: { 
+        background: '#FFF5F5', 
+        color: '#742A2A', 
+        border: '2px solid #E53E3E',
+      },
+    });
+    
+    // Position the investment pool and emergency fund without overlap
+    nodes.push({
+      id: 'emergencyFund',
+      type: 'transaction',
+      data: { 
+        label: 'Emergency Fund',
+        icon: <FaUserShield />,
+        amount: `USDT ${emergencyAmount}`,
+      },
+      position: { x: 1250, y: 30 },
+      style: { 
+        background: '#FFF5F5', 
+        color: '#742A2A', 
+        border: '2px solid #E53E3E',
+      },
+    });
+    
+    nodes.push({
+      id: 'investmentPool',
+      type: 'transaction',
+      data: { 
+        label: 'Investment Pool',
+        icon: <FaChartLine />,
+        amount: `USDT ${investmentAmount}`,
+      },
+      position: { x: 1250, y: 270 },
+      style: { 
+        background: '#EDFDFD', 
+        color: '#065666', 
+        border: '2px solid #0BC5EA',
+      },
+    });
+    
+    // Define which node should be highlighted based on project type
+    const getIsHighlighted = (nodeId, projectType) => {
+      if (nodeId === 'healthcarePool' && projectType === 'foodBank') return true; // Waqf type
+      if (nodeId === 'schoolBuildingPool' && projectType === 'schoolBuilding') return true; // Sadaqah type
+      if (nodeId === 'waterProject' && projectType === 'waterProject') return true; // Zakat type
+      return false;
+    };
+    
+    // Only add the project pools that are relevant to the selected project
+    if (project?.id === 'schoolBuilding' || !project?.id) {
+      nodes.push({
+        id: 'schoolBuildingPool',
+        type: 'transaction',
+        data: { 
+          label: 'School Building Pool',
+          icon: <FaSchool />,
+          amount: `USDT ${project?.id === 'schoolBuilding' ? profitAmount : '0'}`,
+        },
+        position: { x: 1550, y: 30 },
+        style: { 
+          background: getIsHighlighted('schoolBuildingPool', project?.id) ? '#EDFDFD' : '#E6FFFA',
+          color: getIsHighlighted('schoolBuildingPool', project?.id) ? '#065666' : '#2C7A7B',
+          border: getIsHighlighted('schoolBuildingPool', project?.id) ? '2px solid #0BC5EA' : '2px solid #319795',
+          opacity: getIsHighlighted('schoolBuildingPool', project?.id) ? 1 : 0.6,
+        },
+      });
+    }
+    
+    if (project?.id === 'foodBank' || !project?.id) {
+      nodes.push({
+        id: 'healthcarePool',
+        type: 'transaction',
+        data: { 
+          label: 'Healthcare Pool',
+          icon: <FaMedapps />,
+          amount: `USDT ${project?.id === 'foodBank' ? profitAmount : '0'}`,
+        },
+        position: { x: 1550, y: 200 },
+        style: { 
+          background: getIsHighlighted('healthcarePool', project?.id) ? '#EDFDFD' : '#E6FFFA',
+          color: getIsHighlighted('healthcarePool', project?.id) ? '#065666' : '#2C7A7B',
+          border: getIsHighlighted('healthcarePool', project?.id) ? '2px solid #0BC5EA' : '2px solid #319795',
+          opacity: getIsHighlighted('healthcarePool', project?.id) ? 1 : 0.6,
+        },
+      });
+    }
+    
+    if (project?.id === 'waterProject' || !project?.id) {
+      nodes.push({
+        id: 'waterProject',
+        type: 'transaction',
+        data: { 
+          label: 'Water Project',
+          icon: <FaWater />,
+          amount: `USDT ${project?.id === 'waterProject' ? profitAmount : '0'}`,
+        },
+        position: { x: 1550, y: 370 },
+        style: { 
+          background: getIsHighlighted('waterProject', project?.id) ? '#EDFDFD' : '#E6FFFA',
+          color: getIsHighlighted('waterProject', project?.id) ? '#065666' : '#2C7A7B',
+          border: getIsHighlighted('waterProject', project?.id) ? '2px solid #0BC5EA' : '2px solid #319795',
+          opacity: getIsHighlighted('waterProject', project?.id) ? 1 : 0.6,
+        },
+      });
+    }
+    
+    // Add milestone nodes based on the selected project
+    if (project?.id) {
+      const milestones = getMilestones(project.id);
+      
+      // Add milestone nodes with proper positioning
+      if (milestones.length > 0) {
+        // Position milestone nodes vertically to the right of the project pool
+        const sourceNodeId = project.id === 'schoolBuilding' ? 'schoolBuildingPool' : 
+                            project.id === 'foodBank' ? 'healthcarePool' : 
+                            project.id === 'waterProject' ? 'waterProject' : '';
+                            
+        const baseX = 2000; // Increased horizontal spacing from 1850 to 2000
+        let baseY;
+        
+        if (project.id === 'schoolBuilding') {
+          baseY = 30; // Match the Y position of schoolBuildingPool
+        } else if (project.id === 'foodBank') {
+          baseY = 200; // Match the Y position of healthcarePool
+        } else if (project.id === 'waterProject') {
+          baseY = 370; // Match the Y position of waterProject
+        }
+        
+        // Add each milestone as a node in a vertical stack with much more space between them
+        milestones.forEach((milestone, index) => {
+          nodes.push({
+            id: `milestone${index + 1}`,
+            type: 'milestone',
+            data: { 
+              milestone
+            },
+            position: { 
+              x: baseX,
+              y: baseY + (index * 300) // Significantly increased spacing between milestone nodes from 220 to 300
+            },
+          });
+        });
+      }
+    }
+    
+    // Connect general nodes regardless of project
+    edges.push({
+      id: 'donor-to-userWallet',
+      source: 'donor',
+      target: 'userWallet',
+      animated: true,
+      type: 'transaction',
+      style: { stroke: '#319795', strokeWidth: 2 },
+    });
+    
+    edges.push({
+      id: 'userWallet-to-amanah',
+      source: 'userWallet',
+      target: 'amanah',
+      animated: true,
+      type: 'transaction',
+      style: { stroke: '#319795', strokeWidth: 2 },
+    });
+    
+    edges.push({
+      id: 'amanah-to-projectPools',
+      source: 'amanah',
+      target: 'projectPools',
+      animated: true,
+      type: 'transaction',
+      style: { stroke: '#319795', strokeWidth: 2 },
+    });
+    
+    edges.push({
+      id: 'projectPools-to-emergencyFund',
+      source: 'projectPools',
+      target: 'emergencyFund',
+      animated: true,
+      type: 'transaction',
+      style: { stroke: '#319795', strokeWidth: 2 },
+    });
+    
+    edges.push({
+      id: 'projectPools-to-investmentPool',
+      source: 'projectPools',
+      target: 'investmentPool',
+      animated: true,
+      type: 'transaction',
+      style: { stroke: '#319795', strokeWidth: 2 },
+    });
+    
+    // Add edges to connect project pools to their corresponding project-specific nodes
+    if (project?.id === 'schoolBuilding') {
+      const milestones = getMilestones('schoolBuilding');
+      
+      // Connect projectPools to schoolBuildingPool
+      edges.push({
+        id: 'projectPools-to-schoolBuildingPool',
+        source: 'projectPools',
+        target: 'schoolBuildingPool',
+        animated: true,
+        type: 'transaction',
+        style: { stroke: '#319795', strokeWidth: 2 },
+      });
+      
+      // First edge from school building pool to milestone 1
+      edges.push({
+        id: 'edge-schoolBuildingPool-milestone1',
+        source: 'schoolBuildingPool',
+        target: 'milestone1',
+        animated: milestones[0].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 1' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Connect milestones sequentially with better positioned labels
+      // Edge from milestone 1 to milestone 2 with increased curvature
+      edges.push({
+        id: 'edge-milestone1-milestone2',
+        source: 'milestone1',
+        target: 'milestone2',
+        animated: milestones[1].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 2' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Edge from milestone 2 to milestone 3 with increased curvature
+      edges.push({
+        id: 'edge-milestone2-milestone3',
+        source: 'milestone2',
+        target: 'milestone3',
+        animated: milestones[2].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 3' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+        },
+      });
+    } else if (project?.id === 'foodBank') {
+      const milestones = getMilestones('foodBank');
+      
+      // Connect projectPools to healthcarePool
+      edges.push({
+        id: 'projectPools-to-healthcarePool',
+        source: 'projectPools',
+        target: 'healthcarePool',
+        animated: true,
+        type: 'transaction',
+        style: { stroke: '#319795', strokeWidth: 2 },
+      });
+      
+      // First edge from healthcare pool to milestone 1
+      edges.push({
+        id: 'edge-foodBankPool-milestone1',
+        source: 'healthcarePool',
+        target: 'milestone1',
+        animated: milestones[0].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 1' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Connect milestones sequentially with better positioned labels
+      // Edge from milestone 1 to milestone 2 with increased curvature
+      edges.push({
+        id: 'edge-milestone1-milestone2',
+        source: 'milestone1',
+        target: 'milestone2',
+        animated: milestones[1].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 2' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Edge from milestone 2 to milestone 3 with increased curvature
+      edges.push({
+        id: 'edge-milestone2-milestone3',
+        source: 'milestone2',
+        target: 'milestone3',
+        animated: milestones[2].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 3' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+        },
+      });
+    } else if (project?.id === 'waterProject') {
+      const milestones = getMilestones('waterProject');
+      
+      // Connect projectPools to waterProject
+      edges.push({
+        id: 'projectPools-to-waterProject',
+        source: 'projectPools',
+        target: 'waterProject',
+        animated: true,
+        type: 'transaction',
+        style: { stroke: '#319795', strokeWidth: 2 },
+      });
+      
+      // First edge from water project pool to milestone 1
+      edges.push({
+        id: 'edge-waterProject-milestone1',
+        source: 'waterProject',
+        target: 'milestone1',
+        animated: milestones[0].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 1' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Connect milestones sequentially with better positioned labels
+      // Edge from milestone 1 to milestone 2 with increased curvature
+      edges.push({
+        id: 'edge-milestone1-milestone2',
+        source: 'milestone1',
+        target: 'milestone2',
+        animated: milestones[1].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 2' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+        },
+      });
+
+      // Edge from milestone 2 to milestone 3 with increased curvature
+      edges.push({
+        id: 'edge-milestone2-milestone3',
+        source: 'milestone2',
+        target: 'milestone3',
+        animated: milestones[2].status !== 'Pending',
+        type: 'transaction',
+        data: { label: 'Phase 3' },
+        style: { 
+          stroke: '#319795', 
+          strokeWidth: 2,
+          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+        },
+      });
+    }
+
+    return { nodes, edges };
+  };
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { fitView } = useReactFlow();
 
-  // Update nodes when blockchain data changes
+  // Update nodes and edges based on selected project
   useEffect(() => {
-    setNodes(getInitialNodes());
-  }, [blockchainData, selectedProject]);
+    if (selectedProject && selectedProject.id !== 'general') {
+      // For project-specific views, use transaction flow
+      const { nodes: projectNodes, edges: projectEdges } = generateProjectFlow(selectedProject);
+      setNodes(projectNodes);
+      setEdges(projectEdges);
+    } else {
+      // For general view, use the original nodes and edges
+      setNodes(getInitialNodes());
+      setEdges(initialEdges);
+    }
+    
+    // Fit view after nodes are updated
+    setTimeout(() => {
+      fitView({ 
+        duration: 800, 
+        padding: 0.25, 
+        minZoom: 0.35, 
+        maxZoom: 1.5 
+      });
+    }, 50);
+  }, [selectedProject, blockchainData]);
 
   // Simulate real-time updates
   useEffect(() => {
-    // Simulate proposal approval
-    setTimeout(() => {
-      addBlock(selectedProject?.id || 'general', {
-        type: 'Project Approval',
-        amount: '50,000 USDT',
-        from: '0x742d...44e',
-        to: '0x123...456',
-      });
-    }, 2000);
+    if (!selectedProject || selectedProject.id === 'general') {
+      // Simulate proposal approval
+      setTimeout(() => {
+        addBlock('general', {
+          type: 'Project Approval',
+          amount: '50,000 USDT',
+          from: '0x742d...44e',
+          to: '0x123...456',
+        });
+      }, 2000);
 
-    // Simulate donation
-    setTimeout(() => {
-      addBlock(selectedProject?.id || 'general', {
-        type: 'Donation Received',
-        amount: '1,000 USDT',
-        from: '0x912d...785',
-        to: '0x123...456',
-      });
-    }, 4000);
+      // Simulate donation
+      setTimeout(() => {
+        addBlock('general', {
+          type: 'Donation Received',
+          amount: '1,000 USDT',
+          from: '0x912d...785',
+          to: '0x123...456',
+        });
+      }, 4000);
 
-    // Simulate milestone approval
-    setTimeout(() => {
-      addBlock(selectedProject?.id || 'general', {
-        type: 'Milestone Release',
-        amount: '15,000 USDT',
-        from: '0x123...456',
-        to: '0x456...789',
-      });
-    }, 6000);
+      // Simulate milestone approval
+      setTimeout(() => {
+        addBlock('general', {
+          type: 'Milestone Release',
+          amount: '15,000 USDT',
+          from: '0x123...456',
+          to: '0x456...789',
+        });
+      }, 6000);
+    }
   }, [selectedProject]);
 
   return (
@@ -768,8 +1502,23 @@ const Flow = () => {
           <MenuButton 
             as={Button} 
             rightIcon={<FaChevronDown />}
-            leftIcon={<FaCubes />}
-            colorScheme="blue"
+            leftIcon={selectedProject && selectedProject.id !== 'general' 
+              ? (selectedProject.id === 'schoolBuilding' 
+                ? <FaSchool /> 
+                : selectedProject.id === 'waterProject' 
+                ? <FaWater /> 
+                : <FaHandHoldingUsd />)
+              : <FaCubes />
+            }
+            colorScheme={selectedProject && selectedProject.id !== 'general' ? 'teal' : 'blue'}
+            size="md"
+            borderRadius="lg"
+            px={4}
+            _hover={{
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}
+            transition="all 0.2s"
           >
             {selectedProject ? selectedProject.name : 'Select Project'}
           </MenuButton>
@@ -778,10 +1527,20 @@ const Flow = () => {
               <MenuItem 
                 key={project.id} 
                 onClick={() => setSelectedProject(project)}
+                icon={project.id === 'general' 
+                  ? <FaCubes color="#3182CE" /> 
+                  : project.id === 'schoolBuilding' 
+                  ? <FaSchool color="#319795" /> 
+                  : project.id === 'waterProject' 
+                  ? <FaWater color="#319795" /> 
+                  : <FaHandHoldingUsd color="#319795" />
+                }
               >
                 <HStack justify="space-between" width="100%">
                   <Text>{project.name}</Text>
-                  <Badge colorScheme="blue">{project.type}</Badge>
+                  <Badge colorScheme={project.id === 'general' ? 'blue' : 'teal'}>
+                    {project.type}
+                  </Badge>
                 </HStack>
               </MenuItem>
             ))}
@@ -790,7 +1549,7 @@ const Flow = () => {
       </Flex>
 
       <Box 
-        h="400px" 
+        h="550px" 
         w="100%" 
         bg="rgba(11, 197, 234, 0.05)" 
         borderRadius="md"
@@ -803,11 +1562,16 @@ const Flow = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           fitView
-          fitViewOptions={{ duration: 800, padding: 0.2 }}
+          fitViewOptions={{ 
+            duration: 800, 
+            padding: 0.25,
+            minZoom: 0.35,
+            maxZoom: 1.5 
+          }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
-            type: 'custom',
+            type: selectedProject?.id !== 'general' ? 'transaction' : 'custom',
             animated: true,
             style: { stroke: '#319795', strokeWidth: 2 },
           }}
@@ -815,7 +1579,11 @@ const Flow = () => {
           edgeTypes={edgeTypes}
           proOptions={{ hideAttribution: true }}
         >
-          <Background color="#319795" gap={16} size={1} />
+          <Background 
+            color={selectedProject?.id !== 'general' ? '#319795' : '#319795'} 
+            gap={16} 
+            size={1} 
+          />
         </ReactFlow>
       </Box>
     </Box>
