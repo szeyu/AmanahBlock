@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
 import {
   Box,
   Heading,
@@ -14,6 +15,16 @@ import {
   SimpleGrid,
   VStack,
   Divider,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  PopoverArrow,
+  PopoverCloseButton,
+  CloseButton,
+  List,         // Import List
+  ListItem,     // Import ListItem
+  ListIcon      // Import ListIcon
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import {
@@ -23,55 +34,317 @@ import {
   FaCamera,
   FaVrCardboard,
   FaGlobeAfrica,
+  FaTint,        // Water crisis
+  FaSchool,      // Education crisis
+  FaHamburger,   // Food crisis
+  FaHome,        // New crisis
 } from 'react-icons/fa';
-import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { motion } from 'framer-motion';
+import { MapContainer, TileLayer, Marker as LeafletMarker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet.heat';
 
+// Fix for default marker icons
+const DefaultIcon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Custom icon for user location
+const UserLocationIcon = L.divIcon({
+  className: 'user-location-marker',
+  html: `
+    <div style="
+      width: 40px;
+      height: 40px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    ">
+      <div style="
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50%;
+        padding: 4px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#E53E3E">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </div>
+    </div>
+  `,
+  iconSize: [40, 40],
+  iconAnchor: [20, 20],
+  popupAnchor: [0, -20]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 // Mock data for featured impact stories
 const impactStories = [
   {
     id: 1,
-    title: "Clean Water Transforms Village in Somalia",
-    location: "Baidoa, Somalia",
+    title: "Clean Water Initiative in Kuala Lumpur",
+    location: "Kuala Lumpur, Malaysia",
     category: "Water",
     image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     beneficiaries: 1200,
     completionDate: "March 2023",
-    description: "This project provided clean water access to an entire village, reducing waterborne diseases by 85% and allowing girls to attend school instead of walking miles for water.",
+    description: "This project provided clean water access to underserved communities in Kuala Lumpur, reducing waterborne diseases by 85% and improving overall community health.",
     status: "Completed",
     hasVR: false
   },
   {
     id: 2,
-    title: "School Rebuilding in Gaza",
-    location: "Gaza City, Palestine",
+    title: "School Reconstruction in Penang",
+    location: "Penang, Malaysia",
     category: "Education",
     image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     beneficiaries: 850,
     completionDate: "Ongoing",
-    description: "This project is rebuilding a school damaged in conflict, providing education facilities for 850 children and employment for 35 teachers.",
+    description: "This project is rebuilding a school damaged in recent floods, providing education facilities for 850 children and employment for 35 teachers in Penang.",
     status: "In Progress",
     hasVR: false
   },
   {
     id: 3,
-    title: "Emergency Food Relief in Yemen",
-    location: "Sana'a, Yemen",
+    title: "Food Security Program in Johor Bahru",
+    location: "Johor Bahru, Malaysia",
     category: "Food",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
     beneficiaries: 5000,
     completionDate: "January 2023",
-    description: "This emergency response provided food packages to 5,000 people facing severe food insecurity, with special focus on malnourished children and pregnant women.",
+    description: "This emergency response provided food packages to 5,000 people facing food insecurity in Johor Bahru, with special focus on vulnerable communities and children.",
     status: "Completed",
     hasVR: false
   }
 ];
 
+// Sample heatmap data for Malaysia showing critical areas
+const heatmapData = [
+  // Marker 1: Kuala Lumpur: Clean Water Project (Reduced intensity)
+  { lat: 3.1390, lng: 101.6869, intensity: 0.6 }, // Main point
+  { lat: 3.1390, lng: 101.6869, intensity: 0.55 }, // Surrounding area
+  { lat: 3.1390, lng: 101.6869, intensity: 0.5 }, // Extended area
+  { lat: 3.1390, lng: 101.6869, intensity: 0.45 }, // Outer area
+  
+  // Marker 2: Penang: School Rebuilding (Lower intensity)
+  { lat: 5.4164, lng: 100.3298, intensity: 0.4 }, // Main point
+  { lat: 5.4164, lng: 100.3298, intensity: 0.35 }, // Surrounding area
+  { lat: 5.4164, lng: 100.3298, intensity: 0.3 }, // Extended area
+  { lat: 5.4164, lng: 100.3298, intensity: 0.25 }, // Outer area
+  
+  // Marker 3: Johor Bahru: Emergency Food Relief
+  { lat: 1.3521, lng: 103.8198, intensity: 0.9 }, // Main point
+  { lat: 1.3521, lng: 103.8198, intensity: 0.85 }, // Surrounding area
+  { lat: 1.3521, lng: 103.8198, intensity: 0.8 }, // Extended area
+  { lat: 1.3521, lng: 103.8198, intensity: 0.75 }, // Outer area,
+
+  // Marker 4: Putra Heights: Housing Crisis (High intensity)
+  { lat: 2.9936, lng: 101.5739, intensity: 0.95 }, // Main point
+  { lat: 2.9936, lng: 101.5739, intensity: 0.9 }, // Surrounding area
+  { lat: 2.9936, lng: 101.5739, intensity: 0.85 }, // Extended area
+  { lat: 2.9936, lng: 101.5739, intensity: 0.8 }, // Outer area
+];
+
+// Custom Popup Component
+const CustomPopup = ({ content, position }) => {
+  return (
+    <Popover isOpen={true} placement="top">
+      <PopoverTrigger>
+        <Box 
+          position="absolute" 
+          left={`${position[1]}px`} 
+          top={`${position[0]}px`}
+          transform="translate(-50%, -100%)"
+          pointerEvents="none"
+        />
+      </PopoverTrigger>
+      <PopoverContent 
+        bg="gray.800" 
+        color="white" 
+        border="none" 
+        borderRadius="md"
+        boxShadow="lg"
+        _focus={{ outline: 'none' }}
+        maxW="200px"
+      >
+        <PopoverArrow bg="gray.800" />
+        <PopoverCloseButton />
+        <PopoverBody>
+          <Text fontSize="sm" fontWeight="medium">
+            {content}
+          </Text>
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 const GlobalImpactMap = () => {
   const [tooltipContent, setTooltipContent] = useState("");
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [nearestPoints, setNearestPoints] = useState([]);
+  const [showNearestPoints, setShowNearestPoints] = useState(false);
+  const mapRef = useRef(null);
+  const [mapCenter, setMapCenter] = useState([4.5, 109.5]);
+  const [mapZoom, setMapZoom] = useState(6);
+  const heatmapLayerRef = useRef(null);
+  const throttleTimeoutRef = useRef(null);
+  const lastUpdatedZoomRef = useRef(null);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+      
+      // Convert heatmap data
+      const heatmapDataPoints = heatmapData.map(point => [point.lat, point.lng, point.intensity * 100]);
+      
+      // Create heatmap layer
+      const heatmapLayer = L.heatLayer(heatmapDataPoints, {
+        radius: 40, // Increased radius
+        blur: 35,   // Increased blur
+        maxZoom: 12,
+        max: 100,
+        gradient: {
+          0.0: 'blue',
+          0.2: 'cyan',
+          0.4: 'lime',
+          0.5: 'yellow',
+          0.7: 'orange',
+          0.85: 'red'
+        }
+      });
+      
+      heatmapLayerRef.current = heatmapLayer;
+      heatmapLayer.addTo(map);
+
+      // Function to update heatmap options based on zoom
+      const updateHeatmapOptionsIfNeeded = () => {
+        if (!heatmapLayerRef.current) return;
+        
+        const currentZoom = map.getZoom();
+        
+        // Only update if zoom level has actually changed
+        if (currentZoom !== lastUpdatedZoomRef.current) {
+          const newRadius = Math.max(20, 40 - (currentZoom * 2.5)); // Adjusted dynamic radius
+          const newBlur = Math.max(25, 35 - (currentZoom * 2));   // Adjusted dynamic blur
+          
+          heatmapLayerRef.current.setOptions({
+            radius: newRadius,
+            blur: newBlur
+          });
+          lastUpdatedZoomRef.current = currentZoom; // Record the zoom level we updated for
+        }
+      };
+
+      // Throttle function for updates
+      const throttledUpdate = () => {
+        if (throttleTimeoutRef.current) return; // Already waiting
+
+        updateHeatmapOptionsIfNeeded(); // Check/update immediately first time
+
+        throttleTimeoutRef.current = setTimeout(() => {
+          throttleTimeoutRef.current = null; // Clear timeout ref
+          // Check/update again after throttle period, in case map settled on a new zoom level
+          updateHeatmapOptionsIfNeeded(); 
+        }, 30); // Throttle delay: Reduced to 30ms
+      };
+      
+      // Initial zoom setup
+      lastUpdatedZoomRef.current = map.getZoom();
+      updateHeatmapOptionsIfNeeded(); // Ensure initial options are set correctly
+
+      // Attach throttled listeners to zoom and move
+      map.on('zoom', throttledUpdate);
+      map.on('move', throttledUpdate);
+
+      // Cleanup
+      return () => {
+        map.off('zoom', throttledUpdate);
+        map.off('move', throttledUpdate);
+        if (throttleTimeoutRef.current) {
+          clearTimeout(throttleTimeoutRef.current);
+        }
+        if (heatmapLayerRef.current) {
+          map.removeLayer(heatmapLayerRef.current);
+        }
+      };
+    }
+  }, [mapRef.current]);
+
+  // Function to calculate distance between two points using Haversine formula
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Get user's location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  }, []);
+
+  // Calculate nearest points when user location changes
+  useEffect(() => {
+    if (userLocation) {
+      const points = [
+        { name: "Kuala Lumpur", lat: 3.1390, lng: 101.6869, type: "Clean Water Project" },
+        { name: "Penang", lat: 5.4164, lng: 100.3298, type: "School Rebuilding" },
+        { name: "Johor Bahru", lat: 1.3521, lng: 103.8198, type: "Emergency Food Relief" },
+        { name: "Putra Heights", lat: 2.9936, lng: 101.5739, type: "Housing Crisis" }
+      ];
+
+      const pointsWithDistance = points.map(point => ({
+        ...point,
+        distance: calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          point.lat,
+          point.lng
+        )
+      }));
+
+      // Sort by distance and take top 3
+      const nearest = pointsWithDistance
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 3);
+
+      setNearestPoints(nearest);
+    }
+  }, [userLocation]);
 
   const handleMarkerMouseEnter = (content, event) => {
     setTooltipContent(content);
@@ -83,70 +356,402 @@ const GlobalImpactMap = () => {
     setShowTooltip(false);
   };
 
+  const handlePointClick = (point) => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+      
+      // First step: Move to the location
+      map.flyTo([point.lat, point.lng], map.getZoom(), {
+        duration: 1,
+        easeLinearity: 0.25,
+      });
+
+      // Second step: Zoom in after a short delay (allows move to start)
+      setTimeout(() => {
+        map.flyTo([point.lat, point.lng], 14, {
+          duration: 1,
+          easeLinearity: 0.25
+        });
+      }, 100); // Delay ensures zoom starts after move has initiated
+    }
+  };
+
   return (
-    <div className="w-full h-[350px] bg-gray.900 rounded-lg shadow-lg p-4 relative">
-      <ComposableMap
-        projection="geoMercator"
-        projectionConfig={{
-          scale: 100,
-          center: [0, 20]
-        }}
+    <Box className="w-full bg-gray.900 rounded-lg shadow-lg p-4 relative" style={{ height: '500px' }}>
+      <MapContainer
+        center={mapCenter}
+        zoom={mapZoom}
+        style={{ height: '100%', width: '100%', borderRadius: '8px' }}
+        zoomControl={true}
+        scrollWheelZoom={true}
+        ref={mapRef}
       >
-        <Geographies geography="/features.json">
-          {({ geographies }) =>
-            geographies.map((geo) => (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill="#1A202C"
-                stroke="#b6c3d9"
-                style={{
-                  default: { outline: 'none' },
-                  hover: { fill: '#3182CE', outline: 'none' },
-                  pressed: { outline: 'none' }
-                }}
-              />
-            ))
-          }
-        </Geographies>
-        <Marker 
-          coordinates={[45.3182, 2.0469]}
-          onMouseEnter={(e) => handleMarkerMouseEnter("Somalia: Clean Water Project", e)}
-          onMouseLeave={handleMarkerMouseLeave}
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+
+        {/* User Location Marker */}
+        {userLocation && (
+          <LeafletMarker 
+            position={[userLocation.lat, userLocation.lng]}
+            icon={UserLocationIcon}
+            zIndexOffset={1000}
+          >
+            <Popup className="custom-popup">
+              <Box 
+                bg="blue.800" 
+                color="white" 
+                p={2}
+                borderRadius="lg"
+                minW="220px"
+                borderWidth="1px"
+                borderColor="blue.700"
+                boxShadow="lg"
+              >
+                <HStack spacing={2} align="center" mb={1} height={10}>
+                  <Icon as={FaMapMarkerAlt} color="blue.300" boxSize={4} />
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="wide" lineHeight="1">
+                    Your Location
+                  </Text>
+                </HStack>
+                <Box w="90%" textAlign="center" mt={2}>
+                  <Button
+                    size="sm"
+                    colorScheme="blue"
+                    onClick={() => setShowNearestPoints(!showNearestPoints)}
+                  >
+                    {showNearestPoints ? "Hide Nearest Points" : "Show Nearest Points"}
+                  </Button>
+                </Box>
+              </Box>
+            </Popup>
+          </LeafletMarker>
+        )}
+
+        {/* Existing markers */}
+        <LeafletMarker position={[3.1390, 101.6869]}>
+          <Popup className="custom-popup">
+            <Link to="/projects" state={{ openProjectId: 1 }}>
+              <Box 
+                bg="gray.800" 
+                color="white" 
+                p={2}
+                borderRadius="lg"
+                minW="220px"
+                borderWidth="1px"
+                borderColor="gray.700"
+                boxShadow="lg"
+                cursor="pointer"
+                _hover={{ bg: "gray.700" }}
+              >
+                <HStack spacing={2} align="center" mb={1} height={10}>
+                  <Icon as={FaTint} color="blue.300" boxSize={4} />
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="wide" lineHeight="1">
+                    Kuala Lumpur
+                  </Text>
+                </HStack>
+                <HStack spacing={1.5} align="center" mb={1} height={6}>
+                  <Icon as={FaRegCheckCircle} color="blue.300" boxSize={4} />
+                  <Text fontSize="md" color="gray.300" lineHeight="1.2">
+                    Clean Water Project
+                  </Text>
+                </HStack>
+                <Box mt={1}>
+                  <Text fontSize="sm" color="gray.400" mb={0.5} fontWeight="medium" lineHeight="1.2">
+                    Recommended Donations:
+                  </Text>
+                  <List spacing={0}>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Water Filters
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Water Storage Containers
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Water Testing Kits
+                    </ListItem>
+                  </List>
+                </Box>
+              </Box>
+            </Link>
+          </Popup>
+        </LeafletMarker>
+        <LeafletMarker position={[5.4164, 100.3298]}>
+          <Popup className="custom-popup">
+            <Link to="/projects" state={{ openProjectId: 2 }}>
+              <Box 
+                bg="gray.800" 
+                color="white" 
+                p={2}
+                borderRadius="lg"
+                minW="220px"
+                borderWidth="1px"
+                borderColor="gray.700"
+                boxShadow="lg"
+                cursor="pointer"
+                _hover={{ bg: "gray.700" }}
+              >
+                <HStack spacing={2} align="center" mb={1} height={10}>
+                  <Icon as={FaSchool} color="orange.300" boxSize={4} />
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="wide" lineHeight="1">
+                    Penang
+                  </Text>
+                </HStack>
+                <HStack spacing={1.5} align="center" mb={1} height={6}>
+                  <Icon as={FaRegCheckCircle} color="orange.300" boxSize={4} />
+                  <Text fontSize="md" color="gray.300" lineHeight="1.2">
+                    School Rebuilding
+                  </Text>
+                </HStack>
+                <Box mt={1}>
+                  <Text fontSize="sm" color="gray.400" mb={0.5} fontWeight="medium" lineHeight="1.2">
+                    Recommended Donations:
+                  </Text>
+                  <List spacing={0}>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      School Supplies
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Books
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Building Materials
+                    </ListItem>
+                  </List>
+                </Box>
+              </Box>
+            </Link>
+          </Popup>
+        </LeafletMarker>
+        <LeafletMarker position={[1.3521, 103.8198]}>
+          <Popup className="custom-popup">
+            <Link to="/projects" state={{ openProjectId: 3 }}>
+              <Box 
+                bg="gray.800" 
+                color="white" 
+                p={2}
+                borderRadius="lg"
+                minW="220px"
+                borderWidth="1px"
+                borderColor="gray.700"
+                boxShadow="lg"
+                cursor="pointer"
+                _hover={{ bg: "gray.700" }}
+              >
+                <HStack spacing={2} align="center" mb={1} height={10}>
+                  <Icon as={FaHamburger} color="yellow.300" boxSize={4} />
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="wide" lineHeight="1">
+                    Johor Bahru
+                  </Text>
+                </HStack>
+                <HStack spacing={1.5} align="center" mb={1} height={6}>
+                  <Icon as={FaRegCheckCircle} color="yellow.300" boxSize={4} />
+                  <Text fontSize="md" color="gray.300" lineHeight="1.2">
+                    Emergency Food Relief
+                  </Text>
+                </HStack>
+                <Box mt={1}>
+                  <Text fontSize="sm" color="gray.400" mb={0.5} fontWeight="medium" lineHeight="1.2">
+                    Recommended Donations:
+                  </Text>
+                  <List spacing={0}>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Non-perishable Food
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Cooking Utensils
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Food Storage Containers
+                    </ListItem>
+                  </List>
+                </Box>
+              </Box>
+            </Link>
+          </Popup>
+        </LeafletMarker>
+        <LeafletMarker position={[2.9936, 101.5739]}>
+          <Popup className="custom-popup">
+            <Link to="/projects" state={{ openProjectId: 4 }}>
+              <Box 
+                bg="gray.800" 
+                color="white" 
+                p={2}
+                borderRadius="lg"
+                minW="220px"
+                borderWidth="1px"
+                borderColor="gray.700"
+                boxShadow="lg"
+                cursor="pointer"
+                _hover={{ bg: "gray.700" }}
+              >
+                <HStack spacing={2} align="center" mb={1} height={10}>
+                  <Icon as={FaHome} color="red.300" boxSize={4} />
+                  <Text fontSize="lg" fontWeight="bold" letterSpacing="wide" lineHeight="1">
+                    Putra Heights
+                  </Text>
+                </HStack>
+                <HStack spacing={1.5} align="center" mb={1} height={6}>
+                  <Icon as={FaRegCheckCircle} color="red.300" boxSize={4} />
+                  <Text fontSize="md" color="gray.300" lineHeight="1.2">
+                    Housing Crisis
+                  </Text>
+                </HStack>
+                <Box mt={1}>
+                  <Text fontSize="sm" color="gray.400" mb={0.5} fontWeight="medium" lineHeight="1.2">
+                    Recommended Donations:
+                  </Text>
+                  <List spacing={0}>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Building Materials
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Home Essentials
+                    </ListItem>
+                    <ListItem fontSize="sm" color="gray.300" lineHeight="1.2">
+                      <ListIcon as={FaRegCheckCircle} color="green.400" />
+                      Emergency Shelter Kits
+                    </ListItem>
+                  </List>
+                </Box>
+              </Box>
+            </Link>
+          </Popup>
+        </LeafletMarker>
+      </MapContainer>
+
+      {/* Nearest Points Panel */}
+      {showNearestPoints && nearestPoints.length > 0 && (
+        <Box
+          position="absolute"
+          bottom={4}
+          right={4}
+          bg="gray.800"
+          color="white"
+          p={4}
+          borderRadius="lg"
+          boxShadow="lg"
+          maxW="300px"
+          zIndex={1000}
         >
-          <circle r={8} fill="#3182CE" />
-        </Marker>
-        <Marker 
-          coordinates={[35.2956, 31.9522]}
-          onMouseEnter={(e) => handleMarkerMouseEnter("Palestine: School Rebuilding", e)}
-          onMouseLeave={handleMarkerMouseLeave}
-        >
-          <circle r={8} fill="#3182CE" />
-        </Marker>
-        <Marker 
-          coordinates={[44.1917, 15.3694]}
-          onMouseEnter={(e) => handleMarkerMouseEnter("Yemen: Emergency Food Relief", e)}
-          onMouseLeave={handleMarkerMouseLeave}
-        >
-          <circle r={8} fill="#3182CE" />
-        </Marker>
-      </ComposableMap>
+          <CloseButton 
+            position="absolute" 
+            top="8px" 
+            right="8px" 
+            size="sm"
+            onClick={() => setShowNearestPoints(false)}
+            aria-label="Close nearest points panel"
+          />
+          <Heading size="sm" mb={2} mr={6}>Nearest Donation Points</Heading>
+          <VStack align="stretch" spacing={2}>
+            {nearestPoints.map((point, index) => (
+              <Box
+                key={index}
+                p={2}
+                borderRadius="md"
+                bg="gray.700"
+                _hover={{ bg: "gray.600" }}
+                cursor="pointer"
+                onClick={() => handlePointClick(point)}
+              >
+                <Text fontWeight="bold">{point.name}</Text>
+                <Text fontSize="sm" color="gray.300">{point.type}</Text>
+                <Text fontSize="xs" color="gray.400">
+                  Distance: {point.distance.toFixed(1)} km
+                </Text>
+              </Box>
+            ))}
+          </VStack>
+        </Box>
+      )}
       
       {showTooltip && (
-        <div 
-          className="absolute bg-gray.800 text-white px-3 py-2 rounded-md shadow-lg z-10"
+        <Box
+          position="absolute"
+          bg="gray.800"
+          color="white"
+          px={3}
+          py={2}
+          borderRadius="md"
+          boxShadow="lg"
+          zIndex={10}
           style={{ 
             left: `${tooltipPosition.x}px`, 
             top: `${tooltipPosition.y - 40}px`,
             transform: 'translateX(-50%)'
           }}
+          _before={{
+            content: '""',
+            position: 'absolute',
+            bottom: '0',
+            left: '50%',
+            width: '0',
+            height: '0',
+            border: '10px solid transparent',
+            borderTopColor: 'gray.800',
+            borderBottom: '0',
+            marginLeft: '-10px',
+            marginBottom: '-10px'
+          }}
         >
-          {tooltipContent}
-        </div>
+          <Text fontSize="sm" fontWeight="medium">
+            {tooltipContent}
+          </Text>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
+
+// Add custom CSS for Leaflet popup
+const style = document.createElement('style');
+style.textContent = `
+  .custom-popup .leaflet-popup-content-wrapper {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    width: 200px;
+  }
+  .custom-popup .leaflet-popup-content {
+    margin: 0;
+    width: 200px !important;
+  }
+  .custom-popup .leaflet-popup-tip-container {
+    display: none;
+  }
+  .custom-popup .leaflet-popup-close-button {
+    display: none;
+  }
+  .custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+`;
+document.head.appendChild(style);
+
+// Add custom CSS for user location marker
+const userLocationStyle = document.createElement('style');
+userLocationStyle.textContent = `
+  .user-location-marker {
+    z-index: 1000 !important;
+  }
+  .user-location-marker div {
+    z-index: 1000 !important;
+  }
+`;
+document.head.appendChild(userLocationStyle);
 
 const ImpactSection = () => {
   return (
@@ -279,7 +884,7 @@ const ImpactSection = () => {
           p={6}
           borderWidth="1px"
           borderColor="gray.700"
-          height={"900px"}
+          height={"700px"}
         >
           <Flex justify="space-between" align="center" mb={6}>
             <Box>
@@ -306,4 +911,4 @@ const ImpactSection = () => {
   );
 };
 
-export default ImpactSection; 
+export default ImpactSection;

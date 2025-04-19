@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VStack, HStack, Button, Box, Heading, Text, Grid, useDisclosure, Skeleton, SkeletonText } from '@chakra-ui/react';
+import { useLocation } from 'react-router-dom';
 import ProjectCard from '../components/projects/ProjectCard';
 import ProjectFilters from '../components/projects/ProjectFilters';
 import ProjectDetailsModal from '../components/projects/ProjectDetailsModal';
@@ -11,6 +12,7 @@ const ProjectsPage = () => {
   const [favorites, setFavorites] = useState([]);
   const [filters, setFilters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
   
   // Simulate loading delay
   useEffect(() => {
@@ -20,6 +22,24 @@ const ProjectsPage = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Effect to handle opening project modal from map link
+  useEffect(() => {
+    // Check if we navigated with state and loading is finished
+    if (!isLoading && location.state?.openProjectId) {
+      const projectIdToOpen = location.state.openProjectId;
+      const projectToOpen = projectsExploreData.find(p => p.id === projectIdToOpen);
+      
+      if (projectToOpen) {
+        handleProjectClick(projectToOpen);
+        // Optional: Clear the state after use to prevent re-opening on refresh/back
+        // Note: This might require more complex state management or history manipulation
+        // window.history.replaceState({}, document.title)
+      }
+    }
+    // Depend on isLoading and location.state to re-run if needed
+    // Be cautious with location.state as dependency if it causes loops
+  }, [isLoading, location.state]); 
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
