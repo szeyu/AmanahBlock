@@ -297,25 +297,6 @@ const MergedProjectsPage = () => {
               textAlign="center"
               position="relative"
               overflow="hidden"
-              transition="all 0.3s ease-in-out"
-              _hover={{
-                transform: "translateY(-8px)",
-                boxShadow: `0 20px 30px -10px ${stat.color}30`,
-                borderColor: `${stat.color}50`,
-                "& > .stat-icon": {
-                  opacity: "0.2",
-                  transform: "scale(1.2) rotate(10deg)",
-                },
-                "& > .content > .visible-icon": {
-                  transform: "rotateY(360deg)",
-                  color: stat.color,
-                },
-                "& > .content > .stat-value": {
-                  transform: "scale(1.05)",
-                  color: "white",
-                },
-                cursor: "pointer"
-              }}
             >
               {/* Background icon */}
               <Icon 
@@ -325,61 +306,21 @@ const MergedProjectsPage = () => {
                 top="-15px" 
                 right="-15px" 
                 opacity="0.1" 
-                boxSize="80px"
-                className="stat-icon"
-                transition="all 0.5s ease"
+                boxSize="80px" 
               />
               
-              {/* Decorative elements that appear on hover */}
-              <Box
-                position="absolute"
-                bottom="-50px"
-                left="-50px"
-                width="100px"
-                height="100px"
-                borderRadius="full"
-                bg={stat.color}
-                opacity="0"
-                filter="blur(30px)"
-                transition="opacity 0.5s ease"
-                _groupHover={{ opacity: "0.1" }}
-              />
-              
-              {/* Visible icon and content */}
-              <Flex 
-                direction="column" 
-                align="center" 
-                justify="center" 
-                position="relative" 
-                zIndex={1}
-                className="content"
-              >
-                <Icon 
-                  as={stat.icon} 
-                  color={stat.color} 
-                  boxSize={8} 
-                  mb={3}
-                  className="visible-icon"
-                  transition="all 0.6s ease"
-                />
+              {/* Visible icon */}
+              <Flex direction="column" align="center" justify="center" position="relative" zIndex={1}>
+                <Icon as={stat.icon} color={stat.color} boxSize={8} mb={3} />
                 <Text 
                   color="white" 
                   fontSize={{ base: "2xl", md: "3xl" }} 
                   fontWeight="bold"
                   mb={2}
-                  className="stat-value"
-                  transition="all 0.3s ease"
                 >
                   {stat.value}
                 </Text>
-                <Text 
-                  color="gray.400" 
-                  fontSize="sm"
-                  transition="color 0.3s ease"
-                  _groupHover={{ color: "gray.300" }}
-                >
-                  {stat.label}
-                </Text>
+                <Text color="gray.400" fontSize="sm">{stat.label}</Text>
               </Flex>
             </Box>
           ))}
