@@ -1,124 +1,142 @@
 # AmanahBlock - Blockchain-Based Charitable Donation Platform
 
-## Project Overview
+## 🌍 Project Overview
+AmanahBlock is a decentralized platform that combines blockchain technology, AI, and Shariah-compliant financial practices to transform the charitable giving ecosystem. Designed for transparency, inclusiveness, and impact, AmanahBlock addresses major inefficiencies and trust issues prevalent in traditional donation systems.
 
-AmanahBlock is a decentralized, blockchain-powered system designed to revolutionize charitable giving. It integrates smart contracts, Shariah-compliant financial practices, AI-driven insights, and user-friendly interfaces to address key challenges in the charitable sector.
-
-**Presentation Slides and Proposal**: [View our detailed presentation and proposal](https://drive.google.com/drive/folders/1bMI49ETarfeWw6OeBeJhcQGS7pFzEGnb?usp=sharing)
-
-## System Architecture
-
-The platform is organized into six interconnected layers:
-
-1. **Donation Layer**: Collects and routes donations based on donor preferences
-2. **Fund Management Layer**: Manages centralized and specific pools for targeted causes
-3. **Investment Layer**: Facilitates Shariah-compliant investments to grow untagged funds
-4. **Project Layer**: Allocates funds to milestone-based projects
-5. **Governance Layer**: Ensures Shariah compliance and regulatory adherence
-6. **Transparency Layer**: Tracks transactions and prioritizes fund allocation using AI and donor feedback
-
-## Key Features
-
-- **Multiple Donation Types**: Support for cash, waqf assets, and NFT-based food donations
-- **Shariah-Compliant Investments**: Growth of funds through musharakah and mudarabah structures
-- **Milestone-Based Project Funding**: Ensures accountability and verifiable impact
-- **Real-Time Transparency**: Blockchain-based audit trails and interactive dashboards
-- **AI-Driven Insights**: Recommends high-impact projects and optimal fund allocation
-- **Decentralized Governance**: DAO voting system for funding decisions
-- **P2P Currency Exchange**: Converts MYR to USDT without interest (Riba)
-
-## Addressing Core Challenges
-
-- **Lack of Transparency**: Tamper-proof ledger and real-time dashboards
-- **Inefficiencies and High Costs**: Automated processes and reduced intermediaries
-- **Fraud and Mismanagement**: Compliance monitoring and milestone-based disbursements
-- **Donor Disengagement**: Personalized impact reports and feedback mechanisms
-- **Regulatory Compliance**: Built-in governance and Shariah compliance
-
-## Technical Implementation
-
-- Built on scalable blockchain infrastructure (Ethereum/Binance Smart Chain)
-- Smart contracts developed in Solidity
-- Integration with P2P exchange platforms
-- Machine learning models for data analysis
-- Web dashboards for user interaction
-- Robust security measures including cryptographic encryption
-
-## Expected Outcomes
-
-- Enhanced trust through transparent operations
-- Improved efficiency with automated processes
-- Increased impact via strategic fund allocation
-- Stronger donor engagement through personalization
-- Global scalability across diverse regions
-- Full regulatory and Shariah compliance
-
-## Team
-
-Developed by Team Hokkien Mee is Red for the UMHackathon.
+📄 [View our detailed presentation and proposal](https://drive.google.com/drive/folders/1bMI49ETarfeWw6OeBeJhcQGS7pFzEGnb?usp=sharing)
 
 ---
 
-## Getting Started with Development
+## 🧠 System Architecture
+The platform is structured into six key layers:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+| Layer | Description |
+|-------|-------------|
+| **Donation Layer** | Collects and routes donations based on donor preferences |
+| **Fund Management Layer** | Manages centralized and cause-specific donation pools |
+| **Investment Layer** | Grows unallocated funds through Shariah-compliant investments |
+| **Project Layer** | Disburses funds to milestone-verified projects |
+| **Governance Layer** | Maintains compliance and enforces platform rules |
+| **Transparency Layer** | Tracks donations via blockchain and AI-driven feedback |
 
-### Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Key Features
+- **Multi-Modal Donations**: Crypto, online banking (FPX), e-wallets (TnG), physical goods (via Lalamove)
+- **Shariah-Compliant Investments**: Musharakah & Mudarabah-based fund growth
+- **Milestone-Driven Disbursement**: Ensures transparency and accountability
+- **AI + Blockchain Auditing**: Real-time status updates & traceability
+- **DAO Voting System**: Crowd-based emergency fund prioritization
+- **Smart Zakat Tools**: OCR-based zakat calculator & 8-asnaf fund pool
+- **Malaysia Impact Map**: Geolocation-based donation insights
 
-#### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🚀 Technical Stack
+| Component | Technology |
+|----------|------------|
+| **Frontend** | React + Metamask + Privy integration |
+| **Backend** | OpenAI & Gemini for AI proposal analysis |
+| **Storage** | BigChainDB + IPFS (NFT-backed receipts, QR codes) |
+| **Smart Contracts** | Solidity on Ethereum/Binance Smart Chain |
+| **Maps** | OpenStreetMap API for localized impact tracking |
+| **Investment** | HAQQ & Firoza Finance for halal liquidity pools |
 
-#### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.
+## 🛠️ Admin Dashboard - AI Proposal Review
+**Problem**: Manual review of proposals is slow and prone to Shariah non-compliance.  
+**Solution**: AI scans proposals for compliance and enables chat-based review for accuracy and speed.
 
-#### `npm run build`
+---
 
-Builds the app for production to the `build` folder.
+## 💸 Donation Journey - More Payment Options
+**Problem**: Traditional platforms lack inclusive payment options.  
+**Solution**: Accepts crypto, FPX, TnG, and physical goods. Includes map for drop-offs and delivery integration via Lalamove.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm run eject`
+## 🔗 Transparency - Real-Time Donation Flow
+**Problem**: Donors can't trace where funds go.  
+**Solution**: Blockchain-backed transaction history, live status blocks, NFTs, QR-coded receipts for traceability.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🏗️ Project Tracking & Partnerships
+**Problem**: Vague project updates reduce trust.  
+**Solution**: Milestone-verified funding, blockchain records, and corporate CSR integration for sustainable support.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🗳️ DAO Voting - Public Emergency Fund Decisions
+**Problem**: Emergency fund distribution lacks community input.  
+**Solution**: On-chain voting empowers donors and scholars to decide funding priorities.
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📋 Smart Zakat Calculator
+**Problem**: Manual Zakat calculations are slow and error-prone.  
+**Solution**: OCR scanning autofills fields for fast, accurate Zakat fulfillment.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🧭 Zakat Pool System & Malaysia Impact Map
+| Feature | Description |
+|---------|-------------|
+| **Zakat Pool** | Auto-distributes to 8 asnaf categories with donor tracking |
+| **Impact Map** | Tap location to view nearby verified projects and donate instantly |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 💰 Revenue Model
+AmanahBlock sustains itself ethically through:
+- Small administrative fees
+- Percentage from CSR donations
+- Self-proposed platform maintenance projects with full transparency
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 👨‍💻 Team Hokkien Mee is Red
+- Sim Sze Yu
+- Hew Jin Hong
+- John Ong Ming Hom
+- Lim Jack Sheng
+- Lee Ing Zheng
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🧪 Getting Started with Development
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Frontend Setup
+```bash
+npm install     # Install dependencies
+npm run start   # Start the locolhost app
+```
 
-### Deployment
+### AI Backend Setup
+```bash
+cd ai-backend                  # Navigate to the AI backend directory
+python3 -m venv venv           # Create a virtual environment
+source venv/bin/activate       # Activate the virtual environment (Linux/Mac)
+# or
+venv\Scripts\activate          # Activate the virtual environment (Windows)
+pip install -r requirements.txt # Install Python dependencies
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 📺 Demo Flow Summary
+1. **AI reviews proposals** → Admin reviews via AI chat.
+2. **Approved projects** appear in pending tab.
+3. **Donation**: Crypto, FPX, e-wallets, or physical goods.
+4. **Donation Flow**: Transaction blocks show fund routing and receipts (NFT & QR code).
+5. **Project Tracking**: Milestones, CSR partner features, and funding control.
+6. **DAO Voting**: Community decides emergency fund allocation.
+7. **Zakat Tools**: OCR calculator and verified asnaf allocations.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+> "AmanahBlock isn't just a donation platform — it's a movement of ethical giving, empowered by technology."
+
+---
+
