@@ -1,27 +1,28 @@
-import React from 'react';
-import { ChakraProvider, CSSReset } from '@chakra-ui/react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import theme from './styles/theme';
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
-import LandingPage from './pages/LandingPage';
-import Dashboard from './pages/Dashboard';
-import DonationPage from './pages/DonationPage';
-import AuditTrail from './pages/AuditTrail';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import ProfilePage from './pages/ProfilePage';
-import ProjectsPage from './pages/ProjectsPage';
-import LearnPage from './pages/LearnPage';
-import ZakatCalculatorPage from './pages/ZakatCalculatorPage';
-import GovernancePage from './pages/GovernancePage';
-import ImpactExplorerPage from './pages/ImpactExplorerPage';
-import IslamicDefiPage from './pages/IslamicDefiPage';
-import ProjectFundingPage from './pages/ProjectFundingPage';
-import EmergencyFundPage from './pages/EmergencyFundPage';
-import BeneficiaryFeedbackPage from './pages/BeneficiaryFeedbackPage';
-import ScrollToTop from './ScrollToTop';
-import { Web3Provider } from './context/Web3Context';
+import React from "react";
+import { ChakraProvider, CSSReset } from "@chakra-ui/react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import theme from "./styles/theme";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
+import DonationPage from "./pages/DonationPage";
+import AuditTrail from "./pages/AuditTrail";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import ProfilePage from "./pages/ProfilePage";
+import ProjectsPage from "./pages/ProjectsPage";
+import LearnPage from "./pages/LearnPage";
+import ZakatCalculatorPage from "./pages/ZakatCalculatorPage";
+import GovernancePage from "./pages/GovernancePage";
+import ImpactExplorerPage from "./pages/ImpactExplorerPage";
+import IslamicDefiPage from "./pages/IslamicDefiPage";
+import ProjectFundingPage from "./pages/ProjectFundingPage";
+import EmergencyFundPage from "./pages/EmergencyFundPage";
+import BeneficiaryFeedbackPage from "./pages/BeneficiaryFeedbackPage";
+import AdminPage from "./pages/AdminPage";
+import ScrollToTop from "./ScrollToTop";
+import { Web3Provider } from "./context/Web3Context";
 
 function App() {
   return (
@@ -46,7 +47,11 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/project-funding" element={<ProjectFundingPage />} />
             <Route path="/emergency-fund" element={<EmergencyFundPage />} />
-            <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
+            <Route
+              path="/beneficiary-feedback"
+              element={<BeneficiaryFeedbackPage />}
+            />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Footer />
         </Router>
