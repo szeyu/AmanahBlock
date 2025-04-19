@@ -11,25 +11,25 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { FaExternalLinkAlt, FaCertificate } from 'react-icons/fa';
+import { FaReceipt, FaCertificate } from 'react-icons/fa';
 
-const ImpactNFTs = ({ nftCollection, handleNftClick }) => {
+const ImpactNFTs = ({ nftCollection, handleNftClick, onOpenReceiptModal }) => {
   // Define rarity styles
   const rarityStyles = {
-    'Rare': {
+    'Platinum': {
       color: 'purple.500',
       bgGradient: 'linear(to-r, purple.500, pink.500)',
       glow: '0 0 15px rgba(159, 122, 234, 0.7)',
     },
-    'Uncommon': {
-      color: 'teal.500',
-      bgGradient: 'linear(to-r, teal.500, cyan.500)',
-      glow: '0 0 15px rgba(56, 178, 172, 0.7)',
+    'Gold': {
+      color: 'yellow.500',
+      bgGradient: 'linear(to-r, yellow.500, orange.500)',
+      glow: '0 0 15px rgba(236, 201, 75, 0.7)',
     },
-    'Common': {
-      color: 'gray.500',
-      bgGradient: 'linear(to-r, gray.500, gray.400)',
-      glow: '0 0 15px rgba(160, 174, 192, 0.7)',
+    'Bronze': {
+      color: 'orange.700',
+      bgGradient: 'linear(to-r, orange.700, orange.900)',
+      glow: '0 0 15px rgba(192, 86, 33, 0.7)',
     },
   };
 
@@ -84,10 +84,9 @@ const ImpactNFTs = ({ nftCollection, handleNftClick }) => {
           Impact NFTs
         </Heading>
         <Button 
-          as={Link} 
-          to="/nft-gallery" 
+          onClick={onOpenReceiptModal}
           size="sm" 
-          rightIcon={<FaExternalLinkAlt />} 
+          rightIcon={<FaReceipt />} 
           variant="outline" 
           colorScheme="purple"
           borderRadius="full"
@@ -98,13 +97,13 @@ const ImpactNFTs = ({ nftCollection, handleNftClick }) => {
           }}
           transition="all 0.3s ease"
         >
-          View All
+          View Receipt
         </Button>
       </Flex>
       
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={6} position="relative" zIndex="1">
         {nftCollection.map((nft) => {
-          const rarity = rarityStyles[nft.rarity] || rarityStyles.Common;
+          const rarity = rarityStyles[nft.rarity] || rarityStyles.Bronze;
           
           return (
             <Box 
@@ -166,6 +165,7 @@ const ImpactNFTs = ({ nftCollection, handleNftClick }) => {
           );
         })}
       </SimpleGrid>
+      
     </Box>
   );
 };
