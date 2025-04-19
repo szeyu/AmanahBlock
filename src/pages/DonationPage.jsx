@@ -12,13 +12,18 @@ import {
   useDisclosure,
   useToast,
   VStack,
+  Input,
+  Icon,
+  Flex,
+  Badge,
 } from '@chakra-ui/react';
 import { 
   FaSchool, 
   FaHandHoldingWater, 
   FaUtensils, 
   FaHandHoldingUsd, 
-  FaCoins
+  FaCoins,
+  FaRegFilePdf,
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import AIDonationAdvisor from '../components/donation/AIDonationAdvisor';
@@ -299,6 +304,132 @@ const DonationPage = () => {
     }
   };
 
+  // Add new state for PDF upload
+  const [uploadedPdf, setUploadedPdf] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Handle PDF upload
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0];
+    
+    if (!file) return;
+    
+    // Log file information
+    console.log('File object:', file);
+    console.log('File path:', file.path);
+    console.log('File name:', file.name);
+    console.log('File type:', file.type);
+    console.log('File size:', file.size);
+    
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PDF file",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Maximum file size is 5MB",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setUploadedPdf(file);
+  };
+
+  // Handle PDF processing
+  const handleProcessPdf = async () => {
+    if (!uploadedPdf) return;
+
+    setIsProcessing(true);
+    
+    try {
+      console.log('Processing PDF:', uploadedPdf);
+      
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append('file', uploadedPdf);
+      
+      console.log('Uploading file...');
+
+      // Call the new upload endpoint
+      const response = await fetch('http://localhost:8000/upload-pdf', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+
+      console.log('API Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to process PDF: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('API Response data:', data);
+      
+      // Update Zakat calculator with extracted metrics
+      if (data.zakat_metrics) {
+        console.log('Extracted Zakat metrics:', data.zakat_metrics);
+        
+        // Convert "NaN" strings to 0 for the calculator
+        const metrics = Object.fromEntries(
+          Object.entries(data.zakat_metrics).map(([key, value]) => 
+            [key, value === "NaN" ? 0 : parseFloat(value)]
+          )
+        );
+        
+        // Update the calculator
+        if (handleZakatCalculated) {
+          handleZakatCalculated(metrics);
+        }
+        
+        toast({
+          title: "Document processed successfully",
+          description: "Financial metrics have been extracted and applied to the calculator",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Document processed",
+          description: "No financial metrics were found in the document",
+          status: "info",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+
+    } catch (error) {
+      console.error('Error in handleProcessPdf:', error);
+      toast({
+        title: "Error processing document",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <Box 
       p={5} 
@@ -426,6 +557,91 @@ const DonationPage = () => {
             
             <TabPanel px={0}>
               <VStack spacing={8} align="stretch">
+                {/* Add PDF upload section before the calculator */}
+                <Box
+                  bg="rgba(26, 32, 44, 0.7)"
+                  backdropFilter="blur(10px)"
+                  borderRadius="lg"
+                  p={6}
+                  borderWidth="1px"
+                  borderColor="gray.700"
+                >
+                  <Heading size="md" color="white" mb={4}>Upload Zakat Document</Heading>
+                  <Text color="gray.300" mb={6}>
+                    Upload your Zakat-related documents (e.g., financial statements, asset records) for automatic processing.
+                  </Text>
+
+                  <Box
+                    border="2px dashed"
+                    borderColor="gray.600"
+                    borderRadius="md"
+                    p={4}
+                    bg="gray.800"
+                    mb={3}
+                  >
+                    <VStack spacing={2}>
+                      <Text color="gray.300" fontSize="sm" textAlign="center">
+                        Upload your PDF document (Max 5MB)
+                      </Text>
+                      <Button
+                        size="sm"
+                        colorScheme="brand"
+                        onClick={() => document.getElementById('pdf-upload').click()}
+                      >
+                        Select PDF
+                      </Button>
+                      <Input
+                        id="pdf-upload"
+                        type="file"
+                        accept=".pdf"
+                        onChange={handlePdfUpload}
+                        display="none"
+                      />
+                    </VStack>
+                  </Box>
+
+                  {/* Display uploaded PDF */}
+                  {uploadedPdf && (
+                    <Box mt={3}>
+                      <Flex
+                        bg="gray.700"
+                        p={2}
+                        borderRadius="md"
+                        justify="space-between"
+                        align="center"
+                      >
+                        <Flex align="center" gap={2}>
+                          <Icon as={FaRegFilePdf} color="red.400" />
+                          <Text color="white" fontSize="sm" noOfLines={1}>
+                            {uploadedPdf.name}
+                          </Text>
+                          <Badge colorScheme="gray" fontSize="xs">
+                            {(uploadedPdf.size / 1024).toFixed(0)} KB
+                          </Badge>
+                        </Flex>
+                        <Button
+                          size="xs"
+                          colorScheme="red"
+                          variant="ghost"
+                          onClick={() => setUploadedPdf(null)}
+                        >
+                          ✕
+                        </Button>
+                      </Flex>
+
+                      <Button
+                        mt={4}
+                        colorScheme="brand"
+                        isLoading={isProcessing}
+                        onClick={handleProcessPdf}
+                        width="full"
+                      >
+                        Process Document
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+
                 <ZakatCalculator onZakatCalculated={handleZakatCalculated} />
                 
                 {showDonationAmount ? (
