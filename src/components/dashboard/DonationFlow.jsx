@@ -134,7 +134,7 @@ const CustomNode = ({ data }) => {
             <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
               {data.icon}
             </Box>
-            <Text fontWeight="bold" fontSize="md">{data.label}</Text>
+            <Text fontWeight="bold" fontSize="md" color={data.style?.color || '#2C7A7B'}>{data.label}</Text>
           </HStack>
           
           {data.metrics && (
@@ -292,7 +292,7 @@ const TransactionNode = ({ data }) => {
           <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
             {data.icon}
           </Box>
-          <Text fontWeight="bold" fontSize="md">{data.label}</Text>
+          <Text fontWeight="bold" fontSize="md" color={data.style?.color || '#2C7A7B'}>{data.label}</Text>
         </HStack>
         
         {data.amount && (
@@ -374,6 +374,7 @@ const MilestoneNode = ({ data }) => {
             px={2}
             py={0.5}
             borderRadius="full"
+            color="white"
           >
             {data.milestone.status}
           </Badge>
@@ -502,10 +503,10 @@ const Flow = () => {
 
   // Sample projects
   const projects = [
-    { id: 'general', name: 'General View', type: 'All Projects' },
-    { id: 'schoolBuilding', name: 'School Building Project', type: 'Education' },
-    { id: 'waterProject', name: 'Clean Water Initiative', type: 'Infrastructure' },
-    { id: 'foodBank', name: 'Food Bank Program', type: 'Humanitarian' },
+    { id: 'general', name: 'General View', type: 'ALL PROJECTS' },
+    { id: 'schoolBuilding', name: 'School Building Project', type: 'EDUCATION' },
+    { id: 'waterProject', name: 'Clean Water Initiative', type: 'INFRASTRUCTURE' },
+    { id: 'foodBank', name: 'Food Bank Program', type: 'HUMANITARIAN' },
   ];
 
   // Initialize edges for general view
@@ -1555,7 +1556,15 @@ const Flow = () => {
                 : <FaHandHoldingUsd />)
               : <FaCubes />
             }
-            colorScheme={selectedProject && selectedProject.id !== 'general' ? 'teal' : 'blue'}
+            colorScheme={
+              selectedProject && selectedProject.id !== 'general' 
+                ? (selectedProject.id === 'schoolBuilding' 
+                  ? 'teal' 
+                  : selectedProject.id === 'waterProject' 
+                  ? 'cyan' 
+                  : 'orange')
+                : 'blue'
+            }
             size="md"
             borderRadius="lg"
             px={4}
@@ -1565,7 +1574,7 @@ const Flow = () => {
             }}
             transition="all 0.2s"
           >
-            {selectedProject ? selectedProject.name : 'Select Project'}
+            <Text color="white">{selectedProject ? selectedProject.name : 'Select Project'}</Text>
           </MenuButton>
           <MenuList>
             {projects.map((project) => (
@@ -1582,8 +1591,24 @@ const Flow = () => {
                 }
               >
                 <HStack justify="space-between" width="100%">
-                  <Text>{project.name}</Text>
-                  <Badge colorScheme={project.id === 'general' ? 'blue' : 'teal'}>
+                  <Text color="black">{project.name}</Text>
+                  <Badge 
+                    colorScheme={
+                      project.id === 'general' ? 'blue' : 
+                      project.id === 'schoolBuilding' ? 'teal' : 
+                      project.id === 'waterProject' ? 'cyan' : 
+                      'orange'
+                    }
+                    color="white"
+                    fontWeight="bold"
+                    bg={
+                      project.id === 'general' ? 'blue.500' : 
+                      project.id === 'schoolBuilding' ? 'teal.500' : 
+                      project.id === 'waterProject' ? 'cyan.500' : 
+                      'orange.500'
+                    }
+                    px={2}
+                  >
                     {project.type}
                   </Badge>
                 </HStack>
@@ -1605,7 +1630,7 @@ const Flow = () => {
           }}
           transition="all 0.2s"
         >
-          Zoom to Fit
+          <Text color="white">Zoom to Fit</Text>
         </Button>
       </Flex>
 
