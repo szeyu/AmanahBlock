@@ -30,7 +30,7 @@ import ReceiptModal from './ReceiptModal';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-const RecentTransactions = ({ transactions, handleTransactionClick }) => {
+const RecentTransactions = ({ transactions, handleTransactionClick, userDonate, setUserDonate }) => {
   // Define transaction type icons
   const typeIcons = {
     'waqf': FaHandHoldingUsd,
@@ -160,6 +160,10 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
     }, 500); // Give the modal time to render
   };
 
+  const filteredTransactions = userDonate
+  ? transactions 
+  : transactions.slice(0, transactions.length - 1);
+
   return (
     <Box 
       p={6} 
@@ -264,7 +268,7 @@ const RecentTransactions = ({ transactions, handleTransactionClick }) => {
               </Tr>
             </Thead>
             <Tbody>
-              {transactions.map((tx) => {
+              {filteredTransactions.map((tx) => {
                 const primaryType = getPrimaryType(tx.items);
                 const typeIcon = typeIcons[primaryType.toLowerCase()] || FaMoneyBillWave;
                 const totalAmount = calculateTotalAmount(tx.items);

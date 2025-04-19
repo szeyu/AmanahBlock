@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ChakraProvider, CSSReset } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import theme from './styles/theme';
@@ -38,7 +39,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard userDonate={userDonate}/>} />
             <Route path="/donate" element={<DonationPage setUserDonate={setUserDonate}/>} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/audit-trail" element={<AuditTrail />} />
@@ -55,7 +56,7 @@ function App() {
             <Route path="/donation-flow/:transactionId" element={<DonationFlowPage />} />
             <Route path="/admin" element={<AdminPage projectApproved = {projectApproved} setProjectApproved = {setProjectApproved} />} />
             <Route path="/projects-all" element={<MergedProjectsPage projectApproved = {projectApproved} />} />
-            <Route path="/nftreceipt" element={<NFTReceiptPage />} />
+            <Route path="/nftreceipt" element={<NFTReceiptPage userDonate={userDonate} setUserDonate={setUserDonate}/>} />
           </Routes>
           <Footer />
         </Router>
