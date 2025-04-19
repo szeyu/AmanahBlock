@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactFlow, { 
   Background,
   useNodesState,
@@ -43,6 +43,7 @@ import {
   FaMedapps,
   FaChevronDown,
   FaCubes,
+  FaSearchPlus,
 } from 'react-icons/fa';
 
 // Blockchain Block Component
@@ -109,70 +110,70 @@ const CustomNode = ({ data }) => {
   const [isHovered, setIsHovered] = useState(false);
   
   return (
-    <Box
-      p={4}
-      borderRadius="xl"
-      transform={isHovered ? 'translateY(-2px)' : 'none'}
-      transition="all 0.2s"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      bg={data.style?.background || '#E6FFFA'}
-      color={data.style?.color || '#2C7A7B'}
-      border={data.style?.border || '2px solid #319795'}
-      style={{
-        boxShadow: isHovered 
-          ? '0 8px 16px rgba(0,0,0,0.3)' 
-          : '0 4px 12px rgba(0,0,0,0.2)',
-        width: '300px',
-        borderRadius: '12px',
-      }}
-    >
-      <Handle type="target" position={Position.Left} />
-      <VStack spacing={3} align="stretch">
-        <HStack spacing={3}>
-          <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
-            {data.icon}
-          </Box>
-          <Text fontWeight="bold" fontSize="md">{data.label}</Text>
-        </HStack>
-        
-        {data.metrics && (
-          <Stat>
-            <StatLabel color={data.style?.color || '#2C7A7B'}>{data.metrics.label}</StatLabel>
-            <StatNumber fontSize="2xl">{data.metrics.value}</StatNumber>
-            {data.metrics.change && (
-              <StatHelpText>
-                <StatArrow 
-                  type={data.metrics.change > 0 ? 'increase' : 'decrease'} 
-                />
-                {Math.abs(data.metrics.change)}%
-              </StatHelpText>
-            )}
-          </Stat>
-        )}
+      <Box
+        p={4}
+        borderRadius="xl"
+        transform={isHovered ? 'translateY(-2px)' : 'none'}
+        transition="all 0.2s"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        bg={data.style?.background || '#E6FFFA'}
+        color={data.style?.color || '#2C7A7B'}
+        border={data.style?.border || '2px solid #319795'}
+        style={{
+          boxShadow: isHovered 
+            ? '0 8px 16px rgba(0,0,0,0.3)' 
+            : '0 4px 12px rgba(0,0,0,0.2)',
+          width: '300px',
+          borderRadius: '12px',
+        }}
+      >
+        <Handle type="target" position={Position.Left} />
+        <VStack spacing={3} align="stretch">
+          <HStack spacing={3}>
+            <Box fontSize="24px" color={data.style?.color || '#2C7A7B'}>
+              {data.icon}
+            </Box>
+            <Text fontWeight="bold" fontSize="md">{data.label}</Text>
+          </HStack>
+          
+          {data.metrics && (
+            <Stat>
+              <StatLabel color={data.style?.color || '#2C7A7B'}>{data.metrics.label}</StatLabel>
+              <StatNumber fontSize="2xl">{data.metrics.value}</StatNumber>
+              {data.metrics.change && (
+                <StatHelpText>
+                  <StatArrow 
+                    type={data.metrics.change > 0 ? 'increase' : 'decrease'} 
+                  />
+                  {Math.abs(data.metrics.change)}%
+                </StatHelpText>
+              )}
+            </Stat>
+          )}
 
-        {data.progress && (
-          <Box>
+          {data.progress && (
+            <Box>
             <Text fontSize="sm" mb={1} color={data.progress.colorScheme === 'blue' ? '#3182CE' : data.style?.color || '#2C7A7B'}>
               {data.progress.label}: {data.progress.value}%
             </Text>
-            <Progress 
-              value={data.progress.value} 
-              size="sm" 
-              colorScheme={data.progress.colorScheme || 'teal'}
-              borderRadius="full"
-              hasStripe={true}
-              isAnimated={true}
-            />
-          </Box>
-        )}
+              <Progress 
+                value={data.progress.value} 
+                size="sm" 
+                colorScheme={data.progress.colorScheme || 'teal'}
+                borderRadius="full"
+                hasStripe={true}
+                isAnimated={true}
+              />
+            </Box>
+          )}
 
-        {data.blocks && data.blocks.length > 0 && (
-          <Box>
-            <Text fontSize="sm" mb={1}>Latest Block:</Text>
-            <BlockchainBlock data={data.blocks[data.blocks.length - 1]} />
-          </Box>
-        )}
+          {data.blocks && data.blocks.length > 0 && (
+            <Box>
+              <Text fontSize="sm" mb={1}>Latest Block:</Text>
+              <BlockchainBlock data={data.blocks[data.blocks.length - 1]} />
+            </Box>
+          )}
         
         {data.address && (
           <Text fontSize="xs" color="gray.500">Address: {data.address}</Text>
@@ -181,9 +182,9 @@ const CustomNode = ({ data }) => {
         {data.description && (
           <Text fontSize="xs" color="gray.500" noOfLines={2}>{data.description}</Text>
         )}
-      </VStack>
-      <Handle type="source" position={Position.Right} />
-    </Box>
+        </VStack>
+        <Handle type="source" position={Position.Right} />
+      </Box>
   );
 };
 
@@ -281,7 +282,7 @@ const TransactionNode = ({ data }) => {
         boxShadow: isHovered 
           ? '0 8px 16px rgba(0,0,0,0.3)' 
           : '0 4px 12px rgba(0,0,0,0.2)',
-        width: '250px',
+        width: '220px',
         borderRadius: '12px',
       }}
     >
@@ -314,20 +315,20 @@ const MilestoneNode = ({ data }) => {
   
   // Get status-specific colors
   const getBgColor = (status) => {
-    if (status === "Completed") return "#E6FFFA";
-    if (status === "In Progress") return "#EBF8FF";
+    if (status === "COMPLETED") return "#E6FFFA";
+    if (status === "IN PROGRESS") return "#EBF8FF";
     return "#F7FAFC";
   };
   
   const getBorderColor = (status) => {
-    if (status === "Completed") return "#319795";
-    if (status === "In Progress") return "#3182CE";
+    if (status === "COMPLETED") return "#319795";
+    if (status === "IN PROGRESS") return "#3182CE";
     return "#A0AEC0";
   };
 
   // Set opacity based on status
   const getOpacity = (status) => {
-    if (status === "Pending") return 0.6;
+    if (status === "PENDING") return 0.6;
     return 1;
   };
   
@@ -353,7 +354,7 @@ const MilestoneNode = ({ data }) => {
         boxShadow: isHovered 
           ? '0 8px 16px rgba(0,0,0,0.3)' 
           : '0 4px 12px rgba(0,0,0,0.2)',
-        width: '250px',
+        width: '220px',
         borderRadius: '12px',
       }}
     >
@@ -365,8 +366,8 @@ const MilestoneNode = ({ data }) => {
           </Text>
           <Badge 
             colorScheme={
-              data.milestone.status === "Completed" ? "green" : 
-              data.milestone.status === "In Progress" ? "blue" : 
+              data.milestone.status === "COMPLETED" ? "green" : 
+              data.milestone.status === "IN PROGRESS" ? "blue" : 
               "gray"
             }
             fontSize="xs"
@@ -379,7 +380,7 @@ const MilestoneNode = ({ data }) => {
         </HStack>
         
         {/* Add progress bar for In Progress milestones */}
-        {data.milestone.status === "In Progress" && (
+        {data.milestone.status === "IN PROGRESS" && (
           <Box mt={1}>
             <Text fontSize="xs" mb={1} color="#3182CE">Completion: {getProgress()}%</Text>
             <Progress 
@@ -496,6 +497,8 @@ const Flow = () => {
     waterProject: [],
     foodBank: [],
   });
+  const prevSelectedProject = useRef(null);
+  const isInitialRender = useRef(true);
 
   // Sample projects
   const projects = [
@@ -599,6 +602,76 @@ const Flow = () => {
     },
   ];
 
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { fitView } = useReactFlow();
+
+  // Handle zoom to fit button click
+  const handleZoomToFit = () => {
+    // Different zoom settings for general view vs project-specific views
+    if (!selectedProject || selectedProject.id === 'general') {
+      // General view needs a wider view with less zoom
+      fitView({ 
+        duration: 800, 
+        padding: 0.3,
+        minZoom: 0.2,
+        maxZoom: 1.0,
+        includeHiddenNodes: true
+      });
+    } else {
+      // Project view can be zoomed in more to see details
+      fitView({ 
+        duration: 800, 
+        padding: 0.1,
+        minZoom: 0.5,
+        maxZoom: 2.0
+      });
+    }
+  };
+
+  // Update nodes and edges based on selected project
+  useEffect(() => {
+    if (selectedProject && selectedProject.id !== 'general') {
+      // For project-specific views, use transaction flow
+      const { nodes: projectNodes, edges: projectEdges } = generateProjectFlow(selectedProject);
+      setNodes(projectNodes);
+      setEdges(projectEdges);
+    } else {
+      // For general view, use the original nodes and edges
+      setNodes(getInitialNodes());
+      setEdges(initialEdges);
+    }
+    
+    // Only zoom on initial load or when changing view, not on data updates
+    if (isInitialRender.current || selectedProject !== prevSelectedProject.current) {
+      setTimeout(() => {
+        // Different zoom settings for general view vs project-specific views
+        if (!selectedProject || selectedProject.id === 'general') {
+          // General view needs a wider view with less zoom
+          fitView({ 
+            duration: 800, 
+            padding: 0.25,
+            minZoom: 0.35,
+            maxZoom: 1.5
+          });
+        } else {
+          // Project view can be zoomed in more to see details
+          fitView({ 
+            duration: 800, 
+            padding: 0.1,
+            minZoom: 0.5,
+            maxZoom: 2.0
+          });
+        }
+        // Mark initial render complete after first zoom
+        isInitialRender.current = false;
+      }, 50);
+    }
+    
+    // Store the current project selection for comparison in the next render
+    prevSelectedProject.current = selectedProject;
+  }, [selectedProject, blockchainData]);
+
   // Function to add a new block
   const addBlock = (projectId, blockData) => {
     setBlockchainData(prev => ({
@@ -611,6 +684,41 @@ const Flow = () => {
       }]
     }));
   };
+
+  // Simulate real-time updates
+  useEffect(() => {
+    if (!selectedProject || selectedProject.id === 'general') {
+    // Simulate proposal approval
+    setTimeout(() => {
+        addBlock('general', {
+        type: 'Project Approval',
+        amount: '50,000 USDT',
+        from: '0x742d...44e',
+        to: '0x123...456',
+      });
+    }, 2000);
+
+    // Simulate donation
+    setTimeout(() => {
+        addBlock('general', {
+        type: 'Donation Received',
+        amount: '1,000 USDT',
+        from: '0x912d...785',
+        to: '0x123...456',
+      });
+    }, 4000);
+
+    // Simulate milestone approval
+    setTimeout(() => {
+        addBlock('general', {
+        type: 'Milestone Release',
+        amount: '15,000 USDT',
+        from: '0x123...456',
+        to: '0x456...789',
+      });
+    }, 6000);
+    }
+  }, [selectedProject]);
 
   // Initialize nodes for general view with blockchain data
   const getInitialNodes = () => {
@@ -946,18 +1054,18 @@ const Flow = () => {
         return [
           { 
             title: 'Land Acquisition', 
-            status: 'Completed', 
+            status: 'COMPLETED', 
             amount: 'USDT 500' 
           },
           { 
             title: 'Foundation Work', 
-            status: 'In Progress', 
+            status: 'IN PROGRESS', 
             amount: 'USDT 350',
             progress: 65 // 65% complete
           },
           { 
             title: 'Building Construction', 
-            status: 'Pending', 
+            status: 'PENDING', 
             amount: 'USDT 600'
           }
         ];
@@ -965,18 +1073,18 @@ const Flow = () => {
         return [
           { 
             title: 'Site Survey', 
-            status: 'Completed', 
+            status: 'COMPLETED', 
             amount: 'USDT 200' 
           },
           { 
             title: 'Well Drilling', 
-            status: 'In Progress', 
+            status: 'IN PROGRESS', 
             amount: 'USDT 450',
             progress: 40 // 40% complete
           },
           { 
             title: 'Pump Installation', 
-            status: 'Pending', 
+            status: 'PENDING', 
             amount: 'USDT 300'
           }
         ];
@@ -984,18 +1092,18 @@ const Flow = () => {
         return [
           { 
             title: 'Initial Supplies', 
-            status: 'Completed', 
+            status: 'COMPLETED', 
             amount: 'USDT 300' 
           },
           { 
             title: 'Storage Facility', 
-            status: 'In Progress', 
+            status: 'IN PROGRESS', 
             amount: 'USDT 250',
             progress: 75 // 75% complete
           },
           { 
             title: 'Distribution Network', 
-            status: 'Pending', 
+            status: 'PENDING', 
             amount: 'USDT 200'
           }
         ];
@@ -1271,13 +1379,13 @@ const Flow = () => {
         id: 'edge-schoolBuildingPool-milestone1',
         source: 'schoolBuildingPool',
         target: 'milestone1',
-        animated: milestones[0].status !== 'Pending',
+        animated: milestones[0].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 1' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1287,13 +1395,13 @@ const Flow = () => {
         id: 'edge-milestone1-milestone2',
         source: 'milestone1',
         target: 'milestone2',
-        animated: milestones[1].status !== 'Pending',
+        animated: milestones[1].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 2' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1302,13 +1410,13 @@ const Flow = () => {
         id: 'edge-milestone2-milestone3',
         source: 'milestone2',
         target: 'milestone3',
-        animated: milestones[2].status !== 'Pending',
+        animated: milestones[2].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 3' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
         },
       });
     } else if (project?.id === 'foodBank') {
@@ -1329,13 +1437,13 @@ const Flow = () => {
         id: 'edge-foodBankPool-milestone1',
         source: 'healthcarePool',
         target: 'milestone1',
-        animated: milestones[0].status !== 'Pending',
+        animated: milestones[0].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 1' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1345,13 +1453,13 @@ const Flow = () => {
         id: 'edge-milestone1-milestone2',
         source: 'milestone1',
         target: 'milestone2',
-        animated: milestones[1].status !== 'Pending',
+        animated: milestones[1].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 2' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1360,13 +1468,13 @@ const Flow = () => {
         id: 'edge-milestone2-milestone3',
         source: 'milestone2',
         target: 'milestone3',
-        animated: milestones[2].status !== 'Pending',
+        animated: milestones[2].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 3' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
         },
       });
     } else if (project?.id === 'waterProject') {
@@ -1387,13 +1495,13 @@ const Flow = () => {
         id: 'edge-waterProject-milestone1',
         source: 'waterProject',
         target: 'milestone1',
-        animated: milestones[0].status !== 'Pending',
+        animated: milestones[0].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 1' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[0].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[0].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1403,13 +1511,13 @@ const Flow = () => {
         id: 'edge-milestone1-milestone2',
         source: 'milestone1',
         target: 'milestone2',
-        animated: milestones[1].status !== 'Pending',
+        animated: milestones[1].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 2' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[1].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[1].status === 'PENDING' ? 0.6 : 1
         },
       });
 
@@ -1418,13 +1526,13 @@ const Flow = () => {
         id: 'edge-milestone2-milestone3',
         source: 'milestone2',
         target: 'milestone3',
-        animated: milestones[2].status !== 'Pending',
+        animated: milestones[2].status !== 'PENDING',
         type: 'transaction',
         data: { label: 'Phase 3' },
         style: { 
           stroke: '#319795', 
           strokeWidth: 2,
-          opacity: milestones[2].status === 'Pending' ? 0.6 : 1
+          opacity: milestones[2].status === 'PENDING' ? 0.6 : 1
         },
       });
     }
@@ -1432,72 +1540,9 @@ const Flow = () => {
     return { nodes, edges };
   };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { fitView } = useReactFlow();
-
-  // Update nodes and edges based on selected project
-  useEffect(() => {
-    if (selectedProject && selectedProject.id !== 'general') {
-      // For project-specific views, use transaction flow
-      const { nodes: projectNodes, edges: projectEdges } = generateProjectFlow(selectedProject);
-      setNodes(projectNodes);
-      setEdges(projectEdges);
-    } else {
-      // For general view, use the original nodes and edges
-      setNodes(getInitialNodes());
-      setEdges(initialEdges);
-    }
-    
-    // Fit view after nodes are updated
-    setTimeout(() => {
-      fitView({ 
-        duration: 800, 
-        padding: 0.25, 
-        minZoom: 0.35, 
-        maxZoom: 1.5 
-      });
-    }, 50);
-  }, [selectedProject, blockchainData]);
-
-  // Simulate real-time updates
-  useEffect(() => {
-    if (!selectedProject || selectedProject.id === 'general') {
-      // Simulate proposal approval
-      setTimeout(() => {
-        addBlock('general', {
-          type: 'Project Approval',
-          amount: '50,000 USDT',
-          from: '0x742d...44e',
-          to: '0x123...456',
-        });
-      }, 2000);
-
-      // Simulate donation
-      setTimeout(() => {
-        addBlock('general', {
-          type: 'Donation Received',
-          amount: '1,000 USDT',
-          from: '0x912d...785',
-          to: '0x123...456',
-        });
-      }, 4000);
-
-      // Simulate milestone approval
-      setTimeout(() => {
-        addBlock('general', {
-          type: 'Milestone Release',
-          amount: '15,000 USDT',
-          from: '0x123...456',
-          to: '0x456...789',
-        });
-      }, 6000);
-    }
-  }, [selectedProject]);
-
   return (
     <Box>
-      <Flex mb={4}>
+      <Flex mb={4} justify="space-between" align="center">
         <Menu>
           <MenuButton 
             as={Button} 
@@ -1546,14 +1591,30 @@ const Flow = () => {
             ))}
           </MenuList>
         </Menu>
+        
+        {/* Zoom to fit button */}
+        <Button
+          onClick={handleZoomToFit}
+          colorScheme="teal"
+          size="md"
+          borderRadius="lg"
+          leftIcon={<FaSearchPlus />}
+          _hover={{
+            transform: "translateY(-2px)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+          }}
+          transition="all 0.2s"
+        >
+          Zoom to Fit
+        </Button>
       </Flex>
 
       <Box 
-        h="550px" 
+        h="650px" 
         w="100%" 
         bg="rgba(11, 197, 234, 0.05)" 
-        borderRadius="md"
-        boxShadow="0 4px 12px rgba(0,0,0,0.1)"
+        borderRadius="md" 
+        boxShadow="0 4px 12px rgba(0,0,0,0.1)" 
         overflow="hidden"
       >
         <ReactFlow
@@ -1561,15 +1622,16 @@ const Flow = () => {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          fitView
+          fitView={isInitialRender.current} // Only auto-fit on initial render
           fitViewOptions={{ 
             duration: 800, 
-            padding: 0.25,
-            minZoom: 0.35,
-            maxZoom: 1.5 
+            padding: !selectedProject || selectedProject.id === 'general' ? 0.25 : 0.1,
+            minZoom: !selectedProject || selectedProject.id === 'general' ? 0.35 : 0.5,
+            maxZoom: !selectedProject || selectedProject.id === 'general' ? 1.5 : 2.0
           }}
-          minZoom={0.2}
-          maxZoom={1.5}
+          minZoom={!selectedProject || selectedProject.id === 'general' ? 0.25 : 0.3}
+          maxZoom={!selectedProject || selectedProject.id === 'general' ? 1.5 : 2.0}
+          defaultZoom={!selectedProject || selectedProject.id === 'general' ? 0.3 : 0.8} // Lower default zoom for general view
           defaultEdgeOptions={{
             type: selectedProject?.id !== 'general' ? 'transaction' : 'custom',
             animated: true,
