@@ -216,17 +216,17 @@ const GlobalImpactMap = () => {
       
       // Create heatmap layer
       const heatmapLayer = L.heatLayer(heatmapDataPoints, {
-        radius: 20,
-        blur: 20,
+        radius: 40, // Increased radius
+        blur: 35,   // Increased blur
         maxZoom: 12,
-        max: 1.0,
+        max: 100,
         gradient: {
           0.0: 'blue',
           0.2: 'cyan',
           0.4: 'lime',
           0.5: 'yellow',
           0.7: 'orange',
-          0.9: 'red'
+          0.85: 'red'
         }
       });
       
@@ -241,8 +241,8 @@ const GlobalImpactMap = () => {
         
         // Only update if zoom level has actually changed
         if (currentZoom !== lastUpdatedZoomRef.current) {
-          const newRadius = Math.max(12, 20 - (currentZoom * 1.5));
-          const newBlur = Math.max(15, 20 - (currentZoom * 1.2));
+          const newRadius = Math.max(20, 40 - (currentZoom * 2.5)); // Adjusted dynamic radius
+          const newBlur = Math.max(25, 35 - (currentZoom * 2));   // Adjusted dynamic blur
           
           heatmapLayerRef.current.setOptions({
             radius: newRadius,
