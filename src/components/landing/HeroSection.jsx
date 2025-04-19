@@ -8,14 +8,14 @@ const HeroSection = () => {
     <Box 
       position="relative"
       overflow="hidden"
-      bg="#0A0F1E"
+      bg="transparent"
       py={20}
       minH="90vh"
       display="flex"
       alignItems="center"
     >
       {/* Animated gradient background */}
-      <Box 
+      {/* <Box 
         position="absolute"
         top={0}
         left={0}
@@ -25,10 +25,10 @@ const HeroSection = () => {
                      radial-gradient(circle at 80% 70%, rgba(11, 197, 234, 0.1) 0%, transparent 40%)"
         opacity={0.8}
         zIndex={0}
-      />
+      /> */}
       
       {/* Floating elements */}
-      <Box 
+      {/* <Box 
         position="absolute" 
         top="20%" 
         right="15%" 
@@ -52,9 +52,9 @@ const HeroSection = () => {
         opacity={0.15} 
         filter="blur(50px)"
         animation="float 10s infinite alternate-reverse ease-in-out"
-      />
+      /> */}
       
-      <Box 
+      {/* <Box 
         position="absolute" 
         top="60%" 
         right="25%" 
@@ -65,7 +65,7 @@ const HeroSection = () => {
         opacity={0.2} 
         filter="blur(30px)"
         animation="float 6s infinite alternate ease-in-out"
-      />
+      /> */}
       
       <Container maxW="container.xl" position="relative" zIndex={1}>
         <Flex direction={{ base: 'column', lg: 'row' }} align="center" justify="space-between">

@@ -130,52 +130,12 @@ const FeaturesSection = () => {
   return (
     <Box 
       py={20} 
-      bg="#0D101F" 
-      position="relative" 
-      overflow="hidden"
-      style={{ marginTop: "-2px" }}
+      bg="transparent"
+      position="relative"
+      zIndex={1}
+      overflow="visible"
     >
-      {/* Background elements */}
-      <Box 
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        bgGradient="radial-gradient(circle at 30% 70%, rgba(0, 224, 255, 0.08) 0%, transparent 50%), 
-                     radial-gradient(circle at 70% 30%, rgba(138, 124, 251, 0.08) 0%, transparent 50%)"
-        opacity={0.8}
-        zIndex={0}
-      />
-      
-      {/* Floating orbs */}
-      <Box 
-        position="absolute" 
-        top="20%" 
-        right="10%" 
-        w="120px" 
-        h="120px" 
-        borderRadius="full" 
-        bg="#00E0FF" 
-        opacity={0.1} 
-        filter="blur(40px)"
-        animation="float 12s infinite alternate ease-in-out"
-      />
-      
-      <Box 
-        position="absolute" 
-        bottom="10%" 
-        left="5%" 
-        w="150px" 
-        h="150px" 
-        borderRadius="full" 
-        bg="#8A7CFB" 
-        opacity={0.1} 
-        filter="blur(60px)"
-        animation="float 15s infinite alternate-reverse ease-in-out"
-      />
-      
-      <Container maxW="container.xl" position="relative" zIndex={1}>
+      <Container maxW="container.xl">
         <VStack spacing={4} mb={16} textAlign="center">
           <Heading 
             as="h2" 
