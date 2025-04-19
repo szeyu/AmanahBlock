@@ -97,11 +97,11 @@ const Dashboard = ({userDonate}) => {
     },
     { 
       id: 3, 
-      name: "Food Bank #013", 
+      name: "School Donation #013", 
       image: "/NFTCard/NFTCard3.svg",
-      type: "Food", 
+      type: "Education", 
       rarity: "Bronze",
-      issueDate: "2023-03-28"
+      issueDate: "2025-04-20"
     },
   ];
 
