@@ -236,53 +236,6 @@ const AdminPage = () => {
           </TabPanels>
         </Tabs>
       </Box>
-
-      {/* Info Box */}
-      <Box
-        p={6}
-        bg="rgba(13, 16, 31, 0.7)"
-        backdropFilter="blur(10px)"
-        borderRadius="lg"
-        borderWidth="1px"
-        borderColor="rgba(128, 90, 213, 0.2)"
-      >
-        <Flex align="center" mb={4}>
-          <Icon as={FaShieldAlt} color="accent.400" boxSize={6} mr={3} />
-          <Heading size="md" color="white">
-            Shariah Compliance Verification
-          </Heading>
-        </Flex>
-
-        <Text color="gray.300" mb={4}>
-          All charity proposals and milestone reports are subjected to rigorous
-          Shariah compliance checks using our specialized AI system. As an
-          admin, you should verify AI findings and ensure all projects maintain
-          complete adherence to Islamic principles.
-        </Text>
-
-        <HStack spacing={4}>
-          <Badge colorScheme="green" p={2} borderRadius="md">
-            <HStack>
-              <Icon as={FaRegCheckCircle} />
-              <Text>Transparent</Text>
-            </HStack>
-          </Badge>
-
-          <Badge colorScheme="purple" p={2} borderRadius="md">
-            <HStack>
-              <Icon as={FaShieldAlt} />
-              <Text>Shariah Compliant</Text>
-            </HStack>
-          </Badge>
-
-          <Badge colorScheme="blue" p={2} borderRadius="md">
-            <HStack>
-              <Icon as={FaEthereum} />
-              <Text>Blockchain Verified</Text>
-            </HStack>
-          </Badge>
-        </HStack>
-      </Box>
     </Box>
   );
 };
