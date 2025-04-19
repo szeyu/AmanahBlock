@@ -35,48 +35,6 @@ import AIChatbox from "./AIChatbox";
 const MotionBox = motion(Box);
 
 /**
- * ProposalActionButtons - Component for approval/rejection buttons
- *
- * @param {Function} onApprove - Handler for approval action
- * @param {Function} onReject - Handler for rejection action
- */
-const ProposalActionButtons = ({ onApprove, onReject }) => {
-  return (
-    <Box
-      p={4}
-      bg="rgba(26, 32, 44, 0.9)"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="gray.700"
-      width="100%"
-      mt={4}
-    >
-      <Flex gap={4}>
-        <Button
-          leftIcon={<FaRegCheckCircle />}
-          colorScheme="green"
-          flex="1"
-          onClick={onApprove}
-          size="lg"
-        >
-          Approve
-        </Button>
-        <Button
-          leftIcon={<FaRegTimesCircle />}
-          colorScheme="red"
-          variant="outline"
-          flex="1"
-          onClick={onReject}
-          size="lg"
-        >
-          Reject
-        </Button>
-      </Flex>
-    </Box>
-  );
-};
-
-/**
  * ProposalReviewSection - Enhanced component for reviewing charity proposals with AI assistance
  *
  * Features:
@@ -187,14 +145,14 @@ const ProposalReviewSection = ({ proposals }) => {
   }, [selectedProposal, showProposalDetails]);
 
   return (
-    <Box p={{ base: 2, md: 6 }}>
+    <Box p={{ base: 2, md: 6 }} height="100%">
       <Grid
         templateColumns={{
           base: "1fr",
           lg: isSidebarOpen ? "320px 1fr" : "1fr",
         }}
         gap={6}
-        height="calc(100vh - 180px)"
+        height="calc(100vh - 200px)"
       >
         {/* Collapsible Proposals List */}
         {isSidebarOpen && (
@@ -332,34 +290,57 @@ const ProposalReviewSection = ({ proposals }) => {
 
         {/* Main Content Area - Document Viewer and AI Chat */}
         <GridItem height="100%" overflow="hidden">
-          {/* Back Button (only shown when sidebar is collapsed and a proposal is selected) */}
+          {/* Back Button */}
           {!isSidebarOpen && selectedProposal && (
-            <Flex mb={4}>
-              <IconButton
-                icon={<FaChevronLeft />}
-                aria-label="Back to proposal list"
-                onClick={handleToggleSidebar}
-                variant="ghost"
-                color="brand.500"
-                _hover={{ bg: "rgba(11, 197, 234, 0.1)" }}
-                mr={2}
-              />
-              <Text color="white" fontWeight="medium" alignSelf="center">
-                Back to proposal list
-              </Text>
+            <Flex mb={4} width="100%" justify="space-between" align="center">
+              <Flex align="center">
+                <IconButton
+                  icon={<FaChevronLeft />}
+                  aria-label="Back to proposal list"
+                  onClick={handleToggleSidebar}
+                  variant="ghost"
+                  color="brand.500"
+                  _hover={{ bg: "rgba(11, 197, 234, 0.1)" }}
+                  mr={2}
+                />
+                <Text color="white" fontWeight="medium" alignSelf="center">
+                  Back to proposal list
+                </Text>
+              </Flex>
+              
+              {/* Move approval buttons here */}
+              <Flex gap={4} maxWidth="400px">
+                <Button
+                  leftIcon={<FaRegCheckCircle />}
+                  colorScheme="green"
+                  onClick={handleApprove}
+                  size="md"
+                >
+                  Approve
+                </Button>
+                <Button
+                  leftIcon={<FaRegTimesCircle />}
+                  colorScheme="red"
+                  variant="outline"
+                  onClick={handleReject}
+                  size="md"
+                >
+                  Reject
+                </Button>
+              </Flex>
             </Flex>
           )}
 
           {showProposalDetails && selectedProposal ? (
-            <VStack spacing={4} align="stretch" height="calc(100vh - 240px)">
+            <VStack spacing={4} align="stretch" height="100%" overflow="hidden">
               <Grid
                 templateColumns={{ base: "1fr", xl: "3fr 2fr" }}
                 gap={{ base: 6, xl: 8 }}
-                flex="1"
-                minHeight="0"
+                height="100%"
+                overflow="hidden"
               >
                 {/* PDF Viewer Section */}
-                <VStack spacing={4} align="stretch" height="100%">
+                <VStack spacing={4} align="stretch" height="100%" overflow="hidden">
                   <Box
                     bg="rgba(26, 32, 44, 0.7)"
                     backdropFilter="blur(10px)"
@@ -375,6 +356,7 @@ const ProposalReviewSection = ({ proposals }) => {
                     flexDirection="column"
                     overflow="hidden"
                     position="relative"
+                    minHeight="0"
                   >
                     {selectedProposal.flagged && (
                       <Badge
@@ -421,23 +403,23 @@ const ProposalReviewSection = ({ proposals }) => {
                       />
                     </Box>
                   </Box>
-
-                  {/* Separated Action Buttons Component */}
-                  <ProposalActionButtons
-                    onApprove={handleApprove}
-                    onReject={handleReject}
-                  />
                 </VStack>
 
                 {/* AI Analysis */}
-                <Box height="100%">
+                <Box 
+                  height="100%" 
+                  overflow="visible" 
+                  display="flex" 
+                  flexDirection="column"
+                  maxHeight="calc(100vh - 260px)"
+                  position="relative"
+                >
                   <AIChatbox
                     ref={chatboxRef}
                     title="AI Analysis"
                     isFlagged={selectedProposal.flagged}
                     flagReason={selectedProposal.flagReason}
                     chatHistory={selectedProposal.aiChat}
-                    pdfContent={selectedProposal.content}
                     height="100%"
                   />
                 </Box>
