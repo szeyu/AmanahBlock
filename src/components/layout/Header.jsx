@@ -214,15 +214,6 @@ const Header = () => {
               <MenuList bg="gray.800" borderColor="gray.700">
                 <MenuItem 
                   as={Link} 
-                  to="/zakat-calculator"
-                  icon={<FaCalculator />}
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  Zakat Calculator
-                </MenuItem>
-                <MenuItem 
-                  as={Link} 
                   to="/impact"
                   icon={<FaChartPie />}
                   bg="gray.800"
@@ -331,7 +322,6 @@ const Header = () => {
                 <Divider borderColor="gray.700" />
                 
                 <Text color="gray.400" fontSize="sm" fontWeight="bold" px={3}>More</Text>
-                <MobileNavLink to="/zakat-calculator" label="Zakat Calculator" icon={FaCalculator} onClick={onClose} />
                 <MobileNavLink to="/impact" label="Impact Explorer" icon={FaChartPie} onClick={onClose} />
                 <MobileNavLink to="/beneficiary-feedback" label="Beneficiary Feedback" icon={FaComments} onClick={onClose} />
                 <MobileNavLink to="/learn" label="Learn" icon={FaBookOpen} onClick={onClose} />

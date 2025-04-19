@@ -11,12 +11,14 @@ import {
   TabPanel,
   useDisclosure,
   useToast,
+  VStack,
 } from '@chakra-ui/react';
 import { 
   FaSchool, 
   FaHandHoldingWater, 
   FaUtensils, 
   FaHandHoldingUsd, 
+  FaCoins
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import AIDonationAdvisor from '../components/donation/AIDonationAdvisor';
@@ -25,6 +27,7 @@ import DonationAmountSection from '../components/donation/DonationAmountSection'
 import WaqfDonationForm from '../components/donation/WaqfDonationForm';
 import FoodDonationSection from '../components/donation/FoodDonationSection';
 import DonationModals from '../components/donation/DonationModals';
+import ZakatCalculator from '../components/ZakatCalculator';
 import { useWeb3 } from '../context/Web3Context';
 
 const DonationPage = () => {
@@ -34,6 +37,7 @@ const DonationPage = () => {
   const [currency, setCurrency] = useState('USDT');
   const [showAllocation, setShowAllocation] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [showDonationAmount, setShowDonationAmount] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isQRCodeOpen, onOpen: onQRCodeOpen, onClose: onQRCodeClose } = useDisclosure();
   const toast = useToast();
@@ -207,11 +211,10 @@ const DonationPage = () => {
 
   // Update this function to handle donation type changes
   const handleDonationTypeChange = (index) => {
-    // Set donation type based on tab index
     const types = ['sadaqah', 'zakat', 'waqf'];
     setDonationType(types[index]);
+    setShowDonationAmount(false);
     
-    // Reset donation mode to 'money' when switching to zakat or waqf
     if (types[index] === 'zakat' || types[index] === 'waqf') {
       setDonationMode('money');
       setSelectedFoodItems([]);
@@ -278,6 +281,21 @@ const DonationPage = () => {
     setPaymentMethod(method);
     if (method === 'ewallet') {
       onQRCodeOpen();
+    }
+  };
+
+  const [calculatedZakat, setCalculatedZakat] = useState(0);
+  // Add conversion rate state
+  const usdtToMyrRate = 4.72; // 1 USDT = 4.72 MYR
+
+  // Handler for Zakat calculation
+  const handleZakatCalculated = (amount) => {
+    setCalculatedZakat(amount);
+    // When zakat is calculated, update the donation amount with converted USDT value
+    if (donationType === 'zakat') {
+      // Convert MYR to USDT
+      const usdtAmount = amount / usdtToMyrRate;
+      setDonationAmount(usdtAmount);
     }
   };
 
@@ -365,30 +383,31 @@ const DonationPage = () => {
               
               {/* Sadaqah Donation Flow */}
               <Box>
-                {/* Pool Selection - Moved before Donation Amount */}
-                <DonationPoolSelector 
-                  poolStats={poolStats} 
-                  selectedPool={selectedPool} 
-                  setSelectedPool={setSelectedPool} 
-                  showAllocation={showAllocation} 
-                />
-
-                {/* AI Donation Advisor */}
                 <AIDonationAdvisor />
                 
-                {/* Donation Amount Section */}
-                <DonationAmountSection 
-                  donationMode={donationMode}
-                  setDonationMode={setDonationMode}
-                  donationAmount={donationAmount}
-                  setDonationAmount={setDonationAmount}
-                  paymentMethod={paymentMethod}
-                  handlePaymentMethodSelect={handlePaymentMethodSelect}
-                  onOpen={onOpen}
-                />
+                {showDonationAmount ? (
+                  <DonationAmountSection 
+                    donationMode={donationMode}
+                    setDonationMode={setDonationMode}
+                    donationAmount={donationAmount}
+                    setDonationAmount={setDonationAmount}
+                    paymentMethod={paymentMethod}
+                    handlePaymentMethodSelect={handlePaymentMethodSelect}
+                    onOpen={onOpen}
+                  />
+                ) : (
+                  <Button
+                    onClick={() => setShowDonationAmount(true)}
+                    colorScheme="brand"
+                    size="lg"
+                    leftIcon={<FaCoins />}
+                    mt={4}
+                  >
+                    Pay Now
+                  </Button>
+                )}
                 
-                {/* Food Donation Section */}
-                {donationMode === 'food' && (
+                {donationMode === 'food' && showDonationAmount && (
                   <FoodDonationSection 
                     foodItems={foodItems}
                     selectedFoodItems={selectedFoodItems}
@@ -406,86 +425,49 @@ const DonationPage = () => {
             </TabPanel>
             
             <TabPanel px={0}>
-              <Text color="gray.300" mb={4}>
-                Zakat is an obligatory form of charity in Islam, typically 2.5% of one's wealth above a minimum threshold (nisab), given annually.
-              </Text>
-              
-              {/* Add Zakat Calculator Button */}
-              <Button 
-                as={Link} 
-                to="/zakat-calculator" 
-                variant="outline" 
-                colorScheme="brand" 
-                mb={6}
-                borderRadius="xl"
-                borderWidth="1px"
-                borderColor="brand.500"
-                color="brand.400"
-                _hover={{
-                  bg: "rgba(11, 197, 234, 0.1)",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 4px 12px rgba(11, 197, 234, 0.2)"
-                }}
-                transition="all 0.3s ease"
-                position="relative"
-                overflow="hidden"
-                _after={{
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  background: "linear-gradient(90deg, transparent, rgba(11, 197, 234, 0.1), transparent)",
-                  zIndex: 0,
-                  transform: "translateX(-100%)",
-                  animation: "shimmer 2s infinite",
-                }}
-                sx={{
-                  "@keyframes shimmer": {
-                    "100%": {
-                      transform: "translateX(100%)",
-                    },
-                  },
-                }}
-              >
-                Calculate Your Zakat
-              </Button>
-              
-              {/* Zakat Donation Flow */}
-              <Box>
-                {/* Pool Selection */}
-                <DonationPoolSelector 
-                  poolStats={poolStats} 
-                  selectedPool={selectedPool} 
-                  setSelectedPool={setSelectedPool} 
-                  showAllocation={showAllocation} 
-                />
+              <VStack spacing={8} align="stretch">
+                <ZakatCalculator onZakatCalculated={handleZakatCalculated} />
                 
-                {/* AI Donation Advisor */}
-                <AIDonationAdvisor />
-                
-                {/* Donation Amount Section - Pass donationType to control UI */}
-                <DonationAmountSection 
-                  donationMode={donationMode}
-                  setDonationMode={setDonationMode}
-                  donationAmount={donationAmount}
-                  setDonationAmount={setDonationAmount}
-                  paymentMethod={paymentMethod}
-                  handlePaymentMethodSelect={handlePaymentMethodSelect}
-                  onOpen={onOpen}
-                  donationType={donationType}
-                />
-              </Box>
+                {showDonationAmount ? (
+                  <Box>
+                    <Heading size="md" color="white" mb={4}>Make Your Zakat Payment</Heading>
+                    <DonationAmountSection 
+                      donationMode="money"
+                      setDonationMode={setDonationMode}
+                      donationAmount={donationAmount}
+                      setDonationAmount={setDonationAmount}
+                      paymentMethod={paymentMethod}
+                      handlePaymentMethodSelect={handlePaymentMethodSelect}
+                      onOpen={onOpen}
+                      donationType={donationType}
+                    />
+                  </Box>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setShowDonationAmount(true);
+                      // Convert MYR to USDT when clicking the button
+                      const usdtAmount = calculatedZakat / usdtToMyrRate;
+                      setDonationAmount(usdtAmount);
+                    }}
+                    colorScheme="accent"
+                    size="lg"
+                    leftIcon={<FaCoins />}
+                    mt={4}
+                    isDisabled={calculatedZakat <= 0}
+                  >
+                    Pay Zakat Now (RM {calculatedZakat.toFixed(2)} ≈ ${(calculatedZakat / usdtToMyrRate).toFixed(2)} USDT)
+                  </Button>
+                )}
+              </VStack>
             </TabPanel>
             
-            {/* Waqf Panel - Modified to add donation amount section */}
+            {/* Waqf Panel */}
             <TabPanel px={0}>
               <Text color="gray.300" mb={4}>
                 Waqf is an endowment made by a Muslim to a religious, educational, or charitable cause. The donated assets are held and preserved for specific purposes indefinitely.
               </Text>
               
-              {/* Waqf Donation Form */}
               <WaqfDonationForm 
                 waqfForm={waqfForm}
                 handleWaqfFormChange={handleWaqfFormChange}
@@ -495,17 +477,29 @@ const DonationPage = () => {
                 handleRemoveFile={handleRemoveFile}
                 waqfRequests={waqfRequests}
               />
-              {/* Add Donation Amount Section for Waqf */}
-              <DonationAmountSection 
-                donationMode="money"
-                setDonationMode={() => {}} // No-op since we only allow money donations for Waqf
-                donationAmount={waqfDonationAmount}
-                setDonationAmount={setWaqfDonationAmount}
-                paymentMethod={waqfPaymentMethod}
-                handlePaymentMethodSelect={handleWaqfPaymentMethodSelect}
-                onOpen={onOpen}
-                donationType="waqf"
-              />
+              
+              {showDonationAmount ? (
+                <DonationAmountSection 
+                  donationMode="money"
+                  setDonationMode={() => {}}
+                  donationAmount={waqfDonationAmount}
+                  setDonationAmount={setWaqfDonationAmount}
+                  paymentMethod={waqfPaymentMethod}
+                  handlePaymentMethodSelect={handleWaqfPaymentMethodSelect}
+                  onOpen={onOpen}
+                  donationType="waqf"
+                />
+              ) : (
+                <Button
+                  onClick={() => setShowDonationAmount(true)}
+                  colorScheme="green"
+                  size="lg"
+                  leftIcon={<FaCoins />}
+                  mt={4}
+                >
+                  Make Waqf Payment
+                </Button>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>
