@@ -39,7 +39,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/donate" element={<DonationPage />} />
+            <Route path="/donate" element={<DonationPage setUserDonate={setUserDonate}/>} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/audit-trail" element={<AuditTrail />} />
             <Route path="/learn" element={<LearnPage />} />

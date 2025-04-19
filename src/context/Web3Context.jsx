@@ -46,13 +46,6 @@ export const Web3Provider = ({ children }) => {
       });
     } catch (error) {
       console.error("Donation error:", error);
-      toast({
-        title: "Donation failed",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
     } finally {
       setLoading(false);
     }
@@ -85,13 +78,6 @@ export const Web3Provider = ({ children }) => {
       });
     } catch (error) {
       console.error("Food donation error:", error);
-      toast({
-        title: "Food donation failed",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
     } finally {
       setLoading(false);
     }
