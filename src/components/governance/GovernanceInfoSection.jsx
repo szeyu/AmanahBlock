@@ -10,7 +10,9 @@ import {
   Flex,
   Icon,
   Avatar,
-  Badge
+  Badge,
+  SimpleGrid,
+  Container,
 } from '@chakra-ui/react';
 import { 
   FaFileAlt, 
@@ -22,13 +24,8 @@ import {
 import { Link } from 'react-router-dom';
 
 const GovernanceInfoSection = () => {
-  const scholars = [
-    { name: 'Dr. Ahmed Al-Haddad', role: 'Head Scholar', votes: '15.2%', image: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    { name: 'Dr. Yasmin Ibrahim', role: 'Finance Specialist', votes: '12.8%', image: 'https://randomuser.me/api/portraits/women/44.jpg' },
-  ];
-
   return (
-    <Grid templateColumns={{ base: "1fr", lg: "3fr 2fr" }} gap={8} mb={10}>
+    <SimpleGrid columns={1} spacing={8} width="100%" mb={10}>
       <Box 
         bg="rgba(26, 32, 44, 0.5)"
         backdropFilter="blur(10px)"
@@ -37,6 +34,7 @@ const GovernanceInfoSection = () => {
         borderWidth="1px"
         borderColor="rgba(255, 255, 255, 0.1)"
         boxShadow="0 4px 20px rgba(0, 0, 0, 0.15)"
+        width="100%"
       >
         <Heading 
           size="lg" 
@@ -52,7 +50,12 @@ const GovernanceInfoSection = () => {
           SadaqahChain governance is a hybrid system combining traditional Islamic scholarly oversight with modern decentralized governance mechanisms.
         </Text>
         
-        <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={8} mb={8}>
+        <SimpleGrid 
+          columns={{ base: 1, md: 3 }} 
+          spacing={8} 
+          mb={8}
+          width="100%"
+        >
           <GovernanceStep 
             icon={FaFileAlt} 
             iconBg="rgba(128, 90, 213, 0.2)" 
@@ -76,107 +79,33 @@ const GovernanceInfoSection = () => {
             title="3. Community Voting"
             description="Token holders vote on proposals, with voting power proportional to token holdings."
           />
-        </Grid>
+        </SimpleGrid>
         
-        <Button 
-          variant="outline" 
-          rightIcon={<FaRegLightbulb />}
-          as={Link}
-          to="/learn/governance"
-          size="lg"
-          borderColor="brand.400"
-          color="brand.400"
-          _hover={{
-            bg: "rgba(11, 197, 234, 0.1)",
-            transform: "translateY(-2px)"
-          }}
-        >
-          Learn More About Governance
-        </Button>
+        <Flex justify="center" width="100%">
+          <Button 
+            variant="outline" 
+            rightIcon={<FaRegLightbulb />}
+            as={Link}
+            to="/learn/governance"
+            size="lg"
+            borderColor="brand.400"
+            color="brand.400"
+            _hover={{
+              bg: "rgba(11, 197, 234, 0.1)",
+              transform: "translateY(-2px)"
+            }}
+          >
+            Learn More About Governance
+          </Button>
+        </Flex>
       </Box>
-      
-      <Box 
-        bg="rgba(26, 32, 44, 0.5)"
-        backdropFilter="blur(10px)"
-        borderRadius="xl"
-        p={8}
-        borderWidth="1px"
-        borderColor="rgba(255, 255, 255, 0.1)"
-        boxShadow="0 4px 20px rgba(0, 0, 0, 0.15)"
-      >
-        <Heading 
-          size="lg" 
-          color="white" 
-          mb={6}
-          pb={4}
-          borderBottom="1px solid"
-          borderColor="rgba(255, 255, 255, 0.1)"
-        >
-          Scholar Board
-        </Heading>
-        <Text color="gray.300" fontSize="lg" mb={6}>
-          Our governance is guided by a diverse board of Islamic scholars who ensure all activities remain Shariah-compliant.
-        </Text>
-        
-        <VStack spacing={6} align="stretch" mb={8}>
-          {scholars.map((scholar, index) => (
-            <Flex 
-              key={index} 
-              align="center" 
-              justify="space-between"
-              p={4}
-              borderRadius="lg"
-              bg="rgba(255, 255, 255, 0.05)"
-              _hover={{
-                bg: "rgba(255, 255, 255, 0.1)",
-                transform: "translateY(-2px)",
-                transition: "all 0.3s ease"
-              }}
-            >
-              <HStack spacing={4}>
-                <Avatar src={scholar.image} name={scholar.name} size="md" />
-                <Box>
-                  <Text color="white" fontWeight="medium" fontSize="lg">{scholar.name}</Text>
-                  <Text color="brand.300" fontSize="md">{scholar.role}</Text>
-                </Box>
-              </HStack>
-              <Badge 
-                colorScheme="purple" 
-                borderRadius="full" 
-                px={3}
-                py={1}
-                fontSize="md"
-              >
-                {scholar.votes} votes
-              </Badge>
-            </Flex>
-          ))}
-        </VStack>
-        
-        <Button 
-          variant="outline" 
-          w="full"
-          rightIcon={<FaGavel />}
-          as={Link}
-          to="/governance/scholars"
-          size="lg"
-          borderColor="accent.400"
-          color="accent.400"
-          _hover={{
-            bg: "rgba(128, 90, 213, 0.1)",
-            transform: "translateY(-2px)"
-          }}
-        >
-          View All Scholars
-        </Button>
-      </Box>
-    </Grid>
+    </SimpleGrid>
   );
 };
 
 const GovernanceStep = ({ icon, iconBg, iconColor, title, description }) => {
   return (
-    <VStack align="flex-start" spacing={4}>
+    <VStack align="flex-start" spacing={4} width="100%">
       <Flex 
         w="60px" 
         h="60px" 
