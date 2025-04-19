@@ -152,45 +152,11 @@ const Header = () => {
             />
             
             {/* Projects dropdown menu */}
-            <Menu>
-              <MenuButton
-                as={Button}
-                variant="ghost"
-                size="sm"
-                rightIcon={<ChevronDownIcon />}
-                color={isActive("/projects") || isActive("/project-funding") ? "white" : "gray.300"}
-                fontWeight={isActive("/projects") || isActive("/project-funding") ? "bold" : "normal"}
-                _hover={{
-                  bg: "rgba(255, 255, 255, 0.1)",
-                  color: "white"
-                }}
-                _active={{
-                  bg: "rgba(255, 255, 255, 0.1)"
-                }}
-              >
-                Projects
-              </MenuButton>
-              <MenuList bg="gray.800" borderColor="gray.700">
-                <MenuItem 
-                  as={Link} 
-                  to="/projects"
-                  icon={<FaSearch />}
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  Explore Projects
-                </MenuItem>
-                <MenuItem 
-                  as={Link} 
-                  to="/project-funding"
-                  icon={<FaRocket />}
-                  bg="gray.800"
-                  _hover={{ bg: "gray.700" }}
-                >
-                  Ongoing Projects
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <NavLink
+              to="/projects-all"
+              label="All Projects"
+              isActive={isActive("/projects-all")}
+            />
             
             {/* More dropdown menu */}
             <Menu>
@@ -312,8 +278,7 @@ const Header = () => {
                 <Divider borderColor="gray.700" />
                 
                 <Text color="gray.400" fontSize="sm" fontWeight="bold" px={3}>Projects</Text>
-                <MobileNavLink to="/projects" label="Explore Projects" icon={FaSearch} onClick={onClose} />
-                <MobileNavLink to="/project-funding" label="Ongoing Projects" icon={FaRocket} onClick={onClose} />
+                <MobileNavLink to="/projects-all" label="All Projects" icon={FaProjectDiagram} onClick={onClose} />
                 
                 <Divider borderColor="gray.700" />
                 

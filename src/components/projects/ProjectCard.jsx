@@ -14,10 +14,12 @@ import {
   Tooltip,
   useColorModeValue,
   chakra,
-  Divider
+  Divider,
+  Wrap,
+  WrapItem
 } from '@chakra-ui/react';
 import { motion, useAnimation } from 'framer-motion';
-import { FaRegHeart, FaHeart, FaMapMarkerAlt, FaUsers, FaRegClock, FaShieldAlt, FaEthereum } from 'react-icons/fa';
+import { FaRegHeart, FaHeart, FaMapMarkerAlt, FaUsers, FaRegClock, FaShieldAlt, FaEthereum, FaTag } from 'react-icons/fa';
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -46,7 +48,36 @@ const ProjectCard = ({ project, handleProjectClick, favorites, toggleFavorite })
     deadline = '0 days',
     donors = 0,
     verified = false,
+    donationType = 'sadaqah', // Default donation type
   } = project || {};
+
+  // Get donation type styling
+  const getDonationTypeStyle = (type) => {
+    switch(type.toLowerCase()) {
+      case "waqf": return { 
+        bg: "rgba(72, 187, 120, 0.2)", 
+        color: "#48BB78",
+        borderColor: "rgba(72, 187, 120, 0.3)" 
+      };
+      case "sadaqah": return { 
+        bg: "rgba(237, 137, 54, 0.2)", 
+        color: "#ED8936",
+        borderColor: "rgba(237, 137, 54, 0.3)" 
+      };
+      case "zakat": return { 
+        bg: "rgba(214, 188, 0, 0.2)", 
+        color: "#D6BC00",
+        borderColor: "rgba(214, 188, 0, 0.3)" 
+      };
+      default: return { 
+        bg: "rgba(138, 124, 251, 0.2)", 
+        color: "#8A7CFB",
+        borderColor: "rgba(138, 124, 251, 0.3)" 
+      };
+    }
+  };
+
+  const donationStyle = getDonationTypeStyle(donationType);
 
   useEffect(() => {
     if (isHovered) {
@@ -98,6 +129,29 @@ const ProjectCard = ({ project, handleProjectClick, favorites, toggleFavorite })
         transition: "opacity 0.3s ease"
       }}
     >
+      {/* DONATION TYPE RIBBON - Top left corner */}
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        bg={donationStyle.color}
+        color="white"
+        px={3}
+        py={1}
+        fontSize="sm"
+        fontWeight="bold"
+        zIndex={10}
+        clipPath="polygon(0 0, 100% 0, 85% 100%, 0% 100%)"
+        boxShadow="0 2px 5px rgba(0,0,0,0.2)"
+        letterSpacing="wide"
+        textTransform="uppercase"
+        display="flex"
+        alignItems="center"
+      >
+        <Icon as={FaTag} mr={1.5} boxSize={3} />
+        {donationType}
+      </Box>
+
       <Box position="relative" overflow="hidden">
         <Image 
           src={image} 
@@ -284,6 +338,10 @@ const ProjectCard = ({ project, handleProjectClick, favorites, toggleFavorite })
           borderColor="rgba(0, 224, 255, 0.3)"
           _hover={{
             bg: "rgba(0, 224, 255, 0.2)",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleProjectClick(project);
           }}
           opacity={isHovered ? 1 : 0}
           transition="opacity 0.3s ease"

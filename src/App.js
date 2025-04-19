@@ -21,6 +21,7 @@ import EmergencyFundPage from './pages/EmergencyFundPage';
 import BeneficiaryFeedbackPage from './pages/BeneficiaryFeedbackPage';
 import ScrollToTop from './ScrollToTop';
 import { Web3Provider } from './context/Web3Context';
+import MergedProjectsPage from './pages/MergedProjectsPage';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/project-funding" element={<ProjectFundingPage />} />
             <Route path="/emergency-fund" element={<EmergencyFundPage />} />
             <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
+            <Route path="/projects-all" element={<MergedProjectsPage />} />
           </Routes>
           <Footer />
         </Router>
