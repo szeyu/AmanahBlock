@@ -174,6 +174,29 @@ export const projectsExploreData = [
         { name: "Soraya Ahmadi", role: "Program Director", image: "https://randomuser.me/api/portraits/women/17.jpg" },
         { name: "Fatima Nazari", role: "Business Trainer", image: "https://randomuser.me/api/portraits/women/18.jpg" }
       ]
+    },
+    {
+      id: 8,
+      title: "Edu Ed Charity School Building Project",
+      category: "Education",
+      donationType: "sadaqah",
+      location: "Kota Bharu, Kelantan",
+      image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b",
+      description: "Build a new school facility for underprivileged children in rural Kelantan, providing access to quality education in a conducive learning environment.",
+      raised: 45000,
+      goal: 120000,
+      progress: 37.5,
+      deadline: "90 days left",
+      donors: 156,
+      verified: true,
+      shariah: "Fully Compliant",
+      tags: ["Education", "School Building", "Rural Development"],
+      impact: "Will provide education access to 300+ children annually in rural communities",
+      team: [
+        { name: "Ahmad Zulkifli", role: "Project Manager", image: "https://randomuser.me/api/portraits/men/20.jpg" },
+        { name: "Dr. Nurul Huda", role: "Education Consultant", image: "https://randomuser.me/api/portraits/women/22.jpg" },
+        { name: "Mohd Firdaus", role: "Construction Supervisor", image: "https://randomuser.me/api/portraits/men/23.jpg" }
+      ]
     }
   ];
   
