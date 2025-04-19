@@ -25,6 +25,7 @@ import AdminPage from "./pages/AdminPage";
 import ScrollToTop from './ScrollToTop';
 import { Web3Provider } from './context/Web3Context';
 import MergedProjectsPage from './pages/MergedProjectsPage';
+import NFTReceiptPage from './pages/NFTReceiptPage';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
             <Route path="/donation-flow/:transactionId" element={<DonationFlowPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/projects-all" element={<MergedProjectsPage />} />
+            <Route path="/nftreceipt" element={<NFTReceiptPage />} />
           </Routes>
           <Footer />
         </Router>

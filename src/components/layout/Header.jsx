@@ -230,6 +230,15 @@ const Header = () => {
                 >
                   Beneficiary Feedback
                 </MenuItem>
+                <MenuItem
+                  as={Link}
+                  to="/nftreceipt"
+                  icon={<FaComments />}
+                  bg="gray.800"
+                  _hover={{ bg: "gray.700" }}
+                >
+                  NFTs & Receipts
+                </MenuItem>
                 <MenuDivider borderColor="gray.700" />
                 <MenuItem
                   as={Link}
