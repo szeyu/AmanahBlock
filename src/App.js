@@ -51,6 +51,7 @@ function App() {
             <Route path="/beneficiary-feedback" element={<BeneficiaryFeedbackPage />} />
             <Route path="/donation-flow/:transactionId" element={<DonationFlowPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/projects-all" element={<MergedProjectsPage />} />
           </Routes>
           <Footer />
         </Router>

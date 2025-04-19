@@ -21,7 +21,7 @@ import {
   MenuItem
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown } from 'react-icons/fa';
+import { FaProjectDiagram, FaChartLine, FaRegLightbulb, FaSearch, FaRocket, FaFilter, FaAngleDown, FaCoins, FaLayerGroup } from 'react-icons/fa';
 
 // Project components
 import ProjectCardExplore from '../components/projects/ProjectCard';
@@ -98,23 +98,54 @@ const MergedProjectsPage = () => {
     onOpenFunding();
   };
   
+  // Update the stats calculation to be more dynamic
   // Stats for the header
+  const calculateStats = () => {
+    // Count total projects 
+    const totalProjects = projectsData.length + projectsExploreData.length;
+    
+    // Calculate total funds raised from both arrays
+    const totalFundsRaised = [...projectsData, ...projectsExploreData].reduce((sum, project) => {
+      // Handle different property names between data sets
+      const amount = project.raisedAmount || project.raised || 0;
+      return sum + amount;
+    }, 0);
+    
+    // Calculate success rate based on projects that have reached at least 70% of their goal
+    const successfulProjects = [...projectsData, ...projectsExploreData].filter(project => {
+      const progress = project.progress || 0;
+      return progress >= 70; // Consider projects with 70%+ progress as successful
+    });
+    
+    const successRate = totalProjects > 0 
+      ? Math.round((successfulProjects.length / totalProjects) * 100) 
+      : 0;
+    
+    return {
+      totalProjects,
+      totalFundsRaised,
+      successRate
+    };
+  };
+
+  const { totalProjects, totalFundsRaised, successRate } = calculateStats();
+
   const stats = [
     { 
       label: "Total Projects", 
-      value: projectsData.length + projectsExploreData.length,
+      value: totalProjects,
       icon: FaProjectDiagram,
       color: "#00E0FF"
     },
     { 
       label: "Funds Raised", 
-      value: `$${[...projectsData, ...projectsExploreData].reduce((sum, project) => sum + (project.raisedAmount || project.raised || 0), 0).toLocaleString()}`,
+      value: `$${totalFundsRaised.toLocaleString()}`,
       icon: FaChartLine,
       color: "#8A7CFB"
     },
     { 
       label: "Success Rate", 
-      value: "92%",
+      value: `${successRate}%`,
       icon: FaRegLightbulb,
       color: "#48BB78"
     }
@@ -223,111 +254,139 @@ const MergedProjectsPage = () => {
       pt={10}
       pb={20}
     >
-      {/* Decorative elements */}
-      <Box 
-        position="absolute" 
-        top="10%" 
-        right="5%" 
-        width="300px" 
-        height="300px" 
-        borderRadius="full" 
-        bg="#00E0FF" 
-        opacity="0.03" 
-        filter="blur(100px)" 
-        zIndex={0}
-      />
-      
-      <Box 
-        position="absolute" 
-        bottom="10%" 
-        left="5%" 
-        width="300px" 
-        height="300px" 
-        borderRadius="full" 
-        bg="#8A7CFB" 
-        opacity="0.03" 
-        filter="blur(100px)" 
-        zIndex={0}
-      />
-      
-      <Container maxW="container.xl" position="relative" zIndex={1}>
-        {/* Page Header */}
-        <Flex 
-          direction="column" 
-          align="center" 
-          textAlign="center" 
-          mb={12}
+      {/* Page Header */}
+      <Container maxW="container.xl" mb={10} textAlign="center">
+        <Icon 
+          as={FaProjectDiagram}
+          color="#00E0FF"
+          boxSize="50px"
+          mb={6}
+        />
+        <Heading
+          fontSize={{ base: "4xl", md: "5xl" }}
+          mb={4}
+          bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
+          bgClip="text"
+          fontWeight="bold"
         >
-          <MotionBox
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            mb={2}
-          >
-            <Icon as={FaProjectDiagram} color="#00E0FF" boxSize={12} mb={4} />
-          </MotionBox>
-          
-          <MotionHeading
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            size="xl"
-            mb={4}
-            bgGradient="linear(to-r, #00E0FF, #8A7CFB)"
-            bgClip="text"
-            fontWeight="bold"
-          >
-            AmanahBlock Projects
-          </MotionHeading>
-          
-          <MotionText
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            color="gray.400"
-            fontSize="lg"
-            maxW="container.md"
-            mb={8}
-          >
-            Explore and track Shariah-compliant projects from proposal to completion
-          </MotionText>
-          
-          {/* Stats */}
-          <MotionFlex
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            justify="center"
-            wrap="wrap"
-            gap={6}
-            mb={10}
-          >
-            {stats.map((stat, index) => (
+          Project Funding
+        </Heading>
+        <Text
+          fontSize={{ base: "lg", md: "xl" }}
+          color="gray.400"
+          maxW="container.md"
+          mx="auto"
+          mb={10}
+        >
+          Track the progress of funded projects with milestone-based verification on the blockchain
+        </Text>
+      </Container>
+
+      {/* Stats Cards */}
+      <Container maxW="container.xl" mb={10}>
+        <Grid templateColumns={{ base: "1fr", md: "repeat(3, 1fr)" }} gap={6}>
+          {stats.map((stat, index) => (
+            <Box
+              key={index}
+              bg="rgba(13, 16, 31, 0.7)"
+              backdropFilter="blur(10px)"
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor="rgba(255, 255, 255, 0.05)"
+              p={6}
+              textAlign="center"
+              position="relative"
+              overflow="hidden"
+              transition="all 0.3s ease-in-out"
+              _hover={{
+                transform: "translateY(-8px)",
+                boxShadow: `0 20px 30px -10px ${stat.color}30`,
+                borderColor: `${stat.color}50`,
+                "& > .stat-icon": {
+                  opacity: "0.2",
+                  transform: "scale(1.2) rotate(10deg)",
+                },
+                "& > .content > .visible-icon": {
+                  transform: "rotateY(360deg)",
+                  color: stat.color,
+                },
+                "& > .content > .stat-value": {
+                  transform: "scale(1.05)",
+                  color: "white",
+                },
+                cursor: "pointer"
+              }}
+            >
+              {/* Background icon */}
+              <Icon 
+                as={stat.icon} 
+                color={stat.color} 
+                position="absolute" 
+                top="-15px" 
+                right="-15px" 
+                opacity="0.1" 
+                boxSize="80px"
+                className="stat-icon"
+                transition="all 0.5s ease"
+              />
+              
+              {/* Decorative elements that appear on hover */}
               <Box
-                key={index}
-                bg="rgba(13, 16, 31, 0.7)"
-                backdropFilter="blur(10px)"
-                borderRadius="xl"
-                borderWidth="1px"
-                borderColor="rgba(255, 255, 255, 0.05)"
-                p={5}
-                minW={{ base: "100%", md: "200px" }}
-                textAlign="center"
-                transition="all 0.3s"
-                _hover={{
-                  transform: "translateY(-5px)",
-                  boxShadow: "0 10px 30px -10px rgba(0, 224, 255, 0.3)",
-                  borderColor: "rgba(0, 224, 255, 0.3)"
-                }}
+                position="absolute"
+                bottom="-50px"
+                left="-50px"
+                width="100px"
+                height="100px"
+                borderRadius="full"
+                bg={stat.color}
+                opacity="0"
+                filter="blur(30px)"
+                transition="opacity 0.5s ease"
+                _groupHover={{ opacity: "0.1" }}
+              />
+              
+              {/* Visible icon and content */}
+              <Flex 
+                direction="column" 
+                align="center" 
+                justify="center" 
+                position="relative" 
+                zIndex={1}
+                className="content"
               >
-                <Icon as={stat.icon} color={stat.color} boxSize={8} mb={3} />
-                <Text color="white" fontSize="2xl" fontWeight="bold">{stat.value}</Text>
-                <Text color="gray.400" fontSize="sm">{stat.label}</Text>
-              </Box>
-            ))}
-          </MotionFlex>
-        </Flex>
-        
+                <Icon 
+                  as={stat.icon} 
+                  color={stat.color} 
+                  boxSize={8} 
+                  mb={3}
+                  className="visible-icon"
+                  transition="all 0.6s ease"
+                />
+                <Text 
+                  color="white" 
+                  fontSize={{ base: "2xl", md: "3xl" }} 
+                  fontWeight="bold"
+                  mb={2}
+                  className="stat-value"
+                  transition="all 0.3s ease"
+                >
+                  {stat.value}
+                </Text>
+                <Text 
+                  color="gray.400" 
+                  fontSize="sm"
+                  transition="color 0.3s ease"
+                  _groupHover={{ color: "gray.300" }}
+                >
+                  {stat.label}
+                </Text>
+              </Flex>
+            </Box>
+          ))}
+        </Grid>
+      </Container>
+      
+      <Container maxW="container.xl">
         {/* Toggle Buttons for Pending/Ongoing */}
         <Flex justify="space-between" mb={6}>
           <Button
@@ -465,6 +524,7 @@ const MergedProjectsPage = () => {
               _active={{
                 bg: "rgba(13, 16, 31, 0.9)",
               }}
+              leftIcon={<Icon as={FaCoins} />}
             >
               {donationTypeFilter || "Donation Type"}
             </MenuButton>
@@ -654,4 +714,4 @@ const MergedProjectsPage = () => {
   );
 };
 
-export default MergedProjectsPage; 
+export default MergedProjectsPage;

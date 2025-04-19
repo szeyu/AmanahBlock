@@ -380,4 +380,4 @@ const ProjectCard = ({ project, openMilestoneDetails }) => {
   );
 };
 
-export default ProjectCard; 
+export default ProjectCard;
